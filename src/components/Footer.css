@@ -1,0 +1,111 @@
+.footer{
+    width:100%;
+    background:linear-gradient(
+        135deg,
+        #6fd6cb 0%,
+        #42a89c 35%,
+        #1f7b70 70%,
+        #0f4d45 100%
+    );
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:35px 70px;
+    color:#fff;
+    margin-top:60px;
+    flex-wrap:wrap;
+    gap:40px;
+}
+
+/* Logo */
+
+.footer-logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.footer-logo h2{
+    color:#fff;
+    font-size:28px;
+}
+
+/* Contact Info */
+
+.info{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.info-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#fff;
+    font-size:16px;
+}
+
+.info-item svg{
+    width:22px;
+    height:22px;
+    color:#fff;
+}
+
+/* Subscribe */
+
+.subscribe{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.subscribe h3{
+    color:#fff;
+    font-size:24px;
+}
+
+.subscribe-box{
+    display:flex;
+    overflow:hidden;
+    border-radius:40px;
+    background:#fff;
+}
+
+.subscribe input{
+    width:250px;
+    padding:14px 18px;
+    border:none;
+    outline:none;
+    color:#333;
+    background:#fff;
+}
+
+.subscribe button{
+    padding:0 24px;
+    background:#1D5F54;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.subscribe button:hover{
+    background:#14483f;
+}
+.logo{
+    border-radius: 20px;
+     align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 150px;
+}

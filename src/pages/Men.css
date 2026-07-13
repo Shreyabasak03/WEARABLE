@@ -1,0 +1,253 @@
+.image-card{
+    margin-bottom: 30px;
+}
+.image{
+  
+    padding-bottom: 30px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.cards-container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:30px;
+    margin-top:40px;
+    padding:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.1);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 35px rgba(0,0,0,.15);
+}
+
+.img-box{
+    position:relative;
+    height:320px;
+}
+
+.img-box img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.heart{
+    position:absolute;
+    top:18px;
+    right:18px;
+    color:#ff4d6d;
+    background:#fff;
+    padding:8px;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    cursor:pointer;
+}
+
+.card-body{
+    padding:20px;
+}
+
+.product-name{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.product-name span{
+    color:#ff4d6d;
+    font-size:22px;
+    font-weight:700;
+}
+
+.card-body p{
+    color:#666;
+    margin-bottom:20px;
+}
+
+.card-body button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#2AAE9B;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.card-body button:hover{
+    background:#177C70;
+}
+
+/* ==========================
+   Category Slider
+========================== */
+
+.category-slider{
+    width:100%;
+    overflow:hidden;
+    background:linear-gradient(
+        135deg,
+        #2AAE9B 0%,
+        #177C70 60%,
+        #0F4D45 100%
+    );
+    padding:18px 0;
+    position:relative;
+  box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Optional fade effect on both sides */
+.category-slider::before,
+.category-slider::after{
+    content:"";
+    position:absolute;
+    top:0;
+    width:80px;
+    height:100%;
+    z-index:2;
+    pointer-events:none;
+}
+
+.category-slider::before{
+    left:0;
+    background:linear-gradient(to right,#2AAE9B,transparent);
+}
+
+.category-slider::after{
+    right:0;
+    background:linear-gradient(to left,#0F4D45,transparent);
+}
+
+/* ==========================
+   Moving Track
+========================== */
+
+.slide-track{
+    display:flex;
+    align-items:center;
+    width:max-content;
+    gap:70px;
+
+    animation:scroll 25s linear infinite;
+}
+
+/* Pause animation on hover */
+.category-slider:hover .slide-track{
+    animation-play-state:paused;
+}
+
+/* ==========================
+   Category Items
+========================== */
+
+.slide-track span{
+    color:#fff;
+    font-size:22px;
+    font-weight:600;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.35s ease;
+    position:relative;
+    letter-spacing:.5px;
+}
+
+/* Underline Animation */
+
+.slide-track span::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-6px;
+
+    width:0;
+    height:2px;
+
+    background:#fff;
+    transition:.3s ease;
+
+    transform:translateX(-50%);
+}
+
+.slide-track span:hover{
+    transform:translateY(-3px);
+    color:#FFEAA7;
+}
+
+.slide-track span:hover::after{
+    width:100%;
+}
+
+/* ==========================
+   Infinite Scroll
+========================== */
+
+@keyframes scroll{
+
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-50%);
+    }
+
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media(max-width:992px){
+
+    .slide-track{
+        gap:45px;
+    }
+
+    .slide-track span{
+        font-size:18px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .category-slider{
+        padding:14px 0;
+    }
+
+    .slide-track{
+        gap:30px;
+    }
+
+    .slide-track span{
+        font-size:16px;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .slide-track{
+        gap:20px;
+    }
+
+    .slide-track span{
+        font-size:14px;
+    }
+
+}

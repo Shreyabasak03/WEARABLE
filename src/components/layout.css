@@ -1,0 +1,9 @@
+.main{
+    display:flex;
+    min-height:calc(100vh - 70px); /* Navbar height */
+}
+
+.page{
+    min-height: calc(100vh - 70px - 80px); /* Navbar + Footer */
+    width: 100%;
+}
