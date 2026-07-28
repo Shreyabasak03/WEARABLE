@@ -116,26 +116,36 @@ export const Navbar = ({ location, setLocation }) => {
   };
 
   const handleSaveLocation = () => {
+
   if (!manualLocation.trim()) {
     alert("Please enter a location");
     return;
   }
 
   const newLocation = {
-    county: manualLocation,
+    county: manualLocation.trim(),
     state: "",
     manual: true,
   };
 
-  console.log("Saving location:", newLocation);
+  console.log(
+    "Saving location:",
+    newLocation
+  );
 
+  // Update React state
   setLocation(newLocation);
+
+  // Save permanently in browser
+  localStorage.setItem(
+    "userLocation",
+    JSON.stringify(newLocation)
+  );
 
   setManualLocation("");
   setShowLocationForm(false);
   setOpenDropdown(false);
 };
-
   return (
     <nav className="navbar">
 

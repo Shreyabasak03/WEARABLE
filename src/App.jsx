@@ -87,39 +87,55 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 
 function App() {
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(() => {
+  const savedLocation = localStorage.getItem("userLocation");
+
+  return savedLocation
+    ? JSON.parse(savedLocation)
+    : null;
+});
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+  if (!navigator.geolocation) {
+    console.log("Geolocation is not supported");
+    return;
+  }
 
-        console.log("Coordinates:", latitude, longitude);
+navigator.geolocation.getCurrentPosition(
+  async (position) => {
+    const { latitude, longitude } = position.coords;
 
-        try {
-          const response = await axios.get(
-            "https://nominatim.openstreetmap.org/reverse",
-            {
-              params: {
-                lat: latitude,
-                lon: longitude,
-                format: "json",
-              },
-            }
-          );
+    console.log("Coordinates:", latitude, longitude);
 
-          console.log("API address:", response.data.address);
-
-          setLocation(response.data.address);
-        } catch (error) {
-          console.error("Nominatim error:", error);
+    try {
+      const response = await axios.get(
+        "https://nominatim.openstreetmap.org/reverse",
+        {
+          params: {
+            lat: latitude,
+            lon: longitude,
+            format: "json",
+          },
         }
-      },
-      (error) => {
-        console.error("Browser location error:", error);
-      }
-    );
-  }, []);
+      );
+
+      console.log("API address:", response.data.address);
+
+      setLocation(response.data.address);
+    } catch (error) {
+      console.error("Nominatim error:", error);
+    }
+  },
+  (error) => {
+    console.log("Location error:", error.message);
+  },
+  {
+    enableHighAccuracy: false,
+    timeout: 30000,
+    maximumAge: 300000,
+  }
+);
+}, []);
 
   return (
     <Routes>
