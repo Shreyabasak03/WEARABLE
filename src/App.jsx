@@ -7,7 +7,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Men from "./pages/Men";
 import Women from "./pages/Women";
-import Children from "./pages/Children";
+import Kids from "./pages/Kids";
 import Cart from "./pages/Cart";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -150,8 +150,8 @@ function App() {
         />
 
         <Route
-          path="/children"
-          element={<Children />}
+          path="/kids"
+          element={<Kids />}
         />
 
         <Route

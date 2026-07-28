@@ -1,58 +1,50 @@
-import { Heart, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
+import React from "react";
+import { Heart } from "lucide-react";
 import "./ProductCard.css";
 
-export default function ProductCard({ product }) {
-  const { addToCart } = useContext(CartContext);
-
+export default function ProductCard({
+  product,
+  onViewDetails,
+}) {
   return (
     <div className="product-card">
-      {/* Product Image */}
-      <div className="product-image">
-        <img src={product.image} alt={product.title} />
 
-        <button className="wishlist-btn">
+      <div className="product-img-box">
+
+        <img
+          src={product.image}
+          alt={product.name}
+        />
+
+        <button className="heart-btn">
           <Heart size={20} />
         </button>
+
       </div>
 
-      {/* Product Details */}
-      <div className="product-content">
-        <p className="category">{product.category}</p>
+      <div className="product-card-body">
 
-        <h3 className="title">
-          {product.title.length > 45
-            ? product.title.substring(0, 45) + "..."
-            : product.title}
-        </h3>
+        <div className="product-name">
+          <h3>{product.name}</h3>
 
-        <div className="rating">
-          ⭐ {product.rating.rate}
-          <span> ({product.rating.count} Reviews)</span>
+          <span>
+            ${product.price}
+          </span>
         </div>
 
-        <div className="price">
-          <h2>${product.price}</h2>
-        </div>
+        <p className="product-brand">
+          {product.brand}
+        </p>
 
-        <div className="buttons">
-          <Link to={`/product/${product.id}`}>
-            <button className="details-btn">
-              View Details
-            </button>
-          </Link>
+        <button
+          className="details-btn"
+          onClick={() => onViewDetails(product)}
+        >
+          View More Details
+        </button>
 
-          <button
-            className="cart-btn"
-            onClick={() => addToCart(product)}
-          >
-            <ShoppingCart size={18} />
-            Add to Cart
-          </button>
-        </div>
       </div>
+
     </div>
   );
 }
