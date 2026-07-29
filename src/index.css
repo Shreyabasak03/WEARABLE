@@ -1,62 +1,119 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+/* ==========================================
+   1. RESET & BOX-SIZING
+   ========================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-:root{
-  --primary-bg:#E8F7F3;
-  --primary-color:#2AAE9B;
-  --secondary-color:#1D5F54;
-  --text-color:#2C3E50;
-  --white:#fff;
+:root {
+  --primary-bg: #E8F7F3;
+  --primary-color: #2AAE9B;
+  --secondary-color: #1D5F54;
+  --text-color: #2C3E50;
+  --white: #fff;
 }
 
-html{
-  scroll-behavior:smooth;
+/* ==========================================
+   2. VIEWPORT & FULL-WIDTH ENFORCEMENT
+   ========================================== */
+html {
+  scroll-behavior: smooth;
+  width: 100%;
 }
 
-html,
-body,
-#root{
-  width:100%;
-  min-height:100vh;
+/* 
+  CRITICAL FIX: 
+  1. Use width: 100% (NOT 100vw) to prevent scrollbar scaling bugs.
+  2. Put overflow-x ONLY on body so position:sticky works on child elements!
+*/
+body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-color);
+  overflow-x: hidden; /* ONLY BODY HAS OVERFLOW-X */
+  position: relative;
 }
 
-body{
-  font-family:'Poppins',sans-serif;
-  background:var(--primary-bg);
-  color:var(--text-color);
-  overflow-x:hidden;
+/* 
+  DO NOT add overflow or overflow-x to #root, .page, or main!
+  That will break position: sticky and stop the scroll animation.
+*/
+#root,
+.page,
+.page-wrapper,
+main {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-a{
-  text-decoration:none;
-  color:inherit;
+/* Navbar & Footer full-width containment */
+.navbar,
+.footer {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.navbar *, 
+.footer * {
+  max-width: 100%;
+}
+
+/* Clerk UI Portals containment */
+#clerk-components,
+[data-floating-ui-portal] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ==========================================
+   3. TYPOGRAPHY & MEDIA DEFAULTS
+   ========================================== */
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 button,
 input,
 textarea,
-select{
-  font:inherit;
+select {
+  font: inherit;
 }
 
-button{
-  cursor:pointer;
-  border:none;
-  outline:none;
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
 }
 
-img{
-  display:block;
-  max-width:100%;
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 ul,
-ol{
-  list-style:none;
+ol {
+  list-style: none;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  overflow-wrap: break-word;
+}
