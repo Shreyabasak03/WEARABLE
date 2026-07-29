@@ -24,14 +24,15 @@
 }
 
 
-/* LOGO */
+/* =========================
+   LOGO + LOCATION
+========================= */
 
 .logo1 {
   display: flex;
   align-items: center;
   gap: 20px;
 }
-
 
 .image1 {
   width: 140px;
@@ -42,8 +43,43 @@
   border-radius: 20px;
 }
 
+.loc {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 
-/* NAVIGATION */
+  color: white;
+
+  cursor: pointer;
+}
+
+.location-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.location-text p {
+  margin: 0;
+
+  color: white;
+
+  font-size: 13px;
+}
+
+.location-text p:first-child {
+  font-weight: 600;
+}
+
+.location-text p:last-child {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
 
 .product {
   display: flex;
@@ -52,8 +88,12 @@
 }
 
 .product a {
-  text-decoration: none;
+  display: flex;
+  align-items: center;
+
   color: white;
+
+  text-decoration: none;
 
   font-size: 18px;
   font-weight: 500;
@@ -65,155 +105,68 @@
   color: #dddbce;
 }
 
-
-/* LOCATION */
-
-.location-wrapper {
-  position: relative;
+.product a.active {
+  color: #ebe8dc;
 }
 
 
-.loc {
+/* =========================
+   CART
+========================= */
+
+.cart-link {
+  position: relative;
+
   display: flex;
   align-items: center;
-  gap: 7px;
 
-  cursor: pointer;
-
-  color: white;
+  gap: 8px;
 }
 
-
-.location-text {
-  min-width: 100px;
-}
-
-
-.location-text p {
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 18px;
-
-  white-space: nowrap;
-}
-
-
-.arrow {
-  transition: transform 0.3s ease;
-}
-
-
-.arrow.rotate {
-  transform: rotate(180deg);
-}
-
-
-/* DROPDOWN */
-
-.location-dropdown {
+.cart-count {
   position: absolute;
 
-  top: 50px;
-  left: 0;
+  top: -12px;
+  right: -14px;
 
-  width: 320px;
-
-  padding: 20px;
-
-  background: white;
-
-  color: #2c3e50;
-
-  border-radius: 15px;
-
-  box-shadow:
-    0 10px 30px
-    rgba(0, 0, 0, 0.18);
-
-  z-index: 2000;
-}
-
-
-/* DROPDOWN HEADER */
-
-.dropdown-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: #1d5f54;
-
-  font-size: 18px;
-  font-weight: 600;
-
-  margin-bottom: 12px;
-}
-
-
-.dropdown-current {
-  color: #777;
-
-  font-size: 13px;
-
-  margin-bottom: 12px;
-}
-
-
-/* CURRENT LOCATION */
-
-.current-location {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 12px;
-
-  padding: 12px;
-
-  border-radius: 10px;
-
-  background: #e8f7f3;
-
-  margin-bottom: 15px;
-}
-
-
-.current-location strong {
-  display: block;
-
-  color: #1d5f54;
-
-  font-size: 15px;
-}
-
-
-.current-location span {
-  display: block;
-
-  color: #777;
-
-  font-size: 13px;
-
-  margin-top: 3px;
-}
-
-
-/* BUTTONS */
-
-.current-location-btn,
-.change-location-btn,
-.save-location-btn {
-  width: 100%;
+  width: 22px;
+  height: 22px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  gap: 8px;
+  border-radius: 50%;
 
-  padding: 11px;
+  background: #ff4d4d;
+  color: white;
 
-  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   CLERK AUTH
+========================= */
+
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Sign In button */
+
+.signIn {
+  padding: 9px 18px;
+
+  border: none;
+  border-radius: 20px;
+
+  background: #1d5f54;
+  color: white;
 
   font-size: 14px;
   font-weight: 500;
@@ -223,189 +176,52 @@
   transition: 0.3s ease;
 }
 
+.signIn:hover {
+  background: #14483f;
 
-/* CURRENT LOCATION BUTTON */
-
-.current-location-btn {
-  background: #e8f7f3;
-
-  color: #1d5f54;
-
-  margin-bottom: 10px;
-}
-
-.current-location-btn:hover {
-  background: #d4f1eb;
-}
-
-
-/* CHANGE LOCATION */
-
-.change-location-btn {
-  background: #2aae9b;
-
-  color: white;
-}
-
-.change-location-btn:hover {
-  background: #1d5f54;
-}
-
-
-/* FORM */
-
-.location-form {
-  width: 100%;
-}
-
-
-.form-header {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  margin-bottom: 18px;
-}
-
-
-.form-header h3 {
-  margin: 0;
-
-  color: #1d5f54;
-
-  font-size: 18px;
-}
-
-
-.close-btn {
-  width: 30px;
-  height: 30px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #e8f7f3;
-
-  color: #1d5f54;
-
-  cursor: pointer;
-}
-
-
-.close-btn:hover {
-  background: #d4f1eb;
-}
-
-
-/* LABEL */
-
-.location-form label {
-  display: block;
-
-  color: #555;
-
-  font-size: 13px;
-
-  margin-bottom: 7px;
-}
-
-
-/* INPUT */
-
-.location-input {
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-  padding: 10px 12px;
-
-  border: 1px solid #d8e5e2;
-
-  border-radius: 8px;
-
-  margin-bottom: 15px;
-
-  color: #2aae9b;
-}
-
-
-.location-input:focus-within {
-  border-color: #2aae9b;
-}
-
-
-.location-input input {
-  width: 100%;
-
-  border: none;
-  outline: none;
-
-  color: #2c3e50;
-
-  background: transparent;
-
-  font-size: 14px;
-}
-
-
-.location-input input::placeholder {
-  color: #aaa;
-}
-
-
-/* SAVE */
-
-.save-location-btn {
-  background: linear-gradient(
-    135deg,
-    #2aae9b,
-    #177c70
-  );
-
-  color: white;
-}
-
-.save-location-btn:hover {
   transform: translateY(-1px);
-
-  box-shadow:
-    0 5px 15px
-    rgba(42, 174, 155, 0.3);
 }
 
 
-/* MOBILE */
+/* Clerk user avatar */
 
-@media (max-width: 768px) {
+.cl-userButtonBox {
+  width: 40px;
+  height: 40px;
+}
+
+.cl-avatarBox {
+  width: 40px;
+  height: 40px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
 
   .navbar {
     padding: 0 20px;
   }
 
   .product {
-    gap: 12px;
+    gap: 15px;
   }
 
   .product a {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .image1 {
-    width: 100px;
-    height: 55px;
+    width: 110px;
+    height: 60px;
   }
 
-  .location-dropdown {
-    left: -20px;
-    width: 290px;
+  .loc {
+    display: none;
   }
-
 }
 
 
@@ -413,25 +229,33 @@
 
   .navbar {
     height: auto;
-    min-height: 75px;
-
-    padding: 10px 15px;
-  }
-
-  .logo1 {
-    gap: 10px;
-  }
-
-  .location-text p {
-    font-size: 11px;
+    min-height: 70px;
+    padding: 8px 15px;
   }
 
   .product {
-    gap: 8px;
+    gap: 10px;
   }
 
   .product a {
-    font-size: 12px;
+    font-size: 13px;
   }
 
+  .product a:not(.cart-link) {
+    display: none;
+  }
+
+  .cart-link span {
+    display: none;
+  }
+
+  .image1 {
+    width: 90px;
+    height: 50px;
+  }
+
+  .signIn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
 }

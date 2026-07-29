@@ -98,6 +98,58 @@ export default function ScrollSequence() {
   const clipPercentage = 100 - wipeProgress * 100;
 
   return (
+    <div>
+       <div className='home'>
+
+      <div className="left">
+  <span className="tag">NEW COLLECTION</span>
+
+  <h1 className="heading">
+    Where Style <br />
+    Meets Elegance
+  </h1>
+
+  <p className="para">
+    Find your perfect outfit with our latest fashion arrivals.
+    Premium quality with modern designs for every occasion.
+  </p>
+
+  <button className="shop-btn">
+    Shop Now →
+  </button>
+</div>
+      <div className="right">
+        <div class="big">
+          <div class="right-tab">
+            Elevate
+Your Style
+          </div>
+          <img className='img'
+      src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      alt="Fashion"
+    />
+    <div class="left-tab">
+      Start Shopping
+    </div>
+        </div>
+         
+    <div className="small">
+      <img className='small-img'
+      src="https://images.unsplash.com/photo-1684244160171-97f5dac39204?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      alt="Fashion"
+    />
+    <img className='small-img'
+    src="https://plus.unsplash.com/premium_photo-1675186049419-d48f4b28fe7c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      alt="Fashion"
+    />
+    <img className='small-img'
+      src="https://images.unsplash.com/photo-1507680434567-5739c80be1ac?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      alt="Fashion"
+    />
+    </div>
+     
+      </div>
+    </div>
     <div className="scroll-container" ref={containerRef}>
       <div className="sticky-viewport">
         
@@ -147,6 +199,7 @@ export default function ScrollSequence() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

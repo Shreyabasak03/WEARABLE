@@ -1,4 +1,4 @@
-/* .home{
+.home{
     width:100%;
     min-height:100%;
     display:flex;
@@ -161,7 +161,7 @@
 } */ 
 /* .big{
     position: relative;
-} */
+}
 
 
 /* Container layout controls the duration of the scroll */

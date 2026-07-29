@@ -11,6 +11,7 @@ import Kids from "./pages/Kids";
 import Cart from "./pages/Cart";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Checkout from "./pages/Checkout";
 
 function App() {
 
@@ -168,6 +169,10 @@ function App() {
           path="/contact"
           element={<Contact />}
         />
+        <Route
+    path="/checkout"
+    element={<Checkout />}
+  />
 
       </Route>
 
