@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { X, Shirt, User, Baby, Home, ShoppingCart, Info, Phone } from "lucide-react";
-import "./Sidebar.css";
+import "./sidebar.css";
 
 export default function Sidebar({ isOpen, onClose }) {
   return (
