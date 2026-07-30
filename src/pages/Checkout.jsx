@@ -7,7 +7,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import { useCart } from "../context/cartContext";
+import { useCart } from "../context/cartContext.jsx";
 import "./Checkout.css";
 
 export default function Checkout() {
