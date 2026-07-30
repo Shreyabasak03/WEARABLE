@@ -176,7 +176,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/cartContext.jsx";
 import "./Cart.css";
 
 export default function Cart() {
