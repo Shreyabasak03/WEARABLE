@@ -2,16 +2,16 @@ import { Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import Layout from "./components/Layout";
+import Layout from "./components/Layout.jsx";
 
-import Home from "./pages/Home";
-import Men from "./pages/Men";
-import Women from "./pages/Women";
-import Kids from "./pages/Kids";
-import Cart from "./pages/Cart";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Checkout from "./pages/Checkout";
+import Home from "./pages/Home.jsx";
+import Men from "./pages/Men.jsx";
+import Women from "./pages/Women.jsx";
+import Kids from "./pages/Kids.jsx";
+import Cart from "./pages/Cart.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Checkout from "./pages/Checkout.jsx";
 
 function App() {
 
