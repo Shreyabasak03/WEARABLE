@@ -1,163 +1,182 @@
-// import React from "react";
-// import {
-//   MapPin,
-//   ChevronDown,
-//   ShoppingCart,
-// } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
-// import { NavLink } from "react-router-dom";
-// import "./NavBar.css";
-// import logo from "../assets/logo.jpeg";
+import {
+  MapPin,
+  ChevronDown,
+  Navigation,
+  Search,
+  X,
+  ShoppingCart,
+  Menu,
+} from "lucide-react";
 
-// import {
-//   Show,
-//   SignInButton,
-//   UserButton,
-// } from "@clerk/react";
-
-// export const Navbar = ({ location }) => {
-//   // Later replace this with your CartContext count
-//   const cartCount = 3;
-
-//   return (
-//     <nav className="navbar">
-
-//       {/* =========================
-//           LOGO + LOCATION
-//       ========================= */}
-//       <div className="logo1">
-
-//         <NavLink to="/">
-//           <img
-//             src={logo}
-//             alt="Logo"
-//             className="image1"
-//           />
-//         </NavLink>
-
-//         {/* Location */}
-//         <div className="loc">
-
-//           <MapPin size={20} />
-
-//           <div className="location-text">
-
-//             {location ? (
-//               <>
-//                 <p>
-//                   {location.county ||
-//                     location.city ||
-//                     location.town ||
-//                     location.village ||
-//                     "Unknown"}
-//                 </p>
-
-//                 {location.state && (
-//                   <p>{location.state}</p>
-//                 )}
-//               </>
-//             ) : (
-//               <p>Add location</p>
-//             )}
-
-//           </div>
-
-//           <ChevronDown size={18} />
-
-//         </div>
-
-//       </div>
-
-
-//       {/* =========================
-//           NAVIGATION
-//       ========================= */}
-//       <div className="product">
-
-//         <NavLink to="/men">
-//           Men
-//         </NavLink>
-
-//         <NavLink to="/women">
-//           Women
-//         </NavLink>
-
-//         <NavLink to="/children">
-//           Children
-//         </NavLink>
-
-
-//         {/* =========================
-//             CART
-//         ========================= */}
-//         <NavLink
-//           to="/cart"
-//           className="cart-link"
-//         >
-
-//           <ShoppingCart size={22} />
-
-//           <span>Cart</span>
-
-//           {cartCount > 0 && (
-//             <div className="cart-count">
-//               {cartCount}
-//             </div>
-//           )}
-
-//         </NavLink>
-
-
-//         {/* =========================
-//             CLERK AUTHENTICATION
-//         ========================= */}
-//         <div className="auth">
-
-//           {/* User is NOT logged in */}
-//           <Show when="signed-out">
-
-//             <SignInButton>
-//               <button className="signIn">
-//                 Sign In
-//               </button>
-//             </SignInButton>
-
-//           </Show>
-
-
-//           {/* User IS logged in */}
-//           <Show when="signed-in">
-
-//             <UserButton />
-
-//           </Show>
-
-//         </div>
-
-//       </div>
-
-//     </nav>
-//   );
-// };
-
-// src/components/Navbar.jsx
-import React from "react";
-import { MapPin, ChevronDown, ShoppingCart, Menu } from "lucide-react";
 import { NavLink } from "react-router-dom";
+
 import "./NavBar.css";
 import logo from "../assets/logo.jpeg";
-import { Show, SignInButton, UserButton } from "@clerk/react";
 
-// IMPORTANT: Destructure onToggleSidebar here!
-export const Navbar = ({ location, onToggleSidebar }) => {
-  const cartCount = 3;
+import {
+  Show,
+  SignInButton,
+  UserButton,
+} from "@clerk/react";
+
+export const Navbar = ({
+  location,
+  setLocation,
+  detectLocation,
+  onToggleSidebar,
+}) => {
+  const [openDropdown, setOpenDropdown] = useState(false);
+
+  const [showLocationForm, setShowLocationForm] =
+    useState(false);
+
+  const [manualLocation, setManualLocation] =
+    useState("");
+
+  const [cartCount, setCartCount] = useState(0);
+
+  // --------------------------------
+  // GET CART COUNT
+  // --------------------------------
+
+  const updateCartCount = () => {
+    const savedCart = localStorage.getItem("cart");
+
+    if (!savedCart) {
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const cart = JSON.parse(savedCart);
+
+      const totalQuantity = cart.reduce(
+        (total, item) =>
+          total + (Number(item.quantity) || 1),
+        0
+      );
+
+      setCartCount(totalQuantity);
+    } catch (error) {
+      console.error("Cart parsing error:", error);
+      setCartCount(0);
+    }
+  };
+
+  useEffect(() => {
+    updateCartCount();
+
+    window.addEventListener(
+      "cartUpdated",
+      updateCartCount
+    );
+
+    window.addEventListener(
+      "storage",
+      updateCartCount
+    );
+
+    return () => {
+      window.removeEventListener(
+        "cartUpdated",
+        updateCartCount
+      );
+
+      window.removeEventListener(
+        "storage",
+        updateCartCount
+      );
+    };
+  }, []);
+
+  // --------------------------------
+  // LOCATION DROPDOWN
+  // --------------------------------
+
+  const toggleDropDown = () => {
+    setOpenDropdown((prev) => !prev);
+
+    if (showLocationForm) {
+      setShowLocationForm(false);
+    }
+  };
+
+  // --------------------------------
+  // SAVE MANUAL LOCATION
+  // --------------------------------
+
+  const handleSaveLocation = () => {
+    const value = manualLocation.trim();
+
+    if (!value) {
+      alert("Please enter a location");
+      return;
+    }
+
+    const newLocation = {
+      county: value,
+      state: "",
+      manual: true,
+    };
+
+    console.log("Saving manual location:", newLocation);
+
+    // Update React state
+    setLocation(newLocation);
+
+    // Save to localStorage
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify(newLocation)
+    );
+
+    // Close form
+    setManualLocation("");
+    setShowLocationForm(false);
+    setOpenDropdown(false);
+  };
+
+  // --------------------------------
+  // USE CURRENT LOCATION
+  // --------------------------------
+
+  const handleUseCurrentLocation = () => {
+    console.log("Using current location...");
+
+    // IMPORTANT
+    // detectLocation comes from App.jsx
+    if (typeof detectLocation !== "function") {
+      console.error(
+        "detectLocation is not available"
+      );
+      return;
+    }
+
+    // Remove manually saved location first
+    localStorage.removeItem("userLocation");
+
+    // Detect GPS location
+    detectLocation();
+
+    setShowLocationForm(false);
+    setOpenDropdown(false);
+  };
 
   return (
     <nav className="navbar">
+
+      {/* -------------------------------- */}
+      {/* LEFT SIDE */}
+      {/* -------------------------------- */}
+
       <div className="logo1">
-        {/* CLICK HANDLER MUST BE ATTACHED HERE */}
-        <button 
-          type="button" 
+
+        {/* Sidebar button */}
+
+        <button
+          type="button"
           className="menu-toggle-btn"
           onClick={onToggleSidebar}
           aria-label="Toggle Sidebar"
@@ -165,44 +184,243 @@ export const Navbar = ({ location, onToggleSidebar }) => {
           <Menu size={24} />
         </button>
 
+        {/* Logo */}
+
         <NavLink to="/">
-          <img src={logo} alt="Logo" className="image1" />
+          <img
+            src={logo}
+            alt="Logo"
+            className="image1"
+          />
         </NavLink>
 
-        <div className="loc">
-          <MapPin size={20} />
-          <div className="location-text">
-            {location ? (
-              <>
-                <p>{location.county || location.city || location.town || "Unknown"}</p>
-                {location.state && <p>{location.state}</p>}
-              </>
-            ) : (
-              <p>Add location</p>
-            )}
+        {/* -------------------------------- */}
+        {/* LOCATION */}
+        {/* -------------------------------- */}
+
+        <div className="location-wrapper">
+
+          <div
+            className="loc"
+            onClick={toggleDropDown}
+          >
+            <MapPin size={20} />
+
+            <div className="location-text">
+
+              {location ? (
+                <>
+                  <p>
+                    {location.county ||
+                      location.city ||
+                      location.town ||
+                      location.village ||
+                      "Unknown"}
+                  </p>
+
+                  {location.state && (
+                    <p>
+                      {location.state}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p>Detecting location...</p>
+              )}
+
+            </div>
+
+            <ChevronDown
+              size={18}
+              className={
+                openDropdown
+                  ? "arrow rotate"
+                  : "arrow"
+              }
+            />
           </div>
-          <ChevronDown size={18} />
+
+          {/* -------------------------------- */}
+          {/* LOCATION DROPDOWN */}
+          {/* -------------------------------- */}
+
+          {openDropdown && (
+            <div className="location-dropdown">
+
+              {!showLocationForm ? (
+                <>
+                  {/* Header */}
+
+                  <div className="dropdown-title">
+                    <Navigation size={18} />
+                    <span>Location</span>
+                  </div>
+
+                  <p className="dropdown-current">
+                    Your current location
+                  </p>
+
+                  {/* Current location */}
+
+                  <div className="current-location">
+
+                    <MapPin size={18} />
+
+                    <div>
+
+                      <strong>
+                        {location?.county ||
+                          location?.city ||
+                          location?.town ||
+                          location?.village ||
+                          "Unknown location"}
+                      </strong>
+
+                      <span>
+                        {location?.state || ""}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                  {/* Use GPS location */}
+
+                  <button
+                    type="button"
+                    className="current-location-btn"
+                    onClick={
+                      handleUseCurrentLocation
+                    }
+                  >
+                    <Navigation size={18} />
+
+                    Use Current Location
+                  </button>
+
+                  {/* Manual location */}
+
+                  <button
+                    type="button"
+                    className="change-location-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      setShowLocationForm(true);
+                    }}
+                  >
+                    Change Location
+                  </button>
+                </>
+              ) : (
+                /* -------------------------------- */
+                /* MANUAL LOCATION FORM */
+                /* -------------------------------- */
+
+                <div className="location-form">
+
+                  <div className="form-header">
+
+                    <h3>
+                      Change Location
+                    </h3>
+
+                    <button
+                      type="button"
+                      className="close-btn"
+                      onClick={() =>
+                        setShowLocationForm(false)
+                      }
+                    >
+                      <X size={18} />
+                    </button>
+
+                  </div>
+
+                  <label>
+                    Enter your location
+                  </label>
+
+                  <div className="location-input">
+
+                    <Search size={18} />
+
+                    <input
+                      type="text"
+                      value={manualLocation}
+                      onChange={(e) =>
+                        setManualLocation(
+                          e.target.value
+                        )
+                      }
+                      placeholder="Enter city or area"
+                    />
+
+                  </div>
+
+                  <button
+                    type="button"
+                    className="save-location-btn"
+                    onClick={
+                      handleSaveLocation
+                    }
+                  >
+                    Save Location
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
         </div>
+
       </div>
 
+      {/* -------------------------------- */}
+      {/* RIGHT SIDE */}
+      {/* -------------------------------- */}
+
       <div className="product">
-        <NavLink to="/cart" className="cart-link">
+
+        {/* Cart */}
+
+        <NavLink
+          to="/cart"
+          className="cart-link"
+        >
           <ShoppingCart size={22} />
+
           <span>Cart</span>
-          {cartCount > 0 && <div className="cart-count">{cartCount}</div>}
+
+          {cartCount > 0 && (
+            <div className="cart-count">
+              {cartCount}
+            </div>
+          )}
         </NavLink>
 
+        {/* Clerk */}
+
         <div className="auth">
+
           <Show when="signed-out">
             <SignInButton>
-              <button className="signIn">Sign In</button>
+              <button className="signIn">
+                Sign In
+              </button>
             </SignInButton>
           </Show>
+
           <Show when="signed-in">
             <UserButton />
           </Show>
+
         </div>
+
       </div>
+
     </nav>
   );
 };

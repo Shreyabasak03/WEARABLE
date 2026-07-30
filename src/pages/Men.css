@@ -1,182 +1,224 @@
+/* ==========================================
+   MEN PAGE STYLES
+   ========================================== */
+
 .men {
   width: 100%;
-  background: #e8f7f3;
+  background: var(--primary-bg);
   min-height: 100vh;
 }
 
-.cards-container {
+/* ==========================================
+   Hero Image Section (Fixed Overflow)
+   ========================================== */
+
+.image-card {
   width: 100%;
-
-  padding: 40px;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(auto-fill, minmax(250px, 1fr));
-
-  gap: 30px;
-
-  max-width: 1400px;
-
-  margin: 0 auto;
+  position: relative;
+  overflow: hidden; /* Prevents hero from blowing out mobile width */
 }
-/* ==========================
-   Category Slider
-========================== */
 
-.category-slider{
-    width:100%;
-    overflow:hidden;
-    background:linear-gradient(
-        135deg,
-        #2AAE9B 0%,
-        #177C70 60%,
-        #0F4D45 100%
-    );
-    padding:18px 0;
-    position:relative;
+.image-card .image {
+  width: 100%;
+  height: 200px; /* Force consistent hero height on mobile */
+}
+
+@media (min-width: 768px) {
+  .image-card .image {
+    height: 350px;
+  }
+}
+
+.image-card .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================
+   Small Screen Adjustments (For 320px - 400px)
+   ========================================== */
+
+@media (max-width: 600px) {
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 8px;   /* Reduced outer margin */
+    gap: 8px;       /* Tight gap so cards fit comfortably */
+  }
+
+  /* Make text & buttons inside ProductCard fit nicely in small columns */
+  .cards-container > * {
+    font-size: 12px;
+  }
+
+  .cards-container button {
+    padding: 6px 4px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
+  }
+}
+/* ==========================================
+   Category Slider
+   ========================================== */
+
+.category-slider {
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 60%,
+    #0f4d45 100%
+  );
+  padding: 18px 0;
+  position: relative;
   box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.12),
-        0 4px 10px rgba(0, 0, 0, 0.15);
+    0 10px 30px rgba(0, 0, 0, 0.12),
+    0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Optional fade effect on both sides */
 .category-slider::before,
-.category-slider::after{
-    content:"";
-    position:absolute;
-    top:0;
-    width:80px;
-    height:100%;
-    z-index:2;
-    pointer-events:none;
+.category-slider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 80px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.category-slider::before{
-    left:0;
-    background:linear-gradient(to right,#2AAE9B,transparent);
+.category-slider::before {
+  left: 0;
+  background: linear-gradient(to right, var(--primary-color), transparent);
 }
 
-.category-slider::after{
-    right:0;
-    background:linear-gradient(to left,#0F4D45,transparent);
+.category-slider::after {
+  right: 0;
+  background: linear-gradient(to left, #0f4d45, transparent);
 }
 
-/* ==========================
-   Moving Track
-========================== */
-
-.slide-track{
-    display:flex;
-    align-items:center;
-    width:max-content;
-    gap:70px;
-
-    animation:scroll 25s linear infinite;
+/* Moving Track */
+.slide-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: 70px;
+  animation: scroll 25s linear infinite;
 }
 
 /* Pause animation on hover */
-.category-slider:hover .slide-track{
-    animation-play-state:paused;
+.category-slider:hover .slide-track {
+  animation-play-state: paused;
 }
 
-/* ==========================
-   Category Items
-========================== */
-
-.slide-track span{
-    color:#fff;
-    font-size:22px;
-    font-weight:600;
-    white-space:nowrap;
-    cursor:pointer;
-    transition:.35s ease;
-    position:relative;
-    letter-spacing:.5px;
+/* Category Items */
+.slide-track span {
+  color: var(--white);
+  font-size: 22px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.35s ease, color 0.35s ease;
+  position: relative;
+  letter-spacing: 0.5px;
 }
 
 /* Underline Animation */
-
-.slide-track span::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    bottom:-6px;
-
-    width:0;
-    height:2px;
-
-    background:#fff;
-    transition:.3s ease;
-
-    transform:translateX(-50%);
+.slide-track span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  background: var(--white);
+  transition: width 0.3s ease;
+  transform: translateX(-50%);
 }
 
-.slide-track span:hover{
-    transform:translateY(-3px);
-    color:#FFEAA7;
+.slide-track span:hover {
+  transform: translateY(-3px);
+  color: #ffeaa7;
 }
 
-.slide-track span:hover::after{
-    width:100%;
+.slide-track span:hover::after {
+  width: 100%;
 }
 
-/* ==========================
-   Infinite Scroll
-========================== */
-
-@keyframes scroll{
-
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-50%);
-    }
-
+/* Infinite Scroll Keyframes */
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
-/* ==========================
-   Responsive
-========================== */
+/* ==========================================
+   Cards Container & Responsive Grid
+   ========================================== */
 
-@media(max-width:992px){
+.cards-container {
+  width: 100%;
+  padding: 40px;
+  display: grid;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
 
-    .slide-track{
-        gap:45px;
-    }
-
-    .slide-track span{
-        font-size:18px;
-    }
-
+  /* Default (Desktop): Auto-fill with 250px min width */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
-@media(max-width:768px){
-
-    .category-slider{
-        padding:14px 0;
-    }
-
-    .slide-track{
-        gap:30px;
-    }
-
-    .slide-track span{
-        font-size:16px;
-    }
-
+/* Prevent grid items/cards from breaking grid columns */
+.cards-container > * {
+  min-width: 0;
 }
 
-@media(max-width:480px){
+/* ==========================================
+   Responsive Breakpoints
+   ========================================== */
 
-    .slide-track{
-        gap:20px;
-    }
+@media (max-width: 992px) {
+  .slide-track {
+    gap: 45px;
+  }
 
-    .slide-track span{
-        font-size:14px;
-    }
+  .slide-track span {
+    font-size: 18px;
+  }
+}
 
+@media (max-width: 768px) {
+  .category-slider {
+    padding: 14px 0;
+  }
+
+  .slide-track {
+    gap: 30px;
+  }
+
+  .slide-track span {
+    font-size: 16px;
+  }
+
+  .cards-container {
+    padding: 20px;
+    gap: 20px;
+  }
+}
+
+
+
+@media (max-width: 480px) {
+  .slide-track {
+    gap: 20px;
+  }
+
+  .slide-track span {
+    font-size: 14px;
+  }
 }
