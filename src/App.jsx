@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import Layout from "./components/Layout.jsx";
+import Layout from "./components/layout.jsx";
 
 import Home from "./pages/Home.jsx";
 import Men from "./pages/Men.jsx";
