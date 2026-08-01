@@ -12,8 +12,8 @@ export default function ProductCard({
       <div className="product-img-box">
 
         <img
-          src={product.image}
-          alt={product.name}
+          src={product.thumbnail}
+          alt={product.title}
         />
 
         <button className="heart-btn">
@@ -25,11 +25,13 @@ export default function ProductCard({
       <div className="product-card-body">
 
         <div className="product-name">
-          <h3>{product.name}</h3>
+
+          <h3>{product.title}</h3>
 
           <span>
-            ${product.price}
+            ${Number(product.price).toFixed(2)}
           </span>
+
         </div>
 
         <p className="product-brand">

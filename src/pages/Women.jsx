@@ -1,173 +1,111 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import ProductDetails from "../components/ProductDetails";
-
-import products from "../data/product.js";
-
+import { getProductsByCategory } from "../api/productsApi";
+import { useCart } from "../context/cartContext";
 import "./Men.css";
 
 export default function Men() {
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedProduct, setSelectedProduct] =
-    useState(null);
-
-  const [cart, setCart] = useState(() => {
-
-    const savedCart =
-      localStorage.getItem("cart");
-
-    return savedCart
-      ? JSON.parse(savedCart)
-      : [];
-  });
-
+  const { addToCart } = useCart();
 
   const categories = [
-    "Women's Tops",
-    "Dresses",
-    "Kurtis",
-    "Sarees",
-    "Jeans",
-    "T-Shirts",
-    "Shirts",
-    "Skirts",
-    "Shorts",
-    "Jumpsuits",
+    "Men's Shirts",
+    "Men's Shoes",
+    "Men's Watches",
   ];
 
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const [
+        tops,
+        dresses,
+        shoes,
+        watches,
+        bags,
+        jewellery,
+      ] = await Promise.all([
+        getProductsByCategory("tops"),
+        getProductsByCategory("womens-dresses"),
+        getProductsByCategory("womens-shoes"),
+        getProductsByCategory("womens-watches"),
+        getProductsByCategory("womens-bags"),
+        getProductsByCategory("womens-jewellery"),
+      ]);
 
-  // -----------------------
-  // ADD TO CART
-  // -----------------------
-
-  const addToCart = (product, quantity) => {
-
-    setCart((previousCart) => {
-
-      const existingProduct =
-        previousCart.find(
-          (item) => item.id === product.id
-        );
-
-
-      let updatedCart;
-
-
-      if (existingProduct) {
-
-        updatedCart =
-          previousCart.map((item) =>
-            item.id === product.id
-              ? {
-                  ...item,
-                  quantity:
-                    item.quantity + quantity,
-                }
-              : item
-          );
-
-      } else {
-
-        updatedCart = [
-          ...previousCart,
-          {
-            ...product,
-            quantity,
-          },
-        ];
-
-      }
-
-
-      localStorage.setItem(
-        "cart",
-        JSON.stringify(updatedCart)
-      );
-
-
-      return updatedCart;
-
-    });
-
+      setProducts([
+        ...tops,
+        ...dresses,
+        ...shoes,
+        ...watches,
+        ...bags,
+        ...jewellery,
+      ]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  fetchProducts();
+}, []);
+  if (loading) {
+    return <h2>Loading Products...</h2>;
+  }
 
   return (
-
     <div className="men">
 
       {/* HERO */}
-
       <div className="image-card">
 
         <div className="image">
-
           <img
-            src="https://images.unsplash.com/photo-1753162659461-38d8ea5b15ab?q=80&w=3131&auto=format&fit=crop"
-            alt="Women's fashion"
+            src="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1600&auto=format&fit=crop"
+            alt="Men's Fashion"
           />
-
         </div>
-
-
-        {/* CATEGORY SLIDER */}
 
         <div className="category-slider">
-
           <div className="slide-track">
-
-            {[...categories, ...categories].map(
-              (item, index) => (
-                <span key={index}>
-                  {item}
-                </span>
-              )
-            )}
-
+            {[...categories, ...categories].map((item, index) => (
+              <span key={index}>{item}</span>
+            ))}
           </div>
-
         </div>
 
       </div>
 
-
       {/* PRODUCTS */}
-
       <div className="cards-container">
 
-        {products.map((product) => (
-
-          <ProductCard
-            key={product.id}
-            product={product}
-            onViewDetails={
-              setSelectedProduct
-            }
-          />
-
-        ))}
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onViewDetails={setSelectedProduct}
+            />
+          ))
+        ) : (
+          <h2>No Products Found</h2>
+        )}
 
       </div>
 
-
-      {/* PRODUCT DETAILS MODAL */}
-
       {selectedProduct && (
-
         <ProductDetails
           product={selectedProduct}
-
-          onClose={() =>
-            setSelectedProduct(null)
-          }
-
+          onClose={() => setSelectedProduct(null)}
           onAddToCart={addToCart}
         />
-
       )}
 
     </div>
-
   );
 }

@@ -5,6 +5,7 @@ import {
   Heart,
   Minus,
   Plus,
+  Star,
 } from "lucide-react";
 
 import { useCart } from "../context/cartContext";
@@ -17,6 +18,8 @@ export default function ProductDetails({
   const [quantity, setQuantity] = useState(1);
 
   const { addToCart } = useCart();
+
+  if (!product) return null;
 
   const increaseQuantity = () => {
     if (quantity < product.stock) {
@@ -35,10 +38,6 @@ export default function ProductDetails({
     onClose();
   };
 
-  if (!product) {
-    return null;
-  }
-
   return (
     <div className="product-modal-overlay">
 
@@ -55,8 +54,8 @@ export default function ProductDetails({
         {/* Image */}
         <div className="details-image">
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.thumbnail}
+            alt={product.title}
           />
         </div>
 
@@ -67,11 +66,24 @@ export default function ProductDetails({
             {product.category}
           </p>
 
-          <h2>{product.name}</h2>
+          <h2>{product.title}</h2>
 
           <p className="details-brand">
             {product.brand}
           </p>
+
+          {/* Rating */}
+          <div className="details-rating">
+
+            <Star
+              size={18}
+              fill="#FFD700"
+              color="#FFD700"
+            />
+
+            <span>{product.rating} / 5</span>
+
+          </div>
 
           <h3 className="details-price">
             ${Number(product.price).toFixed(2)}
@@ -81,26 +93,13 @@ export default function ProductDetails({
             {product.description}
           </p>
 
-          {/* Size */}
+          {/* Stock */}
           <div className="details-section">
-            <h4>Available Sizes</h4>
 
-            <div className="size-list">
-              {product.sizes?.map((size) => (
-                <span key={size}>
-                  {size}
-                </span>
-              ))}
-            </div>
-          </div>
+            <h4>Available Stock</h4>
 
-          {/* Color */}
-          <div className="details-section">
-            <h4>Color</h4>
+            <p>{product.stock} items available</p>
 
-            <p>
-              {product.colors?.join(", ")}
-            </p>
           </div>
 
           {/* Quantity */}
@@ -143,19 +142,46 @@ export default function ProductDetails({
               disabled={product.stock <= 0}
             >
               <ShoppingCart size={20} />
+
               {product.stock > 0
                 ? "Add to Cart"
                 : "Out of Stock"}
+
             </button>
 
           </div>
 
-          {/* Stock */}
           <p className="stock-info">
+
             {product.stock > 0
               ? `${product.stock} items available`
-              : "Out of stock"}
+              : "Out of Stock"}
+
           </p>
+
+          {/* More Images */}
+          {product.images?.length > 1 && (
+
+            <div className="details-section">
+
+              <h4>More Images</h4>
+
+              <div className="image-gallery">
+
+                {product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={product.title}
+                    className="gallery-image"
+                  />
+                ))}
+
+              </div>
+
+            </div>
+
+          )}
 
         </div>
 

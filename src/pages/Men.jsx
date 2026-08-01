@@ -1,41 +1,59 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import ProductDetails from "../components/ProductDetails";
-import { getAllProducts } from "../api/productsApi";
-import { useCart } from "../context/cartContext.jsx"; // 1. Import useCart
+import { getProductsByCategory } from "../api/productsApi";
+import { useCart } from "../context/cartContext";
 import "./Men.css";
 
 export default function Men() {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
-  // 2. Consume addToCart from central context instead of local useState
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const { addToCart } = useCart();
 
   const categories = [
-    "Women's Tops",
-    "Dresses",
-    "Kurtis",
-    "Sarees",
-    "Jeans",
-    "T-Shirts",
-    "Shirts",
-    "Skirts",
-    "Shorts",
-    "Jumpsuits",
+    "Men's Shirts",
+    "Men's Shoes",
+    "Men's Watches",
   ];
+
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const [shirts, shoes, watches] = await Promise.all([
+        getProductsByCategory("mens-shirts"),
+        getProductsByCategory("mens-shoes"),
+        getProductsByCategory("mens-watches"),
+      ]);
+
+      setProducts([...shirts, ...shoes, ...watches]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProducts();
+}, []);
+  if (loading) {
+    return <h2>Loading Products...</h2>;
+  }
 
   return (
     <div className="men">
+
       {/* HERO */}
       <div className="image-card">
+
         <div className="image">
           <img
-            src="https://images.unsplash.com/photo-1753162659461-38d8ea5b15ab?q=80&w=3131&auto=format&fit=crop"
-            alt="Women's fashion"
+            src="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1600&auto=format&fit=crop"
+            alt="Men's Fashion"
           />
         </div>
 
-        {/* CATEGORY SLIDER */}
         <div className="category-slider">
           <div className="slide-track">
             {[...categories, ...categories].map((item, index) => (
@@ -43,27 +61,34 @@ export default function Men() {
             ))}
           </div>
         </div>
+
       </div>
 
       {/* PRODUCTS */}
       <div className="cards-container">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onViewDetails={setSelectedProduct}
-          />
-        ))}
+
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onViewDetails={setSelectedProduct}
+            />
+          ))
+        ) : (
+          <h2>No Products Found</h2>
+        )}
+
       </div>
 
-      {/* PRODUCT DETAILS MODAL */}
       {selectedProduct && (
         <ProductDetails
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onAddToCart={addToCart} // 3. Passes context method to modal
+          onAddToCart={addToCart}
         />
       )}
+
     </div>
   );
 }

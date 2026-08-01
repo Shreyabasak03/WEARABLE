@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { X, Shirt, User, Baby, Home, ShoppingCart, Info, Phone } from "lucide-react";
+import { X, Shirt, User, Baby, Home, ShoppingCart, Info, Phone,Clock  } from "lucide-react";
 import "./sidebar.css";
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -62,9 +62,10 @@ export default function Sidebar({ isOpen, onClose }) {
             <Phone size={20} />
             <span>Contact</span>
           </NavLink>
-          <NavLink to="/orders">
-  Order History
-</NavLink>
+          <NavLink to="/orders" onClick={onClose} className="sidebar-link">
+                <Clock size={20} />
+            <span>Order History</span>
+          </NavLink>
         </nav>
       </aside>
     </>
