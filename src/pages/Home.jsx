@@ -1,9 +1,30 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  ShoppingCart,
+  ArrowRight,
+  Truck,
+  ShieldCheck,
+  RefreshCw,
+} from 'lucide-react';
+
+import products from '../data/product.js';
+import ProductDetails from '../components/ProductDetails';
+import { useCart } from '../context/cartContext.jsx';
 import './Home.css';
 
 export default function ScrollSequence() {
   const containerRef = useRef(null);
+  const sliderRef = useRef(null);
+  const navigate = useNavigate();
+
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +63,39 @@ export default function ScrollSequence() {
   const imageRadius = Math.max(8 - zoomProgress * 8, 0);
   const clipPercentage = 100 - wipeProgress * 100;
 
+  // Smooth Slider Navigation Logic
+  const scrollSlider = (direction) => {
+    if (sliderRef.current) {
+      const scrollAmount = sliderRef.current.clientWidth * 0.75;
+      sliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  // Categories Data
+  const categories = [
+    {
+      name: "Women's Collection",
+      image:
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800',
+      link: '/men',
+    },
+    {
+      name: 'Dresses & Tops',
+      image:
+        'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800',
+      link: '/men',
+    },
+    {
+      name: 'Trending Styles',
+      image:
+        'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800',
+      link: '/men',
+    },
+  ];
+
   return (
     <div className="page-wrapper">
       {/* HERO SECTION */}
@@ -59,7 +113,9 @@ export default function ScrollSequence() {
             quality with modern designs for every occasion.
           </p>
 
-          <button className="shop-btn">Shop Now &rarr;</button>
+          <button className="shop-btn" onClick={() => navigate('/men')}>
+            Shop Now &rarr;
+          </button>
         </div>
 
         <div className="right">
@@ -144,6 +200,144 @@ export default function ScrollSequence() {
           </div>
         </div>
       </section>
+
+      {/* ==========================================
+          FEATURED CATEGORIES SECTION
+         ========================================== */}
+      <section className="home-categories">
+        <div className="section-header">
+          <h2>Explore Categories</h2>
+          <p>Handpicked styles designed for your everyday wardrobe</p>
+        </div>
+
+        <div className="category-grid">
+          {categories.map((cat, index) => (
+            <div
+              className="category-card"
+              key={index}
+              onClick={() => navigate(cat.link)}
+            >
+              <img src={cat.image} alt={cat.name} />
+              <div className="category-overlay">
+                <h3>{cat.name}</h3>
+                <span className="cat-link">Explore Now &rarr;</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ==========================================
+          ANIMATED FEATURED PRODUCTS SLIDER
+         ========================================== */}
+      <section className="featured-products">
+        <div className="section-header-slider">
+          <div className="header-text">
+            <h2>Trending Arrivals</h2>
+            <p>Discover our top-rated fashion pieces of the week</p>
+          </div>
+
+          {/* Slider Controls */}
+          <div className="slider-controls">
+            <button
+              className="nav-btn prev-btn"
+              onClick={() => scrollSlider('left')}
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              className="nav-btn next-btn"
+              onClick={() => scrollSlider('right')}
+              aria-label="Next Slide"
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable Slider Track */}
+        <div className="product-slider-track" ref={sliderRef}>
+          {products.map((product) => (
+            <div className="slider-card" key={product.id}>
+              <div className="card-media">
+                <img src={product.image} alt={product.name} loading="lazy" />
+
+                {/* Quick Action Overlay */}
+                <div className="media-overlay">
+                  <button
+                    className="quick-action-btn"
+                    onClick={() => setSelectedProduct(product)}
+                    title="Quick View Modal"
+                  >
+                    <Eye size={18} /> Quick View
+                  </button>
+                  <button
+                    className="quick-action-btn primary"
+                    onClick={() => addToCart(product, 1)}
+                    title="Add to Cart"
+                  >
+                    <ShoppingCart size={18} /> Add
+                  </button>
+                </div>
+              </div>
+
+              <div className="card-info">
+                <span className="card-brand">{product.brand}</span>
+                <h3 className="card-title">{product.name}</h3>
+                <div className="card-bottom">
+                  <span className="card-price">
+                    ${Number(product.price).toFixed(2)}
+                  </span>
+                  <button
+                    className="details-link-btn"
+                    onClick={() => setSelectedProduct(product)}
+                  >
+                    Details &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="view-all-wrapper">
+          <Link to="/men" className="view-all-btn">
+            View Full Catalog <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      {/* ==========================================
+          PERKS & FEATURES BANNER
+         ========================================== */}
+      <section className="features-banner">
+        <div className="feature-item">
+          <Truck size={32} />
+          <h4>Free Express Delivery</h4>
+          <p>On all orders over $99</p>
+        </div>
+
+        <div className="feature-item">
+          <ShieldCheck size={32} />
+          <h4>Secure Payment</h4>
+          <p>100% encrypted shopping</p>
+        </div>
+
+        <div className="feature-item">
+          <RefreshCw size={32} />
+          <h4>Easy Returns</h4>
+          <p>30-day return policy</p>
+        </div>
+      </section>
+
+      {/* PRODUCT DETAILS MODAL TRIGGER */}
+      {selectedProduct && (
+        <ProductDetails
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }

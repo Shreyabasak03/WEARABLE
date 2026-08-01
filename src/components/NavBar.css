@@ -93,8 +93,8 @@
 .image1 {
   display: block;
 
-  width: clamp(90px, 12vw, 150px);
-  height: 58px;
+  width: clamp(110px, 18vw, 180px);
+  height: 78px;
 
   object-fit: cover;
 

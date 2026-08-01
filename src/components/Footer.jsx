@@ -1,7 +1,7 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import "./Footer.css";
-import logo from "../assets/logo.jpeg";
+import logo from "../assets/logo.png";
 
 export default function Footer() {
   return (

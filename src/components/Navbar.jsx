@@ -13,7 +13,8 @@ import {
 import { NavLink } from "react-router-dom";
 
 import "./NavBar.css";
-import logo from "../assets/logo.jpeg";
+import logo2 from "../assets/logo.png";
+// import logo2 from "../assets/Gemini_Generated_Image_67v2ol67v2ol67v2-removebg-preview.png";
 
 import {
   Show,
@@ -173,7 +174,7 @@ export const Navbar = ({
 
         <NavLink to="/">
           <img
-            src={logo}
+            src={logo2}
             alt="Logo"
             className="image1"
           />

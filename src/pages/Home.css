@@ -322,3 +322,554 @@ body {
         top: 20%;
     }
 }
+
+/* ==========================================
+   FIX 1: MOBILE SCROLL ANIMATION FIX
+   ========================================== */
+.scroll-container {
+    height: 300vh;
+    background-color: #f7f4f0;
+    position: relative;
+    /* Force GPU acceleration on mobile to prevent scroll stutter */
+    will-change: transform;
+}
+
+.sticky-viewport {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    /* Use svh (small viewport height) to prevent mobile browser address bar jitter */
+    height: 100vh;
+    height: 100svh; 
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 5;
+}
+
+/* Ensure the wiping image layer clips properly on touch devices */
+.wipe-image-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    will-change: clip-path;
+    -webkit-clip-path: polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%);
+}
+
+
+/* ==========================================
+   FIX 2: FULLY RESPONSIVE NEW SECTIONS
+   ========================================== */
+.home-categories {
+    padding: 60px 20px 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.category-grid {
+    display: grid;
+    /* Adjust grid columns so they shrink gracefully on all screen sizes */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.category-card {
+    position: relative;
+    height: clamp(240px, 40vh, 380px);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.featured-products {
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Product Slider Track Fixes */
+.product-slider-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 4px 20px 4px;
+    /* Enable native touch scrolling momentum on iOS/Android */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+}
+
+.slider-card {
+    /* Responsive card sizing */
+    flex: 0 0 clamp(220px, 70vw, 280px);
+    scroll-snap-align: start;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-media {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 35vh, 320px);
+    overflow: hidden;
+    background: #f4f4f4;
+}
+
+/* Perks Banner Responsive Layout */
+.features-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items: center;
+    padding: 40px 20px;
+    background: #ffffff;
+    margin-top: 40px;
+    border-top: 1px solid #eee;
+    gap: 24px;
+    width: 100%;
+}
+
+
+/* ==========================================
+   MOBILE & TABLET MEDIA QUERIES (<768px)
+   ========================================== */
+@media (max-width: 768px) {
+    .section-header-slider {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .slider-controls {
+        display: none; /* Hide arrows on mobile since touch swipe is native */
+    }
+
+    .card-title {
+        font-size: 14px;
+    }
+
+    .card-price {
+        font-size: 16px;
+    }
+
+    /* Make buttons tap-friendly on touch screens */
+    .media-overlay {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 70%);
+        align-items: flex-end;
+        padding: 12px;
+    }
+
+    .quick-action-btn {
+        transform: translateY(0);
+        padding: 8px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .wipe-text-layer h2 {
+        font-size: clamp(1.4rem, 5vw, 2.5rem);
+    }
+}
+
+.home-categories {
+    padding: 60px 40px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10; /* Ensures it sits cleanly above scroll sequence */
+    background: #E8F7F3;
+}
+
+.section-header {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.section-header h2 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    color: #1D5F54;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.section-header p {
+    color: #5d6d6b;
+    font-size: 15px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+}
+
+.category-card {
+    position: relative;
+    height: 280px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.06);
+}
+
+.category-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    color: #ffffff;
+}
+
+.category-overlay h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.cat-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+/* ==========================================
+   4. FEATURED PRODUCTS SLIDER (FIXED GRID & TEXT COLLISION)
+   ========================================== */
+.featured-products {
+    padding: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #E8F7F3;
+}
+
+.section-header-slider {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.header-text h2 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    color: #1D5F54;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+.header-text p {
+    color: #5d6d6b;
+    font-size: 15px;
+}
+
+.slider-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #cce8e2;
+    background: #ffffff;
+    color: #1D5F54;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #2AAE9B;
+    color: #ffffff;
+    border-color: #2AAE9B;
+}
+
+/* Track Fixes */
+.product-slider-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 2px 20px 2px;
+    scrollbar-width: none; /* Hide scrollbar for clean UI */
+}
+
+.product-slider-track::-webkit-scrollbar {
+    display: none;
+}
+
+/* Card Sizing Fix: Prevents cards from shrinking into squished vertical columns */
+.slider-card {
+    flex: 0 0 260px; /* Fixed width per card */
+    min-width: 260px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+.slider-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-media {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    background: #f4f4f4;
+}
+
+.card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Overlay Buttons Fix: Floating on top of image instead of inside card body */
+.media-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.slider-card:hover .media-overlay {
+    opacity: 1;
+}
+
+.quick-action-btn {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #2c3e50;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.quick-action-btn.primary {
+    background: #2AAE9B;
+    color: #ffffff;
+}
+
+.card-info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.card-brand {
+    font-size: 12px;
+    color: #888;
+}
+
+.card-title {
+    font-size: 16px;
+    color: #1D5F54;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Card Bottom Text Collision Fix */
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    gap: 12px;
+}
+
+.card-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2AAE9B;
+    white-space: nowrap;
+}
+
+.details-link-btn {
+    background: transparent;
+    border: none;
+    color: #1D5F54;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Catalog Link */
+.view-all-wrapper {
+    margin-top: 25px;
+}
+
+.view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1D5F54;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+/* ==========================================
+   5. FEATURES / PERKS BANNER
+   ========================================== */
+.features-banner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 40px;
+    background: #ffffff;
+    max-width: 1400px;
+    margin: 40px auto 0;
+    border-radius: 20px;
+    gap: 20px;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.feature-item svg {
+    color: #2AAE9B;
+}
+
+.feature-item h4 {
+    font-size: 16px;
+    color: #1D5F54;
+    font-weight: 600;
+}
+
+.feature-item p {
+    font-size: 13px;
+    color: #777;
+}
+
+@media (min-width: 992px) {
+    .home {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 60px 80px;
+        gap: 0;
+    }
+
+    .left {
+        width: 45%;
+        padding-left: 20px;
+        gap: 25px;
+    }
+
+    .right {
+        width: 50%;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .small {
+        width: auto;
+        height: 100%;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .left-tab {
+        left: -10px;
+        bottom: 10%;
+    }
+
+    .right-tab {
+        right: -10px;
+        top: 10%;
+    }
+
+    .hero-text-layer {
+        top: 20%;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-categories,
+    .featured-products {
+        padding: 30px 16px;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .slider-card {
+        flex: 0 0 220px;
+        min-width: 220px;
+    }
+
+    .card-media {
+        height: 200px;
+    }
+
+    .media-overlay {
+        opacity: 1; /* Always show quick buttons on touch screens */
+    }
+
+    .features-banner {
+        grid-template-columns: 1fr;
+        padding: 30px 16px;
+    }
+}

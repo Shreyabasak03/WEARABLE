@@ -33,11 +33,4 @@ export const getCategories = async () => {
   const res = await API.get("/categories");
   return res.data;
 };
-export const getProductsByCategory = async (category) => {
-  const res = await API.get(`/category/${category}`);
-  return res.data.products;
-};
-export const getProductsByCategory = async (category) => {
-  const res = await API.get(`/category/${category}`);
-  return res.data.products;
-};
+
