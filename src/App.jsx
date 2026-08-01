@@ -13,6 +13,7 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import OrderHistory from "./pages/OrderHistory";
+import Search from "./components/Search.jsx";
 
 function App() {
 
@@ -178,6 +179,7 @@ function App() {
   path="/orders"
   element={<OrderHistory />}
 />
+<Route path="/search" element={<Search />} />
 
       </Route>
 
