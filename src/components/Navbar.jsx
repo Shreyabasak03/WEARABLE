@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import {
   MapPin,
@@ -21,12 +21,17 @@ import {
   UserButton,
 } from "@clerk/react";
 
+// Import Cart Context
+import { useCart } from "../context/cartContext.jsx";
+
+
 export const Navbar = ({
   location,
   setLocation,
   detectLocation,
   onToggleSidebar,
 }) => {
+
   const [openDropdown, setOpenDropdown] = useState(false);
 
   const [showLocationForm, setShowLocationForm] =
@@ -35,61 +40,24 @@ export const Navbar = ({
   const [manualLocation, setManualLocation] =
     useState("");
 
-  const [cartCount, setCartCount] = useState(0);
 
   // --------------------------------
-  // GET CART COUNT
+  // GET CART FROM CONTEXT
   // --------------------------------
 
-  const updateCartCount = () => {
-    const savedCart = localStorage.getItem("cart");
+  const { cartItems } = useCart();
 
-    if (!savedCart) {
-      setCartCount(0);
-      return;
-    }
 
-    try {
-      const cart = JSON.parse(savedCart);
+  // --------------------------------
+  // CALCULATE TOTAL CART QUANTITY
+  // --------------------------------
 
-      const totalQuantity = cart.reduce(
-        (total, item) =>
-          total + (Number(item.quantity) || 1),
-        0
-      );
+  const cartCount = cartItems.reduce(
+    (total, item) =>
+      total + (Number(item.quantity) || 1),
+    0
+  );
 
-      setCartCount(totalQuantity);
-    } catch (error) {
-      console.error("Cart parsing error:", error);
-      setCartCount(0);
-    }
-  };
-
-  useEffect(() => {
-    updateCartCount();
-
-    window.addEventListener(
-      "cartUpdated",
-      updateCartCount
-    );
-
-    window.addEventListener(
-      "storage",
-      updateCartCount
-    );
-
-    return () => {
-      window.removeEventListener(
-        "cartUpdated",
-        updateCartCount
-      );
-
-      window.removeEventListener(
-        "storage",
-        updateCartCount
-      );
-    };
-  }, []);
 
   // --------------------------------
   // LOCATION DROPDOWN
@@ -103,11 +71,13 @@ export const Navbar = ({
     }
   };
 
+
   // --------------------------------
   // SAVE MANUAL LOCATION
   // --------------------------------
 
   const handleSaveLocation = () => {
+
     const value = manualLocation.trim();
 
     if (!value) {
@@ -121,7 +91,10 @@ export const Navbar = ({
       manual: true,
     };
 
-    console.log("Saving manual location:", newLocation);
+    console.log(
+      "Saving manual location:",
+      newLocation
+    );
 
     // Update React state
     setLocation(newLocation);
@@ -138,24 +111,32 @@ export const Navbar = ({
     setOpenDropdown(false);
   };
 
+
   // --------------------------------
   // USE CURRENT LOCATION
   // --------------------------------
 
   const handleUseCurrentLocation = () => {
-    console.log("Using current location...");
+
+    console.log(
+      "Using current location..."
+    );
 
     // IMPORTANT
     // detectLocation comes from App.jsx
     if (typeof detectLocation !== "function") {
+
       console.error(
         "detectLocation is not available"
       );
+
       return;
     }
 
-    // Remove manually saved location first
-    localStorage.removeItem("userLocation");
+    // Remove manually saved location
+    localStorage.removeItem(
+      "userLocation"
+    );
 
     // Detect GPS location
     detectLocation();
@@ -164,14 +145,17 @@ export const Navbar = ({
     setOpenDropdown(false);
   };
 
+
   return (
     <nav className="navbar">
+
 
       {/* -------------------------------- */}
       {/* LEFT SIDE */}
       {/* -------------------------------- */}
 
       <div className="logo1">
+
 
         {/* Sidebar button */}
 
@@ -184,6 +168,7 @@ export const Navbar = ({
           <Menu size={24} />
         </button>
 
+
         {/* Logo */}
 
         <NavLink to="/">
@@ -193,6 +178,7 @@ export const Navbar = ({
             className="image1"
           />
         </NavLink>
+
 
         {/* -------------------------------- */}
         {/* LOCATION */}
@@ -204,12 +190,14 @@ export const Navbar = ({
             className="loc"
             onClick={toggleDropDown}
           >
+
             <MapPin size={20} />
 
             <div className="location-text">
 
               {location ? (
                 <>
+
                   <p>
                     {location.county ||
                       location.city ||
@@ -223,12 +211,18 @@ export const Navbar = ({
                       {location.state}
                     </p>
                   )}
+
                 </>
               ) : (
-                <p>Detecting location...</p>
+
+                <p>
+                  Detecting location...
+                </p>
+
               )}
 
             </div>
+
 
             <ChevronDown
               size={18}
@@ -238,27 +232,40 @@ export const Navbar = ({
                   : "arrow"
               }
             />
+
           </div>
+
 
           {/* -------------------------------- */}
           {/* LOCATION DROPDOWN */}
           {/* -------------------------------- */}
 
           {openDropdown && (
+
             <div className="location-dropdown">
 
+
               {!showLocationForm ? (
+
                 <>
+
                   {/* Header */}
 
                   <div className="dropdown-title">
+
                     <Navigation size={18} />
-                    <span>Location</span>
+
+                    <span>
+                      Location
+                    </span>
+
                   </div>
+
 
                   <p className="dropdown-current">
                     Your current location
                   </p>
+
 
                   {/* Current location */}
 
@@ -284,6 +291,7 @@ export const Navbar = ({
 
                   </div>
 
+
                   {/* Use GPS location */}
 
                   <button
@@ -293,10 +301,13 @@ export const Navbar = ({
                       handleUseCurrentLocation
                     }
                   >
+
                     <Navigation size={18} />
 
                     Use Current Location
+
                   </button>
+
 
                   {/* Manual location */}
 
@@ -304,20 +315,28 @@ export const Navbar = ({
                     type="button"
                     className="change-location-btn"
                     onClick={(e) => {
+
                       e.stopPropagation();
 
                       setShowLocationForm(true);
+
                     }}
                   >
+
                     Change Location
+
                   </button>
+
                 </>
+
               ) : (
+
                 /* -------------------------------- */
                 /* MANUAL LOCATION FORM */
                 /* -------------------------------- */
 
                 <div className="location-form">
+
 
                   <div className="form-header">
 
@@ -332,14 +351,18 @@ export const Navbar = ({
                         setShowLocationForm(false)
                       }
                     >
+
                       <X size={18} />
+
                     </button>
 
                   </div>
 
+
                   <label>
                     Enter your location
                   </label>
+
 
                   <div className="location-input">
 
@@ -358,6 +381,7 @@ export const Navbar = ({
 
                   </div>
 
+
                   <button
                     type="button"
                     className="save-location-btn"
@@ -365,18 +389,24 @@ export const Navbar = ({
                       handleSaveLocation
                     }
                   >
+
                     Save Location
+
                   </button>
 
+
                 </div>
+
               )}
 
             </div>
+
           )}
 
         </div>
 
       </div>
+
 
       {/* -------------------------------- */}
       {/* RIGHT SIDE */}
@@ -384,40 +414,65 @@ export const Navbar = ({
 
       <div className="product">
 
-        {/* Cart */}
+
+        {/* -------------------------------- */}
+        {/* CART */}
+        {/* -------------------------------- */}
 
         <NavLink
           to="/cart"
           className="cart-link"
         >
+
           <ShoppingCart size={22} />
 
-          <span>Cart</span>
+          <span>
+            Cart
+          </span>
+
+
+          {/* Cart Count */}
 
           {cartCount > 0 && (
+
             <div className="cart-count">
+
               {cartCount}
+
             </div>
+
           )}
+
         </NavLink>
 
-        {/* Clerk */}
+
+        {/* -------------------------------- */}
+        {/* CLERK */}
+        {/* -------------------------------- */}
 
         <div className="auth">
 
           <Show when="signed-out">
+
             <SignInButton>
+
               <button className="signIn">
                 Sign In
               </button>
+
             </SignInButton>
+
           </Show>
 
+
           <Show when="signed-in">
+
             <UserButton />
+
           </Show>
 
         </div>
+
 
       </div>
 

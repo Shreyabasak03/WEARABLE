@@ -12,6 +12,7 @@ import Cart from "./pages/Cart.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import OrderHistory from "./pages/OrderHistory";
 
 function App() {
 
@@ -173,6 +174,10 @@ function App() {
     path="/checkout"
     element={<Checkout />}
   />
+  <Route
+  path="/orders"
+  element={<OrderHistory />}
+/>
 
       </Route>
 

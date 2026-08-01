@@ -22,32 +22,66 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
 
+  // --------------------------------
+  // PLACE ORDER
+  // --------------------------------
+
   const handlePlaceOrder = () => {
+
     if (!paymentMethod) {
       alert("Please select a payment method");
       return;
     }
 
-    // For now, simulate order placement
-    setOrderPlaced(true);
+    // Create new order
+    const newOrder = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      status: "Processing",
+      paymentMethod,
+      items: cartItems,
+      total: totalPrice,
+    };
 
-    // Clear cart after successful order
+    // Get previous orders
+    const existingOrders =
+      JSON.parse(localStorage.getItem("orders")) || [];
+
+    // Save new order
+    localStorage.setItem(
+      "orders",
+      JSON.stringify([newOrder, ...existingOrders])
+    );
+
+    // Clear cart
     clearCart();
+
+    // Show success page
+    setOrderPlaced(true);
   };
+
+  // --------------------------------
+  // EMPTY CART
+  // --------------------------------
 
   if (cartItems.length === 0 && !orderPlaced) {
     return (
       <div className="checkout-empty">
+
         <h2>Your cart is empty</h2>
 
         <button onClick={() => navigate("/men")}>
           Continue Shopping
         </button>
+
       </div>
     );
   }
 
-  // Order success screen
+  // --------------------------------
+  // ORDER SUCCESS
+  // --------------------------------
+
   if (orderPlaced) {
     return (
       <div className="order-success">
@@ -64,11 +98,27 @@ export default function Checkout() {
           Your order has been successfully placed.
         </p>
 
-        <button
-          onClick={() => navigate("/")}
+        <div
+          style={{
+            display: "flex",
+            gap: "15px",
+            marginTop: "25px",
+          }}
         >
-          Continue Shopping
-        </button>
+
+          <button
+            onClick={() => navigate("/orders")}
+          >
+            View My Orders
+          </button>
+
+          <button
+            onClick={() => navigate("/")}
+          >
+            Continue Shopping
+          </button>
+
+        </div>
 
       </div>
     );
@@ -92,6 +142,7 @@ export default function Checkout() {
               <h2>Your Order</h2>
 
               {cartItems.map((item) => (
+
                 <div
                   className="checkout-item"
                   key={item.id}
@@ -103,6 +154,7 @@ export default function Checkout() {
                   />
 
                   <div>
+
                     <h3>{item.name}</h3>
 
                     <p>
@@ -110,20 +162,23 @@ export default function Checkout() {
                     </p>
 
                     <p>
-                      ${(
+                      $
+                      {(
                         Number(item.price) *
                         item.quantity
                       ).toFixed(2)}
                     </p>
+
                   </div>
 
                 </div>
+
               ))}
 
             </div>
 
 
-            {/* Payment */}
+            {/* PAYMENT */}
             <div className="checkout-section">
 
               <h2>Select Payment Method</h2>
@@ -141,19 +196,23 @@ export default function Checkout() {
                     setPaymentMethod("upi")
                   }
                 >
+
                   <Smartphone size={25} />
 
                   <div>
+
                     <strong>UPI</strong>
+
                     <p>
                       Google Pay, PhonePe, Paytm
                     </p>
+
                   </div>
 
                 </button>
 
 
-                {/* Card */}
+                {/* CARD */}
                 <button
                   className={`payment-option ${
                     paymentMethod === "card"
@@ -164,14 +223,19 @@ export default function Checkout() {
                     setPaymentMethod("card")
                   }
                 >
+
                   <CreditCard size={25} />
 
                   <div>
-                    <strong>Credit / Debit Card</strong>
+
+                    <strong>
+                      Credit / Debit Card
+                    </strong>
 
                     <p>
                       Visa, Mastercard, RuPay
                     </p>
+
                   </div>
 
                 </button>
@@ -188,14 +252,19 @@ export default function Checkout() {
                     setPaymentMethod("cod")
                   }
                 >
+
                   <Banknote size={25} />
 
                   <div>
-                    <strong>Cash on Delivery</strong>
+
+                    <strong>
+                      Cash on Delivery
+                    </strong>
 
                     <p>
                       Pay when your order arrives
                     </p>
+
                   </div>
 
                 </button>
@@ -213,27 +282,33 @@ export default function Checkout() {
             <h2>Order Summary</h2>
 
             <div className="summary-row">
+
               <span>Subtotal</span>
 
               <span>
                 ${totalPrice.toFixed(2)}
               </span>
+
             </div>
 
             <div className="summary-row">
+
               <span>Shipping</span>
 
               <span>Free</span>
+
             </div>
 
             <div className="summary-line"></div>
 
             <div className="summary-total">
+
               <span>Total</span>
 
               <span>
                 ${totalPrice.toFixed(2)}
               </span>
+
             </div>
 
             <button

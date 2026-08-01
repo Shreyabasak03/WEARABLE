@@ -62,6 +62,9 @@ export default function Sidebar({ isOpen, onClose }) {
             <Phone size={20} />
             <span>Contact</span>
           </NavLink>
+          <NavLink to="/orders">
+  Order History
+</NavLink>
         </nav>
       </aside>
     </>
