@@ -11,8 +11,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-import products from '../data/product.js';
 import ProductDetails from '../components/ProductDetails';
+import { getProductsByCategory } from '../api/ProductsApi.js';
 import { useCart } from '../context/cartContext.jsx';
 import './Home.css';
 
@@ -23,9 +23,35 @@ export default function ScrollSequence() {
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // States for dynamic API products
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const { addToCart } = useCart();
 
+  // 1. Fetch dynamic products from the API (Same logic as Men.jsx)
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const [shirts, shoes, watches] = await Promise.all([
+          getProductsByCategory("mens-shirts"),
+          getProductsByCategory("mens-shoes"),
+          getProductsByCategory("mens-watches"),
+        ]);
+
+        setProducts([...shirts, ...shoes, ...watches]);
+      } catch (err) {
+        console.error("Error loading trending products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // 2. Scroll sequence calculations
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
@@ -44,7 +70,7 @@ export default function ScrollSequence() {
       setScrollProgress(progress);
     };
 
-    handleScroll(); // Call once on mount
+    handleScroll();
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
@@ -201,9 +227,7 @@ export default function ScrollSequence() {
         </div>
       </section>
 
-      {/* ==========================================
-          FEATURED CATEGORIES SECTION
-         ========================================== */}
+      {/* FEATURED CATEGORIES SECTION */}
       <section className="home-categories">
         <div className="section-header">
           <h2>Explore Categories</h2>
@@ -227,9 +251,7 @@ export default function ScrollSequence() {
         </div>
       </section>
 
-      {/* ==========================================
-          ANIMATED FEATURED PRODUCTS SLIDER
-         ========================================== */}
+      {/* TRENDING ARRIVALS (SLIDER WITH LIVE API DATA) */}
       <section className="featured-products">
         <div className="section-header-slider">
           <div className="header-text">
@@ -258,47 +280,59 @@ export default function ScrollSequence() {
 
         {/* Scrollable Slider Track */}
         <div className="product-slider-track" ref={sliderRef}>
-          {products.map((product) => (
-            <div className="slider-card" key={product.id}>
-              <div className="card-media">
-                <img src={product.image} alt={product.name} loading="lazy" />
-
-                {/* Quick Action Overlay */}
-                <div className="media-overlay">
-                  <button
-                    className="quick-action-btn"
-                    onClick={() => setSelectedProduct(product)}
-                    title="Quick View Modal"
-                  >
-                    <Eye size={18} /> Quick View
-                  </button>
-                  <button
-                    className="quick-action-btn primary"
-                    onClick={() => addToCart(product, 1)}
-                    title="Add to Cart"
-                  >
-                    <ShoppingCart size={18} /> Add
-                  </button>
-                </div>
-              </div>
-
-              <div className="card-info">
-                <span className="card-brand">{product.brand}</span>
-                <h3 className="card-title">{product.name}</h3>
-                <div className="card-bottom">
-                  <span className="card-price">
-                    ${Number(product.price).toFixed(2)}
-                  </span>
-                  <button
-                    className="details-link-btn"
-                    onClick={() => setSelectedProduct(product)}
-                  >
-                    Details &rarr;
-                  </button>
-                </div>
-              </div>
+          {loading ? (
+            <div className="loading-container">
+              <h3>Loading Trending Arrivals...</h3>
             </div>
-          ))}
+          ) : products.length > 0 ? (
+            products.map((product) => (
+              <div className="slider-card" key={product.id}>
+                <div className="card-media">
+                  <img 
+                    src={product.thumbnail || product.images?.[0]} 
+                    alt={product.title} 
+                    loading="lazy" 
+                  />
+
+                  {/* Quick Action Overlay */}
+                  <div className="media-overlay">
+                    <button
+                      className="quick-action-btn"
+                      onClick={() => setSelectedProduct(product)}
+                      title="Quick View Modal"
+                    >
+                      <Eye size={18} /> Quick View
+                    </button>
+                    <button
+                      className="quick-action-btn primary"
+                      onClick={() => addToCart(product, 1)}
+                      title="Add to Cart"
+                    >
+                      <ShoppingCart size={18} /> Add
+                    </button>
+                  </div>
+                </div>
+
+                <div className="card-info">
+                  <span className="card-brand">{product.brand || 'Wearable'}</span>
+                  <h3 className="card-title">{product.title}</h3>
+                  <div className="card-bottom">
+                    <span className="card-price">
+                      ${Number(product.price).toFixed(2)}
+                    </span>
+                    <button
+                      className="details-link-btn"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      Details &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <h3>No products available</h3>
+          )}
         </div>
 
         <div className="view-all-wrapper">
@@ -308,9 +342,7 @@ export default function ScrollSequence() {
         </div>
       </section>
 
-      {/* ==========================================
-          PERKS & FEATURES BANNER
-         ========================================== */}
+      {/* PERKS & FEATURES BANNER */}
       <section className="features-banner">
         <div className="feature-item">
           <Truck size={32} />

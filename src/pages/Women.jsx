@@ -13,9 +13,12 @@ export default function Men() {
   const { addToCart } = useCart();
 
   const categories = [
-    "Men's Shirts",
-    "Men's Shoes",
-    "Men's Watches",
+    "women's Shirts",
+    "women's Dresses",
+    "women's Shoes",
+    "women's Watches",
+    "women's Bags",
+    "women's Jewellery",
   ];
 
 useEffect(() => {
