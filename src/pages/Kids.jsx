@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import ProductDetails from "../components/ProductDetails";
-import { getProductsByCategory } from "../api/productsApi";
+import { getProductsByCategory } from "../api/productsApi.js";
 import { useCart } from "../context/cartContext";
 import "./Men.css";
 
