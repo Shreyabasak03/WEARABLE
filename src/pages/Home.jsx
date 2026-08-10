@@ -105,19 +105,19 @@ export default function ScrollSequence() {
     {
       name: "Women's Collection",
       image:
-        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800',
-      link: '/men',
+        'https://plus.unsplash.com/premium_photo-1683817138638-d3d2d0626f71?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      link: '/women',
     },
     {
       name: 'Dresses & Tops',
       image:
-        'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800',
-      link: '/men',
+        'https://images.unsplash.com/photo-1577909687863-91bb3ec12db5?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      link: '/women',
     },
     {
       name: 'Trending Styles',
       image:
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800',
+        'https://images.unsplash.com/photo-1783369997489-705490fe5a82?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       link: '/men',
     },
   ];
