@@ -1,0 +1,669 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #000000;
+  --bg-secondary: #101918;
+  --bg-card: #14201e;
+  --bg-hover: #172522;
+
+  /* Borders */
+  --border: #1e302d;
+  --border-light: #263d39;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #91a6a2;
+  --text-muted: #6f8883;
+
+  /* Gradient colors */
+  --green-light: #6fd6cb;
+  --green: #42a89c;
+  --green-dark: #1f7b70;
+  --green-deep: #0f4d45;
+
+  /* Main gradient */
+  --gradient: linear-gradient(
+    135deg,
+    #6fd6cb 0%,
+    #42a89c 35%,
+    #1f7b70 70%,
+    #0f4d45 100%
+  );
+
+  /* Shadows */
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  border: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--green-dark);
+  color: #ffffff;
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--green-dark);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green);
+}
+
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg-primary);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+
+  background: var(--bg-secondary);
+
+  border-right: 1px solid var(--border);
+
+  padding: 28px 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  z-index: 100;
+}
+
+/* ---------------- Logo ---------------- */
+
+.sidebar-logo {
+  padding: 0 14px;
+  margin-bottom: 45px;
+
+  display: flex;
+  flex-direction: column;
+
+  line-height: 0.9;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+.sidebar-logo span:first-child {
+  color: var(--text-primary);
+}
+
+.sidebar-logo span:last-child {
+  color: var(--green-light);
+}
+
+/* ---------------- Navigation ---------------- */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 13px 15px;
+
+  border-radius: 10px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.sidebar-link svg {
+  flex-shrink: 0;
+}
+
+.sidebar-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+
+  transform: translateX(2px);
+}
+
+/* Active navigation */
+
+.sidebar-link.active {
+  background: var(--gradient);
+
+  color: #ffffff;
+
+  box-shadow: 0 6px 20px rgba(31, 123, 112, 0.25);
+}
+
+.sidebar-link.active:hover {
+  transform: translateX(0);
+}
+
+/* ---------------- Logout ---------------- */
+
+.logout-button {
+  margin-top: auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 13px 15px;
+
+  background: transparent;
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.logout-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   MAIN CONTENT AREA
+========================================================= */
+
+.admin-main {
+  margin-left: 250px;
+
+  width: calc(100% - 250px);
+
+  min-height: 100vh;
+
+  background: var(--bg-primary);
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar {
+  height: 75px;
+
+  padding: 0 32px;
+
+  border-bottom: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--bg-secondary);
+
+  position: sticky;
+  top: 0;
+
+  z-index: 50;
+}
+
+/* ---------------- Search ---------------- */
+
+.search-box {
+  width: 320px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border-light);
+
+  padding: 10px 14px;
+
+  border-radius: 9px;
+
+  color: var(--text-muted);
+
+  transition:
+    border 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--green-dark);
+
+  box-shadow: 0 0 0 3px rgba(66, 168, 156, 0.08);
+}
+
+.search-box input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: var(--text-primary);
+
+  font-size: 13px;
+}
+
+.search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------------- Topbar right ---------------- */
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+
+  gap: 24px;
+}
+
+/* ---------------- Notification ---------------- */
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border);
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border 0.25s ease;
+}
+
+.icon-button:hover {
+  background: var(--green-deep);
+
+  border-color: var(--green-dark);
+
+  color: var(--green-light);
+}
+
+/* ---------------- Admin profile ---------------- */
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.admin-avatar {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  background: var(--gradient);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+}
+
+.admin-name {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  margin-bottom: 3px;
+}
+
+.admin-profile span {
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   PAGE CONTENT
+========================================================= */
+
+.admin-content {
+  padding: 32px;
+}
+
+.admin-content h1 {
+  font-size: 28px;
+
+  font-weight: 600;
+
+  margin-bottom: 8px;
+}
+
+.admin-content p {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border-radius: 9px;
+
+  background: var(--gradient);
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 18px rgba(31, 123, 112, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 9px 24px rgba(31, 123, 112, 0.3);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border-radius: 9px;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border-light);
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: var(--bg-card);
+
+  color: var(--text-primary);
+
+  border-color: var(--green-dark);
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+
+  box-shadow: var(--shadow);
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .admin-main {
+    margin-left: 220px;
+
+    width: calc(100% - 220px);
+  }
+
+  .topbar {
+    padding: 0 24px;
+  }
+
+  .admin-content {
+    padding: 24px;
+  }
+
+  .search-box {
+    width: 250px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+
+    padding: 24px 10px;
+  }
+
+  .sidebar-logo {
+    align-items: center;
+
+    padding: 0;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 35px;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+
+    padding: 13px 10px;
+  }
+
+  .sidebar-link span,
+  .logout-button span {
+    display: none;
+  }
+
+  .logout-button {
+    justify-content: center;
+
+    padding: 13px 10px;
+  }
+
+  .admin-main {
+    margin-left: 70px;
+
+    width: calc(100% - 70px);
+  }
+
+  .topbar {
+    height: 68px;
+
+    padding: 0 18px;
+  }
+
+  .search-box {
+    width: 200px;
+  }
+
+  .admin-profile > div:last-child {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 12px;
+  }
+
+  .admin-content {
+    padding: 22px 18px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - SMALL MOBILE
+========================================================= */
+
+@media (max-width: 500px) {
+  .sidebar {
+    width: 60px;
+
+    padding: 20px 7px;
+  }
+
+  .admin-main {
+    margin-left: 60px;
+
+    width: calc(100% - 60px);
+  }
+
+  .sidebar-logo {
+    font-size: 12px;
+  }
+
+  .search-box {
+    width: 45px;
+
+    padding: 10px;
+
+    justify-content: center;
+  }
+
+  .search-box input {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .admin-content {
+    padding: 18px 14px;
+  }
+
+  .admin-content h1 {
+    font-size: 23px;
+  }
+}

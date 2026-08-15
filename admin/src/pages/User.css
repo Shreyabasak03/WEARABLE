@@ -1,0 +1,574 @@
+/* =========================================================
+   USERS PAGE
+========================================================= */
+
+.users-page {
+  width: 100%;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.users-header {
+  margin-bottom: 28px;
+}
+
+.users-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+.users-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   USER STATISTICS
+========================================================= */
+
+.user-stats {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.user-stat-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 18px;
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+}
+
+.user-stat-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+}
+
+.user-stat-icon.total {
+  background: var(--green-deep);
+  color: var(--green-light);
+}
+
+.user-stat-icon.active {
+  background: rgba(66, 168, 156, 0.1);
+  color: var(--green-light);
+}
+
+.user-stat-icon.new {
+  background: rgba(120, 174, 232, 0.1);
+  color: #78aee8;
+}
+
+.user-stat-icon.blocked {
+  background: rgba(232, 141, 141, 0.1);
+  color: #e88d8d;
+}
+
+.user-stat-card span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+}
+
+.user-stat-card h3 {
+  color: var(--text-primary);
+
+  font-size: 20px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   USERS CARD
+========================================================= */
+
+.users-card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.users-toolbar {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.user-search {
+  width: 320px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 9px 12px;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 8px;
+
+  color: var(--text-muted);
+}
+
+.user-search:focus-within {
+  border-color: var(--green-dark);
+}
+
+.user-search input {
+  width: 100%;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+}
+
+.user-search input::placeholder {
+  color: var(--text-muted);
+}
+
+
+/* =========================================================
+   STATUS FILTER
+========================================================= */
+
+.user-status-filter {
+  padding: 9px 12px;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+.user-status-filter:focus {
+  border-color: var(--green-dark);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.users-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+
+  min-width: 1000px;
+
+  border-collapse: collapse;
+}
+
+.users-table th {
+  padding: 13px 18px;
+
+  text-align: left;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+
+  font-weight: 500;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.users-table td {
+  padding: 15px 18px;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+}
+
+.users-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.users-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   USER INFO
+========================================================= */
+
+.user-info {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--green-deep);
+
+  color: var(--green-light);
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.user-info h4 {
+  margin-bottom: 3px;
+
+  color: var(--text-primary);
+
+  font-size: 11px;
+
+  font-weight: 500;
+}
+
+.user-info span {
+  color: var(--text-muted);
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+.user-phone {
+  font-size: 11px;
+
+  color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+.user-orders {
+  color: var(--text-primary);
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   SPENT
+========================================================= */
+
+.user-spent {
+  color: var(--text-primary);
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   JOINED
+========================================================= */
+
+.user-joined {
+  color: var(--text-secondary);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.user-status {
+  display: inline-flex;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 9px;
+
+  font-weight: 500;
+}
+
+.user-status.active {
+  color: var(--green-light);
+
+  background: rgba(66, 168, 156, 0.1);
+}
+
+.user-status.blocked {
+  color: #e88d8d;
+
+  background: rgba(232, 141, 141, 0.1);
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.user-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+.user-actions button {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  border-radius: 6px;
+
+  color: var(--text-muted);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.user-actions button:hover {
+  background: var(--bg-hover);
+
+  color: var(--text-primary);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.no-users {
+  padding: 50px !important;
+
+  text-align: center;
+
+  color: var(--text-muted) !important;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.users-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 16px 18px;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.users-pagination {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+.users-pagination button {
+  padding: 7px 10px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: var(--text-secondary);
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+.users-pagination button:hover:not(:disabled) {
+  background: var(--bg-hover);
+
+  color: var(--text-primary);
+}
+
+.users-pagination button:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+.users-pagination .active-page {
+  background: var(--green-deep);
+
+  border-color: var(--green-dark);
+
+  color: var(--green-light);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .user-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .users-toolbar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .user-search {
+    width: 100%;
+  }
+
+  .user-status-filter {
+    width: 100%;
+  }
+
+  .users-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .user-stats {
+    grid-template-columns: 1fr;
+  }
+
+}
