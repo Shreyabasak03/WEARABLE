@@ -12,7 +12,8 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Products from "./pages/Products.jsx";
 import Orders from "./pages/Orders.jsx";
 import Users from "./pages/Users.jsx";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Settings.jsx";
+import AddProduct from "./pages/AddProduct.jsx";
 
 
 function App() {
@@ -75,6 +76,10 @@ function App() {
          
 
         </Route>
+        <Route
+  path="/products/add"
+  element={<AddProduct />}
+/>
 
 
         {/* =================================================

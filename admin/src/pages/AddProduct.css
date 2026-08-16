@@ -1,0 +1,520 @@
+/* =========================================================
+   ADD PRODUCT PAGE
+========================================================= */
+
+.add-product-page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.add-product-header {
+  margin-bottom: 28px;
+}
+
+.add-product-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-top: 18px;
+  margin-bottom: 7px;
+}
+
+.add-product-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  background: transparent;
+  border: none;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+.back-button:hover {
+  color: var(--green-light);
+}
+
+
+/* =========================================================
+   FORM CARD
+========================================================= */
+
+.form-card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+
+  padding: 24px;
+
+  margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   FORM CARD HEADER
+========================================================= */
+
+.form-card-header {
+  margin-bottom: 24px;
+}
+
+.form-card-header h2 {
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: var(--text-primary);
+
+  margin-bottom: 5px;
+}
+
+.form-card-header p {
+  font-size: 11px;
+
+  color: var(--text-muted);
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--text-secondary);
+
+  font-size: 11px;
+
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select,
+.tag-input input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 13px;
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 8px;
+
+  background: var(--bg-hover);
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+  resize: vertical;
+
+  min-height: 120px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.tag-input input:focus {
+  border-color: var(--green-dark);
+
+  box-shadow:
+    0 0 0 3px rgba(66, 168, 156, 0.08);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder,
+.tag-input input::placeholder {
+  color: var(--text-muted);
+}
+
+
+/* =========================================================
+   TAG INPUT
+========================================================= */
+
+.tag-input {
+  display: flex;
+
+  gap: 10px;
+}
+
+.tag-input button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 0 16px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: var(--gradient);
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.tag-input button:hover {
+  opacity: 0.9;
+}
+
+
+/* =========================================================
+   TAGS
+========================================================= */
+
+.tags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.tag {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 6px 9px;
+
+  border-radius: 6px;
+
+  background: rgba(66, 168, 156, 0.1);
+
+  border: 1px solid rgba(66, 168, 156, 0.2);
+
+  color: var(--green-light);
+
+  font-size: 10px;
+}
+
+.tag button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--green-light);
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+.status-row h2 {
+  font-size: 15px;
+
+  font-weight: 600;
+
+  margin-bottom: 5px;
+}
+
+.status-row p {
+  font-size: 11px;
+
+  color: var(--text-muted);
+}
+
+
+/* =========================================================
+   SWITCH
+========================================================= */
+
+.switch {
+  position: relative;
+
+  width: 44px;
+
+  height: 24px;
+
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+
+  width: 0;
+
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+
+  inset: 0;
+
+  cursor: pointer;
+
+  background: var(--bg-hover);
+
+  border: 1px solid var(--border);
+
+  border-radius: 30px;
+
+  transition: 0.25s;
+}
+
+.slider::before {
+  content: "";
+
+  position: absolute;
+
+  width: 18px;
+
+  height: 18px;
+
+  left: 2px;
+
+  top: 2px;
+
+  background: var(--text-muted);
+
+  border-radius: 50%;
+
+  transition: 0.25s;
+}
+
+.switch input:checked + .slider {
+  background: var(--green-deep);
+
+  border-color: var(--green-dark);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+
+  background: var(--green-light);
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.form-message {
+  padding: 12px 15px;
+
+  border-radius: 8px;
+
+  font-size: 11px;
+
+  margin-bottom: 16px;
+}
+
+.form-message.error {
+  color: #e88d8d;
+
+  background: rgba(232, 141, 141, 0.08);
+
+  border: 1px solid rgba(232, 141, 141, 0.15);
+}
+
+.form-message.success {
+  color: var(--green-light);
+
+  background: rgba(66, 168, 156, 0.08);
+
+  border: 1px solid rgba(66, 168, 156, 0.15);
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+========================================================= */
+
+.form-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding-bottom: 30px;
+}
+
+.cancel-button,
+.save-product-button {
+  padding: 11px 18px;
+
+  border-radius: 8px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: transparent;
+
+  border: 1px solid var(--border);
+
+  color: var(--text-secondary);
+}
+
+.cancel-button:hover {
+  background: var(--bg-hover);
+
+  color: var(--text-primary);
+}
+
+.save-product-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 130px;
+
+  background: var(--gradient);
+
+  border: none;
+
+  color: white;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.save-product-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 20px rgba(66, 168, 156, 0.2);
+}
+
+.save-product-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .form-card {
+    padding: 18px;
+  }
+
+  .tag-input {
+    flex-direction: column;
+  }
+
+  .tag-input button {
+    padding: 10px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .save-product-button {
+    width: 100%;
+  }
+}

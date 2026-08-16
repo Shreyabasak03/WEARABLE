@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import {
   Search,
   Plus,
-  MoreHorizontal,
   Package,
   Edit,
   Trash2,
@@ -11,68 +13,176 @@ import {
 
 import "./Products.css";
 
+
 const Products = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All Categories");
+  const [statusFilter, setStatusFilter] = useState("All Status");
 
-  const products = [
-    {
-      id: 1,
-      name: "Classic Oversized T-Shirt",
-      category: "Men",
-      price: 799,
-      stock: 42,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Premium Denim Jacket",
-      category: "Men",
-      price: 2499,
-      stock: 18,
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Women's Casual Sneakers",
-      category: "Women",
-      price: 1899,
-      stock: 7,
-      status: "Low Stock",
-    },
-    {
-      id: 4,
-      name: "Slim Fit Cargo Pants",
-      category: "Men",
-      price: 1299,
-      stock: 25,
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Minimal Crossbody Bag",
-      category: "Accessories",
-      price: 999,
-      stock: 0,
-      status: "Out of Stock",
-    },
-    {
-      id: 6,
-      name: "Oversized Hoodie",
-      category: "Women",
-      price: 1599,
-      stock: 12,
-      status: "Active",
-    },
-  ];
+  const [products, setProducts] = useState([]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // ==========================================
+  // GET PRODUCTS FROM BACKEND
+  // ==========================================
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await axios.get(
+        "http://localhost:5001/api/products"
+      );
+
+      console.log("Products received:", response.data);
+
+      setProducts(response.data.products || []);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+
+      setError(
+        err.response?.data?.message ||
+          "Failed to load products."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ==========================================
+  // FETCH PRODUCTS WHEN PAGE LOADS
+  // ==========================================
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // ==========================================
+  // PRODUCT STATUS
+  // ==========================================
+
+  const getProductStatus = (stock) => {
+    if (stock === 0) {
+      return "Out of Stock";
+    }
+
+    if (stock <= 10) {
+      return "Low Stock";
+    }
+
+    return "Active";
+  };
+
+  // ==========================================
+  // FILTER PRODUCTS
+  // ==========================================
+
+  const filteredProducts = products.filter((product) => {
+    const status = getProductStatus(product.stock);
+
+    const matchesSearch =
+      product.name
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
+
+    const matchesCategory =
+      categoryFilter === "All Categories" ||
+      product.category === categoryFilter;
+
+    const matchesStatus =
+      statusFilter === "All Status" ||
+      status === statusFilter;
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesStatus
+    );
+  });
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+
+  if (loading) {
+    return (
+      <div className="products-page">
+        <div className="products-header">
+          <div>
+            <h1>Products</h1>
+
+            <p>
+              Manage your store products and inventory.
+            </p>
+          </div>
+        </div>
+
+        <div className="products-card">
+          <div
+            style={{
+              padding: "50px",
+              textAlign: "center",
+              color: "var(--text-muted)",
+            }}
+          >
+            Loading products...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // ERROR
+  // ==========================================
+
+  if (error) {
+    return (
+      <div className="products-page">
+        <div className="products-header">
+          <div>
+            <h1>Products</h1>
+
+            <p>
+              Manage your store products and inventory.
+            </p>
+          </div>
+
+          <button
+            className="add-product-button"
+            onClick={fetchProducts}
+          >
+            Retry
+          </button>
+        </div>
+
+        <div className="products-card">
+          <div
+            style={{
+              padding: "50px",
+              textAlign: "center",
+              color: "#e88d8d",
+            }}
+          >
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // MAIN UI
+  // ==========================================
 
   return (
     <div className="products-page">
 
-      {/* Header */}
+      {/* HEADER */}
 
       <div className="products-header">
 
@@ -84,22 +194,24 @@ const Products = () => {
           </p>
         </div>
 
-        <button className="add-product-button">
+        <button className="add-product-button" onClick={() => navigate("/products/add")}>
           <Plus size={18} />
-
+          
           Add Product
         </button>
 
       </div>
 
 
-      {/* Products Card */}
+      {/* PRODUCTS CARD */}
 
       <div className="products-card">
 
-        {/* Toolbar */}
+        {/* TOOLBAR */}
 
         <div className="products-toolbar">
+
+          {/* SEARCH */}
 
           <div className="product-search">
 
@@ -109,25 +221,48 @@ const Products = () => {
               type="text"
               placeholder="Search products..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
             />
 
           </div>
 
 
+          {/* FILTERS */}
+
           <div className="product-filters">
 
-            <select>
+            <select
+              value={categoryFilter}
+              onChange={(e) =>
+                setCategoryFilter(e.target.value)
+              }
+            >
               <option>All Categories</option>
+
               <option>Men</option>
+
               <option>Women</option>
+
               <option>Accessories</option>
+
+              <option>Children</option>
             </select>
 
-            <select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value)
+              }
+            >
               <option>All Status</option>
+
               <option>Active</option>
+
               <option>Low Stock</option>
+
               <option>Out of Stock</option>
             </select>
 
@@ -136,7 +271,7 @@ const Products = () => {
         </div>
 
 
-        {/* Products Table */}
+        {/* TABLE */}
 
         <div className="products-table-wrapper">
 
@@ -165,121 +300,182 @@ const Products = () => {
 
             <tbody>
 
-              {filteredProducts.map((product) => (
+              {filteredProducts.length > 0 ? (
 
-                <tr key={product.id}>
+                filteredProducts.map((product) => {
 
-                  {/* Product */}
+                  const status = getProductStatus(
+                    product.stock
+                  );
 
-                  <td>
+                  return (
 
-                    <div className="product-info">
+                    <tr
+                      key={product._id}
+                    >
 
-                      <div className="product-image">
+                      {/* PRODUCT */}
 
-                        <Package size={20} />
+                      <td>
 
-                      </div>
+                        <div className="product-info">
 
-                      <div>
+                          <div className="product-image">
 
-                        <h4>
-                          {product.name}
-                        </h4>
+                            {product.image ? (
 
-                        <span>
-                          ID: #{product.id}
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "8px",
+                                }}
+                              />
+
+                            ) : (
+
+                              <Package size={20} />
+
+                            )}
+
+                          </div>
+
+
+                          <div>
+
+                            <h4>
+                              {product.name}
+                            </h4>
+
+                            <span>
+                              ID: #
+                              {product._id
+                                ?.slice(-6)
+                                .toUpperCase()}
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </td>
+
+
+                      {/* CATEGORY */}
+
+                      <td>
+
+                        <span className="category-text">
+                          {product.category}
                         </span>
 
-                      </div>
-
-                    </div>
-
-                  </td>
+                      </td>
 
 
-                  {/* Category */}
+                      {/* PRICE */}
 
-                  <td>
-                    <span className="category-text">
-                      {product.category}
-                    </span>
-                  </td>
+                      <td>
 
+                        <span className="product-price">
 
-                  {/* Price */}
+                          ₹
+                          {Number(
+                            product.price
+                          ).toLocaleString("en-IN")}
 
-                  <td>
+                        </span>
 
-                    <span className="product-price">
-                      ₹{product.price.toLocaleString("en-IN")}
-                    </span>
-
-                  </td>
+                      </td>
 
 
-                  {/* Stock */}
+                      {/* STOCK */}
 
-                  <td>
+                      <td>
 
-                    <span
-                      className={`stock-value ${
-                        product.stock <= 5
-                          ? "stock-danger"
-                          : product.stock <= 10
-                          ? "stock-warning"
-                          : ""
-                      }`}
-                    >
-                      {product.stock}
-                    </span>
+                        <span
+                          className={`stock-value ${
+                            product.stock <= 5
+                              ? "stock-danger"
+                              : product.stock <= 10
+                              ? "stock-warning"
+                              : ""
+                          }`}
+                        >
+                          {product.stock}
+                        </span>
 
-                  </td>
-
-
-                  {/* Status */}
-
-                  <td>
-
-                    <span
-                      className={`product-status ${product.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                    >
-                      {product.status}
-                    </span>
-
-                  </td>
+                      </td>
 
 
-                  {/* Actions */}
+                      {/* STATUS */}
 
-                  <td>
+                      <td>
 
-                    <div className="product-actions">
+                        <span
+                          className={`product-status ${status
+                            .toLowerCase()
+                            .replace(" ", "-")}`}
+                        >
+                          {status}
+                        </span>
 
-                      <button title="View">
-                        <Eye size={16} />
-                      </button>
+                      </td>
 
-                      <button title="Edit">
-                        <Edit size={16} />
-                      </button>
 
-                      <button
-                        className="delete-action"
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {/* ACTIONS */}
 
-                    </div>
+                      <td>
 
+                        <div className="product-actions">
+
+                          <button title="View">
+                            <Eye size={16} />
+                          </button>
+
+
+                          <button title="Edit">
+                            <Edit size={16} />
+                          </button>
+
+
+                          <button
+                            className="delete-action"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  );
+
+                })
+
+              ) : (
+
+                <tr>
+
+                  <td
+                    colSpan="6"
+                    style={{
+                      textAlign: "center",
+                      padding: "50px",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    No products found.
                   </td>
 
                 </tr>
 
-              ))}
+              )}
 
             </tbody>
 
@@ -288,13 +484,19 @@ const Products = () => {
         </div>
 
 
-        {/* Footer */}
+        {/* FOOTER */}
 
         <div className="products-footer">
 
           <span>
-            Showing {filteredProducts.length} of {products.length} products
+
+            Showing{" "}
+            {filteredProducts.length}{" "}
+            of{" "}
+            {products.length} products
+
           </span>
+
 
           <div className="pagination">
 
@@ -304,10 +506,6 @@ const Products = () => {
 
             <button className="active-page">
               1
-            </button>
-
-            <button>
-              2
             </button>
 
             <button>
