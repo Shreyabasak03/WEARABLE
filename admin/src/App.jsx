@@ -14,6 +14,7 @@ import Orders from "./pages/Orders.jsx";
 import Users from "./pages/Users.jsx";
 import Settings from "./pages/Settings.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
+import EditProduct from "./pages/EditProduct";
 
 
 function App() {
@@ -80,7 +81,10 @@ function App() {
   path="/products/add"
   element={<AddProduct />}
 />
-
+<Route
+  path="/products/edit/:id"
+  element={<EditProduct />}
+/>
 
         {/* =================================================
             UNKNOWN ROUTES
@@ -97,6 +101,7 @@ function App() {
         />
 
       </Routes>
+
 
     </BrowserRouter>
   );

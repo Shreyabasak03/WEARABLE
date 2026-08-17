@@ -9,38 +9,58 @@ export default function ProductCard({
   return (
     <div className="product-card">
 
+      {/* PRODUCT IMAGE */}
+
       <div className="product-img-box">
 
         <img
-          src={product.thumbnail}
-          alt={product.title}
+          src={product.image}
+          alt={product.name}
         />
 
-        <button className="heart-btn">
+        <button
+          className="heart-btn"
+          type="button"
+        >
           <Heart size={20} />
         </button>
 
       </div>
 
+
+      {/* PRODUCT INFORMATION */}
+
       <div className="product-card-body">
 
         <div className="product-name">
 
-          <h3>{product.title}</h3>
+          <h3>
+            {product.name}
+          </h3>
 
           <span>
-            ${Number(product.price).toFixed(2)}
+            ₹{Number(product.price).toLocaleString("en-IN")}
           </span>
 
         </div>
 
-        <p className="product-brand">
-          {product.brand}
-        </p>
+
+        {/* BRAND */}
+
+        {product.brand && (
+          <p className="product-brand">
+            {product.brand}
+          </p>
+        )}
+
+
+        {/* DETAILS BUTTON */}
 
         <button
           className="details-btn"
-          onClick={() => onViewDetails(product)}
+          onClick={() =>
+            onViewDetails(product)
+          }
         >
           View More Details
         </button>

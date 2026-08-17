@@ -25,6 +25,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+
   // ==========================================
   // GET PRODUCTS FROM BACKEND
   // ==========================================
@@ -80,6 +81,34 @@ const Products = () => {
   // ==========================================
   // FILTER PRODUCTS
   // ==========================================
+const handleDelete = async (productId) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(
+      `http://localhost:5001/api/products/${productId}`
+    );
+
+    // Remove the product from the current UI
+    setProducts((prevProducts) =>
+      prevProducts.filter(
+        (product) => product._id !== productId
+      )
+    );
+
+  } catch (err) {
+    console.error("Failed to delete product:", err);
+
+    alert(
+      err.response?.data?.message ||
+        "Failed to delete product."
+    );
+  }
+};
 
   const filteredProducts = products.filter((product) => {
     const status = getProductStatus(product.stock);
@@ -103,6 +132,7 @@ const Products = () => {
       matchesStatus
     );
   });
+
 
   // ==========================================
   // LOADING
@@ -436,17 +466,22 @@ const Products = () => {
                           </button>
 
 
-                          <button title="Edit">
-                            <Edit size={16} />
-                          </button>
-
+                         <button
+  title="Edit"
+  onClick={() =>
+    navigate(`/products/edit/${product._id}`)
+  }
+>
+  <Edit size={16} />
+</button>
 
                           <button
-                            className="delete-action"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+  className="delete-action"
+  title="Delete"
+  onClick={() => handleDelete(product._id)}
+>
+  <Trash2 size={16} />
+</button>
 
                         </div>
 

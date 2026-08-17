@@ -12,39 +12,65 @@ export default function Men() {
 
   const { addToCart } = useCart();
 
+  // ==========================================
+  // CATEGORY SLIDER
+  // ==========================================
+
   const categories = [
     "Men's Shirts",
     "Men's Shoes",
     "Men's Watches",
   ];
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const [shirts, shoes, watches] = await Promise.all([
-        getProductsByCategory("mens-shirts"),
-        getProductsByCategory("mens-shoes"),
-        getProductsByCategory("mens-watches"),
-      ]);
+  // ==========================================
+  // FETCH MEN PRODUCTS
+  // ==========================================
 
-      setProducts([...shirts, ...shoes, ...watches]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const menProducts =
+          await getProductsByCategory("Men");
 
-  fetchProducts();
-}, []);
+        setProducts(menProducts);
+      } catch (error) {
+        console.error(
+          "Failed to fetch men products:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+
   if (loading) {
-    return <h2>Loading Products...</h2>;
+    return (
+      <div className="men">
+        <div className="products-loading">
+          <h2>Loading Products...</h2>
+        </div>
+      </div>
+    );
   }
+
+  // ==========================================
+  // PAGE
+  // ==========================================
 
   return (
     <div className="men">
 
-      {/* HERO */}
+      {/* ======================================
+          HERO
+      ====================================== */}
+
       <div className="image-card">
 
         <div className="image">
@@ -54,39 +80,80 @@ useEffect(() => {
           />
         </div>
 
+
+        {/* ====================================
+            CATEGORY SLIDER
+        ==================================== */}
+
         <div className="category-slider">
+
           <div className="slide-track">
-            {[...categories, ...categories].map((item, index) => (
-              <span key={index}>{item}</span>
-            ))}
+
+            {[...categories, ...categories].map(
+              (item, index) => (
+                <span key={index}>
+                  {item}
+                </span>
+              )
+            )}
+
           </div>
+
         </div>
 
       </div>
 
-      {/* PRODUCTS */}
+
+      {/* ======================================
+          PRODUCTS
+      ====================================== */}
+
       <div className="cards-container">
 
         {products.length > 0 ? (
+
           products.map((product) => (
+
             <ProductCard
-              key={product.id}
+              key={product._id}
               product={product}
               onViewDetails={setSelectedProduct}
             />
+
           ))
+
         ) : (
-          <h2>No Products Found</h2>
+
+          <div className="no-products">
+
+            <h2>No Products Found</h2>
+
+            <p>
+              There are currently no men's
+              products available.
+            </p>
+
+          </div>
+
         )}
 
       </div>
 
+
+      {/* ======================================
+          PRODUCT DETAILS
+      ====================================== */}
+
       {selectedProduct && (
+
         <ProductDetails
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          onClose={() =>
+            setSelectedProduct(null)
+          }
           onAddToCart={addToCart}
         />
+
       )}
 
     </div>

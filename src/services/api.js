@@ -2,10 +2,25 @@
 
 import axios from "axios";
 
-export const getProducts = () => {
-    return axios.get("https://fakestoreapi.com/products");
+const API_URL = "http://localhost:5001/api/products";
+
+// ==========================================
+// GET ALL PRODUCTS
+// ==========================================
+
+export const getProducts = async () => {
+  const response = await axios.get(API_URL);
+
+  return response.data.products;
 };
 
-export const getSingleProduct = (id) => {
-    return axios.get(`https://fakestoreapi.com/products/${id}`);
+
+// ==========================================
+// GET SINGLE PRODUCT
+// ==========================================
+
+export const getSingleProduct = async (id) => {
+  const response = await axios.get(`${API_URL}/${id}`);
+
+  return response.data.product;
 };

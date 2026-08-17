@@ -1,172 +1,3 @@
-// import React from "react";
-// import { Link } from "react-router-dom";
-// import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
-// import { useCart } from "../context/CartContext";
-// import "./Cart.css";
-
-// export default function Cart() {
-//   const {
-//     cartItems,
-//     increaseQuantity,
-//     decreaseQuantity,
-//     removeFromCart,
-//     clearCart,
-//     totalPrice,
-//   } = useCart();
-
-//   if (cartItems.length === 0) {
-//     return (
-//       <div className="empty-cart">
-//         <ShoppingBag size={70} />
-
-//         <h2>Your Cart is Empty</h2>
-
-//         <p>
-//           Looks like you haven't added anything to your cart yet.
-//         </p>
-
-//         <Link to="/men" className="continue-shopping">
-//           Continue Shopping
-//         </Link>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="cart-page">
-//       <div className="cart-container">
-
-//         <div className="cart-header">
-//           <div>
-//             <h1>Your Shopping Cart</h1>
-//             <p>{cartItems.length} product(s) in your cart</p>
-//           </div>
-
-//           <button
-//             className="clear-cart"
-//             onClick={clearCart}
-//           >
-//             Clear Cart
-//           </button>
-//         </div>
-
-//         <div className="cart-content">
-
-//           {/* Products */}
-//           <div className="cart-products">
-
-//             {cartItems.map((item) => (
-//               <div className="cart-item" key={item.id}>
-
-//                 <img
-//                   src={item.image}
-//                   alt={item.name}
-//                   className="cart-item-image"
-//                 />
-
-//                 <div className="cart-item-details">
-
-//                   <h3>{item.name}</h3>
-
-//                   <p className="cart-category">
-//                     {item.category}
-//                   </p>
-
-//                   <p className="cart-price">
-//                     ${item.price.toFixed(2)}
-//                   </p>
-
-//                   <div className="quantity-control">
-
-//                     <button
-//                       onClick={() =>
-//                         decreaseQuantity(item.id)
-//                       }
-//                     >
-//                       <Minus size={16} />
-//                     </button>
-
-//                     <span>{item.quantity}</span>
-
-//                     <button
-//                       onClick={() =>
-//                         increaseQuantity(item.id)
-//                       }
-//                     >
-//                       <Plus size={16} />
-//                     </button>
-
-//                   </div>
-
-//                 </div>
-
-//                 <div className="cart-item-right">
-
-//                   <p className="item-total">
-//                     ${(item.price * item.quantity).toFixed(2)}
-//                   </p>
-
-//                   <button
-//                     className="remove-btn"
-//                     onClick={() =>
-//                       removeFromCart(item.id)
-//                     }
-//                   >
-//                     <Trash2 size={20} />
-//                   </button>
-
-//                 </div>
-
-//               </div>
-//             ))}
-
-//           </div>
-
-//           {/* Summary */}
-//           <div className="cart-summary">
-
-//             <h2>Order Summary</h2>
-
-//             <div className="summary-row">
-//               <span>Subtotal</span>
-//               <span>${totalPrice.toFixed(2)}</span>
-//             </div>
-
-//             <div className="summary-row">
-//               <span>Shipping</span>
-//               <span>Free</span>
-//             </div>
-
-//             <div className="summary-line"></div>
-
-//             <div className="summary-total">
-//               <span>Total</span>
-//               <span>${totalPrice.toFixed(2)}</span>
-//             </div>
-
-//            <button
-//   className="checkout-btn"
-//   onClick={() => navigate("/checkout")}
-// >
-//   Proceed to Checkout
-// </button>
-
-//             <Link
-//               to="/men"
-//               className="continue-link"
-//             >
-//               Continue Shopping
-//             </Link>
-
-//           </div>
-
-//         </div>
-
-//       </div>
-//     </div>
-//   );
-// }
-
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -180,7 +11,6 @@ import { useCart } from "../context/cartContext.jsx";
 import "./Cart.css";
 
 export default function Cart() {
-
   const navigate = useNavigate();
 
   const {
@@ -192,8 +22,10 @@ export default function Cart() {
     totalPrice,
   } = useCart();
 
+  // ==========================================
+  // EMPTY CART
+  // ==========================================
 
-  // Empty Cart
   if (cartItems.length === 0) {
     return (
       <div className="empty-cart">
@@ -224,16 +56,25 @@ export default function Cart() {
 
       <div className="cart-container">
 
-        {/* Header */}
+        {/* ======================================
+            HEADER
+        ====================================== */}
+
         <div className="cart-header">
 
           <div>
-            <h1>Your Shopping Cart</h1>
+
+            <h1>
+              Your Shopping Cart
+            </h1>
 
             <p>
-              {cartItems.length} product(s) in your cart
+              {cartItems.length} product(s)
+              {" "}in your cart
             </p>
+
           </div>
+
 
           <button
             className="clear-cart"
@@ -247,17 +88,21 @@ export default function Cart() {
 
         <div className="cart-content">
 
-          {/* Products */}
+          {/* ====================================
+              PRODUCTS
+          ==================================== */}
+
           <div className="cart-products">
 
             {cartItems.map((item) => (
 
               <div
                 className="cart-item"
-                key={item.id}
+                key={item.id || item._id}
               >
 
-                {/* Image */}
+                {/* IMAGE */}
+
                 <img
                   src={item.image}
                   alt={item.name}
@@ -265,39 +110,54 @@ export default function Cart() {
                 />
 
 
-                {/* Details */}
+                {/* DETAILS */}
+
                 <div className="cart-item-details">
 
-                  <h3>{item.name}</h3>
+                  <h3>
+                    {item.name}
+                  </h3>
+
 
                   <p className="cart-category">
                     {item.category}
                   </p>
 
+
                   <p className="cart-price">
-                    ${Number(item.price).toFixed(2)}
+                    ₹
+                    {Number(item.price).toLocaleString(
+                      "en-IN"
+                    )}
                   </p>
 
 
-                  {/* Quantity */}
+                  {/* QUANTITY */}
+
                   <div className="quantity-control">
 
                     <button
                       onClick={() =>
-                        decreaseQuantity(item.id)
+                        decreaseQuantity(
+                          item.id || item._id
+                        )
                       }
                       disabled={item.quantity <= 1}
                     >
                       <Minus size={16} />
                     </button>
 
+
                     <span>
                       {item.quantity}
                     </span>
 
+
                     <button
                       onClick={() =>
-                        increaseQuantity(item.id)
+                        increaseQuantity(
+                          item.id || item._id
+                        )
                       }
                       disabled={
                         item.quantity >= item.stock
@@ -311,22 +171,29 @@ export default function Cart() {
                 </div>
 
 
-                {/* Right Side */}
+                {/* =================================
+                    RIGHT SIDE
+                ================================= */}
+
                 <div className="cart-item-right">
 
                   <p className="item-total">
-                    $
+
+                    ₹
                     {(
                       Number(item.price) *
                       item.quantity
-                    ).toFixed(2)}
+                    ).toLocaleString("en-IN")}
+
                   </p>
 
 
                   <button
                     className="remove-btn"
                     onClick={() =>
-                      removeFromCart(item.id)
+                      removeFromCart(
+                        item.id || item._id
+                      )
                     }
                   >
                     <Trash2 size={20} />
@@ -341,18 +208,28 @@ export default function Cart() {
           </div>
 
 
-          {/* Order Summary */}
+          {/* ====================================
+              ORDER SUMMARY
+          ==================================== */}
+
           <div className="cart-summary">
 
-            <h2>Order Summary</h2>
+            <h2>
+              Order Summary
+            </h2>
 
 
             <div className="summary-row">
 
-              <span>Subtotal</span>
+              <span>
+                Subtotal
+              </span>
 
               <span>
-                ${totalPrice.toFixed(2)}
+                ₹
+                {Number(totalPrice).toLocaleString(
+                  "en-IN"
+                )}
               </span>
 
             </div>
@@ -360,9 +237,13 @@ export default function Cart() {
 
             <div className="summary-row">
 
-              <span>Shipping</span>
+              <span>
+                Shipping
+              </span>
 
-              <span>Free</span>
+              <span>
+                Free
+              </span>
 
             </div>
 
@@ -372,25 +253,34 @@ export default function Cart() {
 
             <div className="summary-total">
 
-              <span>Total</span>
+              <span>
+                Total
+              </span>
 
               <span>
-                ${totalPrice.toFixed(2)}
+                ₹
+                {Number(totalPrice).toLocaleString(
+                  "en-IN"
+                )}
               </span>
 
             </div>
 
 
-            {/* Checkout */}
+            {/* CHECKOUT */}
+
             <button
               className="checkout-btn"
-              onClick={() => navigate("/checkout")}
+              onClick={() =>
+                navigate("/checkout")
+              }
             >
               Proceed to Checkout
             </button>
 
 
-            {/* Continue Shopping */}
+            {/* CONTINUE SHOPPING */}
+
             <Link
               to="/men"
               className="continue-link"

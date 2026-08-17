@@ -1,36 +1,79 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://dummyjson.com/products",
+  baseURL: "http://localhost:5001/api/products",
 });
 
-// Get all products
+// ==========================================
+// GET ALL PRODUCTS
+// ==========================================
+
 export const getAllProducts = async () => {
-  const res = await API.get("?limit=100");
+  const res = await API.get("/");
+
   return res.data.products;
 };
 
-// Get product by ID
+
+// ==========================================
+// GET PRODUCT BY ID
+// ==========================================
+
 export const getProductById = async (id) => {
   const res = await API.get(`/${id}`);
-  return res.data;
+
+  return res.data.product;
 };
 
-// Get category products
+
+// ==========================================
+// GET PRODUCTS BY CATEGORY
+// ==========================================
+
 export const getProductsByCategory = async (category) => {
-  const res = await API.get(`/category/${category}`);
-  return res.data.products;
+  const res = await API.get("/");
+
+  const products = res.data.products;
+
+  return products.filter(
+    (product) =>
+      product.category.toLowerCase() ===
+      category.toLowerCase()
+  );
 };
 
-// Search
+
+// ==========================================
+// SEARCH PRODUCTS
+// ==========================================
+
 export const searchProducts = async (query) => {
-  const res = await API.get(`/search?q=${query}`);
-  return res.data.products;
+  const res = await API.get("/");
+
+  const products = res.data.products;
+
+  return products.filter((product) =>
+    product.name
+      .toLowerCase()
+      .includes(query.toLowerCase())
+  );
 };
 
-// Categories
+
+// ==========================================
+// GET CATEGORIES
+// ==========================================
+
 export const getCategories = async () => {
-  const res = await API.get("/categories");
-  return res.data;
-};
+  const res = await API.get("/");
 
+  const products = res.data.products;
+
+  const categories = [
+    ...new Set(
+      products.map((product) => product.category)
+    ),
+  ];
+
+  return categories;
+};
