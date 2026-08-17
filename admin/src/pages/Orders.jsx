@@ -19,7 +19,9 @@ const Orders = () => {
   const [statusFilter, setStatusFilter] = useState("All Status");
 
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
+
+const [selectedOrder, setSelectedOrder] = useState(null);
 
   // =====================================================
   // FETCH ORDERS FROM BACKEND
@@ -545,19 +547,20 @@ const Orders = () => {
 
                     <div className="order-actions">
 
-                      <button
-                        title="View order"
-                      >
-                        <Eye size={16} />
-                      </button>
+                     <button
+  title="View order"
+  onClick={() => setSelectedOrder(order)}
+>
+  <Eye size={16} />
+</button>
 
-                      <button
+                      {/* <button
                         title="More"
                       >
                         <MoreHorizontal
                           size={17}
                         />
-                      </button>
+                      </button> */}
 
                     </div>
 
@@ -631,7 +634,228 @@ const Orders = () => {
         </div>
 
       </div>
+{/* =================================================
+    ORDER DETAILS MODAL
+================================================= */}
 
+{selectedOrder && (
+  <div
+    className="order-modal-overlay"
+    onClick={() => setSelectedOrder(null)}
+  >
+
+    <div
+      className="order-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      {/* Modal Header */}
+
+      <div className="order-modal-header">
+
+        <div>
+          <h2>
+            Order Details
+          </h2>
+
+          <span>
+            #{selectedOrder._id.slice(-6)}
+          </span>
+        </div>
+
+        <button
+          className="order-modal-close"
+          onClick={() => setSelectedOrder(null)}
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      {/* Customer */}
+
+      <div className="order-modal-section">
+
+        <h3>
+          Customer Information
+        </h3>
+
+        <div className="order-detail-grid">
+
+          <div>
+            <span>Name</span>
+            <strong>
+              {selectedOrder.customer?.name}
+            </strong>
+          </div>
+
+          <div>
+            <span>Email</span>
+            <strong>
+              {selectedOrder.customer?.email}
+            </strong>
+          </div>
+
+          <div>
+            <span>Phone</span>
+            <strong>
+              {selectedOrder.customer?.phone}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* Products */}
+
+      <div className="order-modal-section">
+
+        <h3>
+          Products
+        </h3>
+
+        <div className="order-products-list">
+
+          {selectedOrder.products?.map(
+            (item, index) => (
+
+              <div
+                className="order-product-row"
+                key={index}
+              >
+
+                <div className="order-product-details">
+
+                  {item.image && (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                    />
+                  )}
+
+                  <div>
+                    <strong>
+                      {item.name}
+                    </strong>
+
+                    <span>
+                      Quantity: {item.quantity}
+                    </span>
+                  </div>
+
+                </div>
+
+                <strong>
+                  ₹
+                  {(
+                    item.price * item.quantity
+                  ).toLocaleString("en-IN")}
+                </strong>
+
+              </div>
+
+            )
+          )}
+
+        </div>
+
+      </div>
+
+
+      {/* Shipping Address */}
+
+      <div className="order-modal-section">
+
+        <h3>
+          Shipping Address
+        </h3>
+
+        <p className="shipping-address">
+
+          {selectedOrder.shippingAddress?.address}
+          <br />
+
+          {selectedOrder.shippingAddress?.city},{" "}
+          {selectedOrder.shippingAddress?.state}
+          <br />
+
+          PIN:{" "}
+          {selectedOrder.shippingAddress?.pincode}
+
+        </p>
+
+      </div>
+
+
+      {/* Payment + Status */}
+
+      <div className="order-modal-bottom">
+
+        <div>
+
+          <span>
+            Payment
+          </span>
+
+          <strong>
+            {selectedOrder.paymentMethod}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Status
+          </span>
+
+          <strong>
+            {selectedOrder.status}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Total Amount
+          </span>
+
+          <strong className="modal-total">
+
+            ₹
+            {selectedOrder.totalAmount?.toLocaleString(
+              "en-IN"
+            )}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      {/* Order Date */}
+
+      <div className="order-modal-date">
+
+        Order placed on{" "}
+
+        {new Date(
+          selectedOrder.createdAt
+        ).toLocaleString("en-IN")}
+
+      </div>
+
+    </div>
+
+  </div>
+)}
     </div>
   );
 };
