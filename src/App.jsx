@@ -8,6 +8,7 @@ import Home from "./pages/Home.jsx";
 import Men from "./pages/Men.jsx";
 import Women from "./pages/Women.jsx";
 import Kids from "./pages/Kids.jsx";
+import Accessories from "./pages/Accessories.jsx";
 import Cart from "./pages/Cart.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
@@ -155,6 +156,10 @@ function App() {
         <Route
           path="/kids"
           element={<Kids />}
+        />
+         <Route
+          path="/Accessories"
+          element={<Accessories />}
         />
 
         <Route

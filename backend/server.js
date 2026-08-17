@@ -28,6 +28,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
 const productRoutes = require("./routes/ProductRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.use(express.json());
 // =====================================================
 
 app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 // =====================================================
 // SERVER

@@ -17,38 +17,47 @@ export default function Kids() {
   // ==========================================
 
   const categories = [
-    "Kids' Clothing",
-    "Kids' Shoes",
-    "Kids' Watches",
-    "Kids' Bags",
-    "Kids' Accessories",
+    "Watches",
+    "Sunglasses",
+    "Bags",
+    "Jewellery",
   ];
 
 
   // ==========================================
-  // FETCH KIDS PRODUCTS
+  // FETCH ACCESSORIES
   // ==========================================
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const kidsProducts =
-          await getProductsByCategory("Children");
 
-        setProducts(kidsProducts);
+    const fetchProducts = async () => {
+
+      try {
+
+        const accessories =
+          await getProductsByCategory(
+            "Accessories"
+          );
+
+        setProducts(accessories);
 
       } catch (error) {
+
         console.error(
-          "Failed to fetch kids products:",
+          "Failed to fetch accessories:",
           error
         );
 
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
     fetchProducts();
+
   }, []);
 
 
@@ -57,13 +66,21 @@ export default function Kids() {
   // ==========================================
 
   if (loading) {
+
     return (
-      <div className="kids">
+      <div className="accessories">
+
         <div className="products-loading">
-          <h2>Loading Products...</h2>
+
+          <h2>
+            Loading Products...
+          </h2>
+
         </div>
+
       </div>
     );
+
   }
 
 
@@ -72,7 +89,8 @@ export default function Kids() {
   // ==========================================
 
   return (
-    <div className="kids">
+
+    <div className="accessories">
 
       {/* ======================================
           HERO
@@ -83,8 +101,8 @@ export default function Kids() {
         <div className="image">
 
           <img
-            src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=1600&auto=format&fit=crop"
-            alt="Kids Fashion"
+            src="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1600&auto=format&fit=crop"
+            alt="Accessories"
           />
 
         </div>
@@ -145,8 +163,8 @@ export default function Kids() {
             </h2>
 
             <p>
-              There are currently no kids'
-              products available.
+              There are currently no
+              accessories available.
             </p>
 
           </div>
@@ -172,5 +190,6 @@ export default function Kids() {
       )}
 
     </div>
+
   );
 }

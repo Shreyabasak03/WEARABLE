@@ -373,53 +373,122 @@
 
 
 /* =========================================================
-   STATUS
+   STATUS DROPDOWN
 ========================================================= */
 
-.order-status {
+.order-status-wrapper {
   display: inline-flex;
 
   align-items: center;
 
   gap: 5px;
+}
 
-  padding: 5px 9px;
+.order-status-select {
+  padding: 5px 8px;
+
+  border: 1px solid transparent;
 
   border-radius: 20px;
+
+  outline: none;
 
   font-size: 9px;
 
   font-weight: 500;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.order-status.delivered {
-  color: var(--green-light);
 
-  background: rgba(66, 168, 156, 0.1);
-}
+/* =========================
+   PENDING
+========================= */
 
-.order-status.processing {
-  color: #78aee8;
-
-  background: rgba(120, 174, 232, 0.1);
-}
-
-.order-status.shipped {
-  color: #9bc4ee;
-
-  background: rgba(120, 174, 232, 0.1);
-}
-
-.order-status.pending {
+.order-status-select.pending {
   color: #e4b75d;
 
   background: rgba(228, 183, 93, 0.1);
+
+  border-color: rgba(228, 183, 93, 0.15);
 }
 
-.order-status.cancelled {
+
+/* =========================
+   CONFIRMED
+========================= */
+
+.order-status-select.confirmed {
+  color: #78aee8;
+
+  background: rgba(120, 174, 232, 0.1);
+
+  border-color: rgba(120, 174, 232, 0.15);
+}
+
+
+/* =========================
+   SHIPPED
+========================= */
+
+.order-status-select.shipped {
+  color: #9bc4ee;
+
+  background: rgba(120, 174, 232, 0.1);
+
+  border-color: rgba(120, 174, 232, 0.15);
+}
+
+
+/* =========================
+   DELIVERED
+========================= */
+
+.order-status-select.delivered {
+  color: var(--green-light);
+
+  background: rgba(66, 168, 156, 0.1);
+
+  border-color: rgba(66, 168, 156, 0.15);
+}
+
+
+/* =========================
+   CANCELLED
+========================= */
+
+.order-status-select.cancelled {
   color: #e88d8d;
 
   background: rgba(232, 141, 141, 0.1);
+
+  border-color: rgba(232, 141, 141, 0.15);
+}
+
+
+/* =========================
+   FOCUS
+========================= */
+
+.order-status-select:focus {
+  border-color: var(--green-dark);
+}
+
+
+/* =========================
+   DROPDOWN OPTIONS
+========================= */
+
+.order-status-select option {
+  background: var(--bg-card);
+
+  color: var(--text-primary);
 }
 
 

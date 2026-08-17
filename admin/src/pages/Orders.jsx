@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
 import {
   Search,
   Eye,
@@ -12,125 +14,108 @@ import {
 
 import "./Orders.css";
 
-
 const Orders = () => {
-
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
 
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const orders = [
-    {
-      id: "#ORD-1024",
-      customer: "Ananya Sharma",
-      email: "ananya@gmail.com",
-      product: "Classic Oversized T-Shirt",
-      amount: 1598,
-      date: "Aug 15, 2026",
-      status: "Delivered",
-    },
-    {
-      id: "#ORD-1023",
-      customer: "Rahul Das",
-      email: "rahul@gmail.com",
-      product: "Premium Denim Jacket",
-      amount: 2499,
-      date: "Aug 14, 2026",
-      status: "Processing",
-    },
-    {
-      id: "#ORD-1022",
-      customer: "Priya Singh",
-      email: "priya@gmail.com",
-      product: "Women's Casual Sneakers",
-      amount: 1899,
-      date: "Aug 14, 2026",
-      status: "Shipped",
-    },
-    {
-      id: "#ORD-1021",
-      customer: "Arjun Roy",
-      email: "arjun@gmail.com",
-      product: "Slim Fit Cargo Pants",
-      amount: 1299,
-      date: "Aug 13, 2026",
-      status: "Delivered",
-    },
-    {
-      id: "#ORD-1020",
-      customer: "Sneha Das",
-      email: "sneha@gmail.com",
-      product: "Minimal Crossbody Bag",
-      amount: 999,
-      date: "Aug 13, 2026",
-      status: "Pending",
-    },
-    {
-      id: "#ORD-1019",
-      customer: "Riya Sen",
-      email: "riya@gmail.com",
-      product: "Oversized Hoodie",
-      amount: 1599,
-      date: "Aug 12, 2026",
-      status: "Cancelled",
-    },
-    {
-      id: "#ORD-1018",
-      customer: "Amit Roy",
-      email: "amit@gmail.com",
-      product: "Classic White Shirt",
-      amount: 1199,
-      date: "Aug 12, 2026",
-      status: "Shipped",
-    },
-  ];
+  // =====================================================
+  // FETCH ORDERS FROM BACKEND
+  // =====================================================
 
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5001/api/orders"
+      );
 
-  /* =====================================================
-     FILTER ORDERS
-  ===================================================== */
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  // =====================================================
+  // UPDATE ORDER STATUS
+  // =====================================================
+
+  const updateStatus = async (orderId, newStatus) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5001/api/orders/${orderId}`,
+        {
+          status: newStatus,
+        }
+      );
+
+      // Update UI immediately
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId
+            ? response.data.order
+            : order
+        )
+      );
+
+    } catch (error) {
+      console.error("Error updating order status:", error);
+
+      alert("Failed to update order status.");
+    }
+  };
+
+  // =====================================================
+  // FILTER ORDERS
+  // =====================================================
 
   const filteredOrders = orders.filter((order) => {
+    const customerName =
+      order.customer?.name?.toLowerCase() || "";
+
+    const productNames =
+      order.products
+        ?.map((item) => item.name)
+        .join(" ")
+        .toLowerCase() || "";
+
+    const orderId =
+      order._id?.toLowerCase() || "";
+
+    const searchText = search.toLowerCase();
 
     const matchesSearch =
-      order.id
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-
-      order.customer
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-
-      order.product
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
+      orderId.includes(searchText) ||
+      customerName.includes(searchText) ||
+      productNames.includes(searchText);
 
     const matchesStatus =
       statusFilter === "All Status" ||
       order.status === statusFilter;
 
-
     return matchesSearch && matchesStatus;
-
   });
 
-
-  /* =====================================================
-     STATUS ICON
-  ===================================================== */
+  // =====================================================
+  // STATUS ICON
+  // =====================================================
 
   const getStatusIcon = (status) => {
-
     switch (status) {
-
       case "Delivered":
         return <CheckCircle size={14} />;
 
       case "Shipped":
         return <Truck size={14} />;
 
-      case "Processing":
+      case "Confirmed":
         return <Package size={14} />;
 
       case "Pending":
@@ -144,11 +129,43 @@ const Orders = () => {
     }
   };
 
+  // =====================================================
+  // ORDER STATISTICS
+  // =====================================================
+
+  const totalOrders = orders.length;
+
+  const pendingOrders = orders.filter(
+    (order) => order.status === "Pending"
+  ).length;
+
+  const confirmedOrders = orders.filter(
+    (order) => order.status === "Confirmed"
+  ).length;
+
+  const deliveredOrders = orders.filter(
+    (order) => order.status === "Delivered"
+  ).length;
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
+    return (
+      <div className="orders-page">
+        <div className="orders-header">
+          <div>
+            <h1>Orders</h1>
+            <p>Loading customer orders...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-
     <div className="orders-page">
-
 
       {/* =================================================
           HEADER
@@ -157,7 +174,6 @@ const Orders = () => {
       <div className="orders-header">
 
         <div>
-
           <h1>
             Orders
           </h1>
@@ -165,7 +181,6 @@ const Orders = () => {
           <p>
             Manage and track customer orders.
           </p>
-
         </div>
 
       </div>
@@ -177,6 +192,7 @@ const Orders = () => {
 
       <div className="order-stats">
 
+        {/* Total Orders */}
 
         <div className="order-stat-card">
 
@@ -185,19 +201,19 @@ const Orders = () => {
           </div>
 
           <div>
-
             <span>
               Total Orders
             </span>
 
             <h3>
-              1,248
+              {totalOrders}
             </h3>
-
           </div>
 
         </div>
 
+
+        {/* Pending */}
 
         <div className="order-stat-card">
 
@@ -206,19 +222,19 @@ const Orders = () => {
           </div>
 
           <div>
-
             <span>
               Pending
             </span>
 
             <h3>
-              24
+              {pendingOrders}
             </h3>
-
           </div>
 
         </div>
 
+
+        {/* Confirmed */}
 
         <div className="order-stat-card">
 
@@ -227,19 +243,19 @@ const Orders = () => {
           </div>
 
           <div>
-
             <span>
-              Processing
+              Confirmed
             </span>
 
             <h3>
-              38
+              {confirmedOrders}
             </h3>
-
           </div>
 
         </div>
 
+
+        {/* Delivered */}
 
         <div className="order-stat-card">
 
@@ -248,19 +264,16 @@ const Orders = () => {
           </div>
 
           <div>
-
             <span>
               Delivered
             </span>
 
             <h3>
-              1,132
+              {deliveredOrders}
             </h3>
-
           </div>
 
         </div>
-
 
       </div>
 
@@ -271,13 +284,11 @@ const Orders = () => {
 
       <div className="orders-card">
 
-
         {/* =================================================
             TOOLBAR
         ================================================= */}
 
         <div className="orders-toolbar">
-
 
           <div className="order-search">
 
@@ -303,32 +314,31 @@ const Orders = () => {
             }
           >
 
-            <option>
+            <option value="All Status">
               All Status
             </option>
 
-            <option>
+            <option value="Pending">
               Pending
             </option>
 
-            <option>
-              Processing
+            <option value="Confirmed">
+              Confirmed
             </option>
 
-            <option>
+            <option value="Shipped">
               Shipped
             </option>
 
-            <option>
+            <option value="Delivered">
               Delivered
             </option>
 
-            <option>
+            <option value="Cancelled">
               Cancelled
             </option>
 
           </select>
-
 
         </div>
 
@@ -382,15 +392,14 @@ const Orders = () => {
 
               {filteredOrders.map((order) => (
 
-                <tr key={order.id}>
-
+                <tr key={order._id}>
 
                   {/* Order */}
 
                   <td>
 
                     <span className="order-number">
-                      {order.id}
+                      #{order._id.slice(-6)}
                     </span>
 
                   </td>
@@ -403,19 +412,21 @@ const Orders = () => {
                     <div className="customer-info">
 
                       <div className="customer-avatar">
-                        {order.customer
-                          .charAt(0)
+
+                        {order.customer?.name
+                          ?.charAt(0)
                           .toUpperCase()}
+
                       </div>
 
                       <div>
 
                         <h4>
-                          {order.customer}
+                          {order.customer?.name}
                         </h4>
 
                         <span>
-                          {order.email}
+                          {order.customer?.email}
                         </span>
 
                       </div>
@@ -429,9 +440,17 @@ const Orders = () => {
 
                   <td>
 
-                    <span className="order-product-name">
-                      {order.product}
-                    </span>
+                    <div className="order-product-name">
+
+                      {order.products?.map(
+                        (item, index) => (
+                          <div key={index}>
+                            {item.name} × {item.quantity}
+                          </div>
+                        )
+                      )}
+
+                    </div>
 
                   </td>
 
@@ -441,7 +460,10 @@ const Orders = () => {
                   <td>
 
                     <strong className="order-total">
-                      ₹{order.amount.toLocaleString("en-IN")}
+                      ₹
+                      {order.totalAmount?.toLocaleString(
+                        "en-IN"
+                      )}
                     </strong>
 
                   </td>
@@ -452,7 +474,18 @@ const Orders = () => {
                   <td>
 
                     <span className="order-date">
-                      {order.date}
+
+                      {new Date(
+                        order.createdAt
+                      ).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
+
                     </span>
 
                   </td>
@@ -462,17 +495,46 @@ const Orders = () => {
 
                   <td>
 
-                    <span
-                      className={`order-status ${order.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                    >
+                    <div className="order-status-wrapper">
 
                       {getStatusIcon(order.status)}
 
-                      {order.status}
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          updateStatus(
+                            order._id,
+                            e.target.value
+                          )
+                        }
+                        className={`order-status-select ${order.status
+                          .toLowerCase()
+                          .replace(" ", "-")}`}
+                      >
 
-                    </span>
+                        <option value="Pending">
+                          Pending
+                        </option>
+
+                        <option value="Confirmed">
+                          Confirmed
+                        </option>
+
+                        <option value="Shipped">
+                          Shipped
+                        </option>
+
+                        <option value="Delivered">
+                          Delivered
+                        </option>
+
+                        <option value="Cancelled">
+                          Cancelled
+                        </option>
+
+                      </select>
+
+                    </div>
 
                   </td>
 
@@ -486,31 +548,27 @@ const Orders = () => {
                       <button
                         title="View order"
                       >
-
                         <Eye size={16} />
-
                       </button>
-
 
                       <button
                         title="More"
                       >
-
                         <MoreHorizontal
                           size={17}
                         />
-
                       </button>
 
                     </div>
 
                   </td>
 
-
                 </tr>
 
               ))}
 
+
+              {/* No Orders */}
 
               {filteredOrders.length === 0 && (
 
@@ -520,9 +578,7 @@ const Orders = () => {
                     colSpan="7"
                     className="no-orders"
                   >
-
                     No orders found.
-
                   </td>
 
                 </tr>
@@ -543,10 +599,8 @@ const Orders = () => {
         <div className="orders-footer">
 
           <span>
-
             Showing {filteredOrders.length} of{" "}
             {orders.length} orders
-
           </span>
 
 
@@ -576,12 +630,10 @@ const Orders = () => {
 
         </div>
 
-
       </div>
 
     </div>
   );
 };
-
 
 export default Orders;

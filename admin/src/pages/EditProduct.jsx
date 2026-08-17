@@ -403,7 +403,7 @@ const EditProduct = () => {
 
             {/* DISCOUNT */}
 
-            <div className="form-group">
+            {/* <div className="form-group">
 
               <label>Discount (%)</label>
 
@@ -416,7 +416,7 @@ const EditProduct = () => {
                 onChange={handleChange}
               />
 
-            </div>
+            </div> */}
 
 
             {/* IMAGE */}

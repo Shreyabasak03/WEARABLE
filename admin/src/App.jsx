@@ -15,6 +15,7 @@ import Users from "./pages/Users.jsx";
 import Settings from "./pages/Settings.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
 import EditProduct from "./pages/EditProduct";
+import ViewProduct from "./pages/ViewProduct.jsx";
 
 
 function App() {
@@ -84,6 +85,10 @@ function App() {
 <Route
   path="/products/edit/:id"
   element={<EditProduct />}
+/>
+<Route
+  path="/products/view/:id"
+  element={<ViewProduct />}
 />
 
         {/* =================================================

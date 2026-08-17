@@ -461,9 +461,14 @@ const handleDelete = async (productId) => {
 
                         <div className="product-actions">
 
-                          <button title="View">
-                            <Eye size={16} />
-                          </button>
+                        <button
+  title="View"
+  onClick={() =>
+    navigate(`/products/view/${product._id}`)
+  }
+>
+  <Eye size={16} />
+</button>
 
 
                          <button

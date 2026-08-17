@@ -77,3 +77,5 @@ export const getCategories = async () => {
 
   return categories;
 };
+
+

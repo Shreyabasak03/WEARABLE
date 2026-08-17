@@ -362,7 +362,7 @@ const AddProduct = () => {
 
             {/* DISCOUNT */}
 
-            <div className="form-group">
+            {/* <div className="form-group">
 
               <label>
                 Discount (%)
@@ -380,7 +380,7 @@ const AddProduct = () => {
                 onChange={handleChange}
               />
 
-            </div>
+            </div> */}
 
 
             {/* IMAGE */}
