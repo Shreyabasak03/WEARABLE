@@ -16,7 +16,7 @@ export default function ProductDetails({
   onClose,
 }) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  // const { addToCart } = useCart();
 
   const [selectedImage, setSelectedImage] = useState("");
 

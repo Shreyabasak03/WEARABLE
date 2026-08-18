@@ -1,21 +1,87 @@
 const express = require("express");
 const router = express.Router();
+const { getAuth } = require("@clerk/express");
 
 const Order = require("../model/order");
+const Product = require("../model/product");
+
 
 // ===============================
 // CREATE ORDER
 // ===============================
 router.post("/", async (req, res) => {
   try {
-    const order = new Order(req.body);
+    // ==========================================
+    // CHECK CLERK AUTHENTICATION
+    // ==========================================
 
+    const { userId } = getAuth(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "You must be signed in to place an order",
+      });
+    }
+
+    const { products } = req.body;
+
+    // --------------------------------
+    // VALIDATE PRODUCTS
+    // --------------------------------
+
+    if (!products || products.length === 0) {
+      return res.status(400).json({
+        message: "Order must contain at least one product",
+      });
+    }
+
+    // --------------------------------
+    // CHECK STOCK FIRST
+    // --------------------------------
+
+    for (const item of products) {
+      const product = await Product.findById(item.product);
+
+      if (!product) {
+        return res.status(404).json({
+          message: `Product not found: ${item.product}`,
+        });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          message: `Not enough stock for ${product.name}. Available stock: ${product.stock}`,
+        });
+      }
+    }
+
+    // --------------------------------
+    // DECREASE STOCK
+    // --------------------------------
+
+    for (const item of products) {
+      const product = await Product.findById(item.product);
+
+      product.stock -= item.quantity;
+
+      await product.save();
+    }
+
+    // --------------------------------
+    // CREATE ORDER
+    // --------------------------------
+
+   const order = new Order({
+  ...req.body,
+  clerkUserId: userId,
+});
     const savedOrder = await order.save();
 
     res.status(201).json({
       message: "Order created successfully",
       order: savedOrder,
     });
+
   } catch (error) {
     console.error("Create order error:", error);
 
@@ -29,15 +95,33 @@ router.post("/", async (req, res) => {
 // ===============================
 // GET ALL ORDERS
 // ===============================
+// ===============================
+// GET MY ORDERS
+// ===============================
 router.get("/", async (req, res) => {
   try {
-    const orders = await Order.find()
+    // Get logged-in Clerk user
+    const { userId } = getAuth(req);
+
+    // User must be signed in
+    if (!userId) {
+      return res.status(401).json({
+        message: "You must be signed in to view your orders",
+      });
+    }
+
+    // IMPORTANT:
+    // Only get orders belonging to this Clerk user
+    const orders = await Order.find({
+      clerkUserId: userId,
+    })
       .populate("products.product")
       .sort({ createdAt: -1 });
 
     res.status(200).json(orders);
+
   } catch (error) {
-    console.error("Get orders error:", error);
+    console.error("Get my orders error:", error);
 
     res.status(500).json({
       message: "Failed to fetch orders",
@@ -51,9 +135,8 @@ router.get("/", async (req, res) => {
 // ===============================
 router.get("/:id", async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      "products.product"
-    );
+    const order = await Order.findById(req.params.id)
+      .populate("products.product");
 
     if (!order) {
       return res.status(404).json({
@@ -62,6 +145,7 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).json(order);
+
   } catch (error) {
     console.error("Get single order error:", error);
 
@@ -79,14 +163,7 @@ router.put("/:id", async (req, res) => {
   try {
     const { status } = req.body;
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({
@@ -94,10 +171,42 @@ router.put("/:id", async (req, res) => {
       });
     }
 
+    // --------------------------------
+    // RESTORE STOCK WHEN CANCELLED
+    // --------------------------------
+
+    if (
+      status === "Cancelled" &&
+      order.status !== "Cancelled" &&
+      !order.stockRestored
+    ) {
+      for (const item of order.products) {
+        const product = await Product.findById(item.product);
+
+        if (product) {
+          product.stock += item.quantity;
+
+          await product.save();
+        }
+      }
+
+      // Mark stock as restored
+      order.stockRestored = true;
+    }
+
+    // --------------------------------
+    // UPDATE STATUS
+    // --------------------------------
+
+    order.status = status;
+
+    const updatedOrder = await order.save();
+
     res.status(200).json({
       message: "Order status updated successfully",
-      order,
+      order: updatedOrder,
     });
+
   } catch (error) {
     console.error("Update order error:", error);
 
@@ -124,6 +233,7 @@ router.delete("/:id", async (req, res) => {
     res.status(200).json({
       message: "Order deleted successfully",
     });
+
   } catch (error) {
     console.error("Delete order error:", error);
 

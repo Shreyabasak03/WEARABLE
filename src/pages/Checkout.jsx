@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CreditCard,
   Smartphone,
   Banknote,
   CheckCircle,
+  MapPin,
 } from "lucide-react";
 import axios from "axios";
 
 import { useCart } from "../context/cartContext.jsx";
 import "./Checkout.css";
+
+import { useAuth, useClerk } from "@clerk/react";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -20,9 +23,58 @@ export default function Checkout() {
     clearCart,
   } = useCart();
 
+  // =====================================================
+  // CLERK AUTHENTICATION
+  // =====================================================
+
+  const {
+    isSignedIn,
+    getToken,
+  } = useAuth();
+
+  const { openSignIn } = useClerk();
+
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // =====================================================
+  // SHIPPING ADDRESS
+  // =====================================================
+
+  const [shippingAddress, setShippingAddress] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  // =====================================================
+  // LOAD LOCATION FROM LOCAL STORAGE
+  // =====================================================
+
+  useEffect(() => {
+    const savedLocation =
+      JSON.parse(localStorage.getItem("userLocation")) || null;
+
+    if (savedLocation) {
+      setShippingAddress((prev) => ({
+        ...prev,
+
+        city:
+          savedLocation.city ||
+          savedLocation.county ||
+          savedLocation.town ||
+          savedLocation.village ||
+          "",
+
+        state: savedLocation.state || "",
+      }));
+    }
+  }, []);
 
   // =====================================================
   // LOAD RAZORPAY SCRIPT
@@ -30,9 +82,8 @@ export default function Checkout() {
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
-      const existingScript = document.getElementById(
-        "razorpay-script"
-      );
+      const existingScript =
+        document.getElementById("razorpay-script");
 
       if (existingScript) {
         resolve(true);
@@ -42,6 +93,7 @@ export default function Checkout() {
       const script = document.createElement("script");
 
       script.id = "razorpay-script";
+
       script.src =
         "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -58,7 +110,7 @@ export default function Checkout() {
   };
 
   // =====================================================
-  // CREATE ORDER IN YOUR DATABASE
+  // CREATE ORDER IN MONGODB
   // =====================================================
 
   const createDatabaseOrder = async ({
@@ -66,47 +118,104 @@ export default function Checkout() {
     razorpayOrderId = null,
     razorpayPaymentId = null,
   }) => {
-    const orderData = {
-      products: cartItems.map((item) => ({
-        product: item.id,
-        name: item.name,
-        image: item.image,
-        price: Number(item.price),
-        quantity: item.quantity,
-      })),
+    try {
+      // ================================================
+      // GET CLERK AUTH TOKEN
+      // ================================================
 
-      customer: {
-        name: "Guest Customer",
-        email: "guest@example.com",
-        phone: "0000000000",
-      },
+      const token = await getToken();
 
-      shippingAddress: {
-        address: "Not provided",
-        city: "Not provided",
-        state: "Not provided",
-        pincode: "000000",
-      },
+      if (!token) {
+        throw new Error(
+          "Authentication token not available. Please sign in again."
+        );
+      }
 
-      paymentMethod,
+      // ================================================
+      // ORDER DATA
+      // ================================================
 
-      totalAmount: Number(totalPrice),
+      const orderData = {
+        // ---------------------------------------------
+        // PRODUCTS
+        // ---------------------------------------------
 
-      status:
-        paymentMethod === "COD"
-          ? "Pending"
-          : "Confirmed",
+        products: cartItems.map((item) => ({
+          product: item.id,
+          name: item.name,
+          image: item.image,
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+        })),
 
-      razorpayOrderId,
-      razorpayPaymentId,
-    };
+        // ---------------------------------------------
+        // CUSTOMER
+        // ---------------------------------------------
 
-    const response = await axios.post(
-      "http://localhost:5001/api/orders",
-      orderData
-    );
+        customer: {
+          name: shippingAddress.fullName,
+          email: shippingAddress.email,
+          phone: shippingAddress.phone,
+        },
 
-    return response.data;
+        // ---------------------------------------------
+        // SHIPPING ADDRESS
+        // ---------------------------------------------
+
+        shippingAddress: {
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          pincode: shippingAddress.pincode,
+        },
+
+        // ---------------------------------------------
+        // PAYMENT
+        // ---------------------------------------------
+
+        paymentMethod,
+
+        totalAmount: Number(totalPrice),
+
+        status:
+          paymentMethod === "COD"
+            ? "Pending"
+            : "Confirmed",
+
+        // ---------------------------------------------
+        // RAZORPAY DETAILS
+        // ---------------------------------------------
+
+        razorpayOrderId,
+        razorpayPaymentId,
+      };
+
+      console.log("ORDER DATA:", orderData);
+
+      // ================================================
+      // SEND ORDER + CLERK TOKEN TO BACKEND
+      // ================================================
+
+      const response = await axios.post(
+        "http://localhost:5001/api/orders",
+        orderData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+
+    } catch (error) {
+      console.error(
+        "Create database order error:",
+        error
+      );
+
+      throw error;
+    }
   };
 
   // =====================================================
@@ -118,7 +227,7 @@ export default function Checkout() {
       setLoading(true);
 
       // ---------------------------------------------
-      // Load Razorpay
+      // LOAD RAZORPAY
       // ---------------------------------------------
 
       const razorpayLoaded = await loadRazorpay();
@@ -133,7 +242,7 @@ export default function Checkout() {
       }
 
       // ---------------------------------------------
-      // Create Razorpay order from backend
+      // CREATE RAZORPAY ORDER
       // ---------------------------------------------
 
       const response = await axios.post(
@@ -146,7 +255,7 @@ export default function Checkout() {
       const razorpayOrder = response.data.order;
 
       // ---------------------------------------------
-      // Razorpay Checkout
+      // RAZORPAY OPTIONS
       // ---------------------------------------------
 
       const options = {
@@ -184,7 +293,9 @@ export default function Checkout() {
 
             if (!verifyResponse.data.success) {
               alert("Payment verification failed.");
+
               setLoading(false);
+
               return;
             }
 
@@ -212,6 +323,7 @@ export default function Checkout() {
             clearCart();
 
             setLoading(false);
+
             setOrderPlaced(true);
 
           } catch (error) {
@@ -221,17 +333,22 @@ export default function Checkout() {
             );
 
             alert(
-              "Payment was completed but order verification failed. Please contact support."
+              error.response?.data?.message ||
+                "Payment was completed but order verification failed. Please contact support."
             );
 
             setLoading(false);
           }
         },
 
+        // ---------------------------------------------
+        // PREFILL RAZORPAY
+        // ---------------------------------------------
+
         prefill: {
-          name: "",
-          email: "",
-          contact: "",
+          name: shippingAddress.fullName,
+          email: shippingAddress.email,
+          contact: shippingAddress.phone,
         },
 
         notes: {
@@ -249,7 +366,8 @@ export default function Checkout() {
         },
       };
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay =
+        new window.Razorpay(options);
 
       razorpay.open();
 
@@ -283,6 +401,7 @@ export default function Checkout() {
       clearCart();
 
       setLoading(false);
+
       setOrderPlaced(true);
 
     } catch (error) {
@@ -305,10 +424,88 @@ export default function Checkout() {
   // =====================================================
 
   const handlePlaceOrder = () => {
+
+    // =============================================
+    // CHECK CLERK AUTHENTICATION FIRST
+    // =============================================
+
+    if (!isSignedIn) {
+      openSignIn();
+      return;
+    }
+
+    // ---------------------------------------------
+    // PAYMENT METHOD
+    // ---------------------------------------------
+
     if (!paymentMethod) {
       alert("Please select a payment method");
       return;
     }
+
+    // ---------------------------------------------
+    // SHIPPING ADDRESS
+    // ---------------------------------------------
+
+    if (
+      !shippingAddress.fullName.trim() ||
+      !shippingAddress.phone.trim() ||
+      !shippingAddress.email.trim() ||
+      !shippingAddress.address.trim() ||
+      !shippingAddress.city.trim() ||
+      !shippingAddress.state.trim() ||
+      !shippingAddress.pincode.trim()
+    ) {
+      alert("Please complete your shipping address");
+      return;
+    }
+
+    // ---------------------------------------------
+    // PHONE VALIDATION
+    // ---------------------------------------------
+
+    if (
+      shippingAddress.phone.length !== 10 ||
+      !/^\d+$/.test(shippingAddress.phone)
+    ) {
+      alert(
+        "Please enter a valid 10-digit phone number"
+      );
+      return;
+    }
+
+    // ---------------------------------------------
+    // EMAIL VALIDATION
+    // ---------------------------------------------
+
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        shippingAddress.email
+      )
+    ) {
+      alert(
+        "Please enter a valid email address"
+      );
+      return;
+    }
+
+    // ---------------------------------------------
+    // PINCODE VALIDATION
+    // ---------------------------------------------
+
+    if (
+      shippingAddress.pincode.length !== 6 ||
+      !/^\d+$/.test(shippingAddress.pincode)
+    ) {
+      alert(
+        "Please enter a valid 6-digit PIN code"
+      );
+      return;
+    }
+
+    // ---------------------------------------------
+    // PAYMENT
+    // ---------------------------------------------
 
     if (paymentMethod === "cod") {
       handleCODOrder();
@@ -325,7 +522,9 @@ export default function Checkout() {
     return (
       <div className="checkout-empty">
 
-        <h2>Your cart is empty</h2>
+        <h2>
+          Your cart is empty
+        </h2>
 
         <button
           onClick={() => navigate("/men")}
@@ -394,7 +593,9 @@ export default function Checkout() {
 
       <div className="checkout-container">
 
-        <h1>Checkout</h1>
+        <h1>
+          Checkout
+        </h1>
 
         <div className="checkout-content">
 
@@ -404,11 +605,15 @@ export default function Checkout() {
 
           <div className="checkout-left">
 
-            {/* ORDER ITEMS */}
+            {/* =====================================
+                ORDER ITEMS
+            ===================================== */}
 
             <div className="checkout-section">
 
-              <h2>Your Order</h2>
+              <h2>
+                Your Order
+              </h2>
 
               {cartItems.map((item) => (
 
@@ -424,7 +629,9 @@ export default function Checkout() {
 
                   <div>
 
-                    <h3>{item.name}</h3>
+                    <h3>
+                      {item.name}
+                    </h3>
 
                     <p>
                       Quantity: {item.quantity}
@@ -434,7 +641,7 @@ export default function Checkout() {
                       ₹
                       {(
                         Number(item.price) *
-                        item.quantity
+                        Number(item.quantity)
                       ).toFixed(2)}
                     </p>
 
@@ -443,6 +650,212 @@ export default function Checkout() {
                 </div>
 
               ))}
+
+            </div>
+
+            {/* =====================================
+                SHIPPING ADDRESS
+            ===================================== */}
+
+            <div className="checkout-section">
+
+              <h2>
+                <MapPin size={20} />
+                Shipping Address
+              </h2>
+
+              <div className="shipping-form">
+
+                {/* NAME + EMAIL */}
+
+                <div className="form-row">
+
+                  <div className="form-group">
+
+                    <label>
+                      Full Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        shippingAddress.fullName
+                      }
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          fullName:
+                            e.target.value,
+                        })
+                      }
+                      placeholder="Enter your full name"
+                    />
+
+                  </div>
+
+                  <div className="form-group">
+
+                    <label>
+                      Email Address
+                    </label>
+
+                    <input
+                      type="email"
+                      value={
+                        shippingAddress.email
+                      }
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          email:
+                            e.target.value,
+                        })
+                      }
+                      placeholder="Enter your email"
+                    />
+
+                  </div>
+
+                </div>
+
+                {/* PHONE */}
+
+                <div className="form-row">
+
+                  <div className="form-group">
+
+                    <label>
+                      Phone Number
+                    </label>
+
+                    <input
+                      type="tel"
+                      value={
+                        shippingAddress.phone
+                      }
+                      maxLength={10}
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          phone:
+                            e.target.value.replace(
+                              /\D/g,
+                              ""
+                            ),
+                        })
+                      }
+                      placeholder="Enter 10-digit phone number"
+                    />
+
+                  </div>
+
+                </div>
+
+                {/* ADDRESS */}
+
+                <div className="form-group">
+
+                  <label>
+                    Address
+                  </label>
+
+                  <textarea
+                    value={
+                      shippingAddress.address
+                    }
+                    onChange={(e) =>
+                      setShippingAddress({
+                        ...shippingAddress,
+                        address:
+                          e.target.value,
+                      })
+                    }
+                    placeholder="House / Flat / Street / Area"
+                    rows="3"
+                  />
+
+                </div>
+
+                {/* CITY + STATE + PIN */}
+
+                <div className="form-row">
+
+                  <div className="form-group">
+
+                    <label>
+                      City / Area
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        shippingAddress.city
+                      }
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          city:
+                            e.target.value,
+                        })
+                      }
+                      placeholder="City / Area"
+                    />
+
+                  </div>
+
+                  <div className="form-group">
+
+                    <label>
+                      State
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        shippingAddress.state
+                      }
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          state:
+                            e.target.value,
+                        })
+                      }
+                      placeholder="State"
+                    />
+
+                  </div>
+
+                  <div className="form-group">
+
+                    <label>
+                      PIN Code
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        shippingAddress.pincode
+                      }
+                      maxLength={6}
+                      onChange={(e) =>
+                        setShippingAddress({
+                          ...shippingAddress,
+                          pincode:
+                            e.target.value.replace(
+                              /\D/g,
+                              ""
+                            ),
+                        })
+                      }
+                      placeholder="6-digit PIN"
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
 
@@ -477,10 +890,13 @@ export default function Checkout() {
 
                   <div>
 
-                    <strong>UPI</strong>
+                    <strong>
+                      UPI
+                    </strong>
 
                     <p>
-                      Google Pay, PhonePe, Paytm
+                      Google Pay, PhonePe,
+                      Paytm
                     </p>
 
                   </div>
@@ -511,7 +927,8 @@ export default function Checkout() {
                     </strong>
 
                     <p>
-                      Visa, Mastercard, RuPay
+                      Visa, Mastercard,
+                      RuPay
                     </p>
 
                   </div>
@@ -542,7 +959,8 @@ export default function Checkout() {
                     </strong>
 
                     <p>
-                      Pay when your order arrives
+                      Pay when your order
+                      arrives
                     </p>
 
                   </div>
@@ -561,11 +979,15 @@ export default function Checkout() {
 
           <div className="checkout-summary">
 
-            <h2>Order Summary</h2>
+            <h2>
+              Order Summary
+            </h2>
 
             <div className="summary-row">
 
-              <span>Subtotal</span>
+              <span>
+                Subtotal
+              </span>
 
               <span>
                 ₹{totalPrice.toFixed(2)}
@@ -575,17 +997,24 @@ export default function Checkout() {
 
             <div className="summary-row">
 
-              <span>Shipping</span>
+              <span>
+                Shipping
+              </span>
 
-              <span>Free</span>
+              <span>
+                Free
+              </span>
 
             </div>
 
-            <div className="summary-line"></div>
+            <div className="summary-line">
+            </div>
 
             <div className="summary-total">
 
-              <span>Total</span>
+              <span>
+                Total
+              </span>
 
               <span>
                 ₹{totalPrice.toFixed(2)}

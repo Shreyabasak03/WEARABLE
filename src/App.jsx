@@ -13,121 +13,90 @@ import Cart from "./pages/Cart.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Checkout from "./pages/Checkout.jsx";
-import OrderHistory from "./pages/OrderHistory";
+import OrderHistory from "./pages/OrderHistory.jsx";
 import Search from "./components/Search.jsx";
+import OrderDetails from "./pages/OrderDetails.jsx";
 
 function App() {
-
   const [location, setLocation] = useState(() => {
     const savedLocation = localStorage.getItem("userLocation");
 
-    return savedLocation
-      ? JSON.parse(savedLocation)
-      : null;
+    return savedLocation ? JSON.parse(savedLocation) : null;
   });
-
-
 
   const detectLocation = () => {
-  return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+      console.log("detectLocation function called");
 
-    console.log("detectLocation function called");
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        reject(new Error("Geolocation not supported"));
+        return;
+      }
 
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      reject(new Error("Geolocation not supported"));
-      return;
-    }
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
+          console.log("Coordinates:", latitude, longitude);
 
-        const { latitude, longitude } = position.coords;
-
-        console.log("Coordinates:", latitude, longitude);
-
-        try {
-
-          const response = await axios.get(
-            "https://nominatim.openstreetmap.org/reverse",
-            {
-              params: {
-                lat: latitude,
-                lon: longitude,
-                format: "json",
+          try {
+            const response = await axios.get(
+              "https://nominatim.openstreetmap.org/reverse",
+              {
+                params: {
+                  lat: latitude,
+                  lon: longitude,
+                  format: "json",
+                },
               },
-            }
-          );
+            );
 
-          const address = response.data.address;
+            const address = response.data.address;
 
-          console.log("API address:", address);
+            console.log("API address:", address);
 
-          setLocation(address);
+            setLocation(address);
 
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify(address)
-          );
+            localStorage.setItem("userLocation", JSON.stringify(address));
 
-          resolve(address);
+            resolve(address);
+          } catch (error) {
+            console.error("Nominatim error:", error);
 
-        } catch (error) {
+            reject(error);
+          }
+        },
 
-          console.error("Nominatim error:", error);
+        (error) => {
+          console.error("Location error code:", error.code);
+
+          console.error("Location error message:", error.message);
 
           reject(error);
-        }
-      },
+        },
 
-      (error) => {
-
-        console.error(
-          "Location error code:",
-          error.code
-        );
-
-        console.error(
-          "Location error message:",
-          error.message
-        );
-
-        reject(error);
-      },
-
-      {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 300000,
-      }
-    );
-  });
-};
+        {
+          enableHighAccuracy: false,
+          timeout: 30000,
+          maximumAge: 300000,
+        },
+      );
+    });
+  };
 
   // AUTO DETECT ON FIRST VISIT
 
-
   useEffect(() => {
-
-    const savedLocation =
-      localStorage.getItem(
-        "userLocation"
-      );
-
+    const savedLocation = localStorage.getItem("userLocation");
 
     if (!savedLocation) {
-
       detectLocation();
-
     }
-
   }, []);
 
-
   return (
-
     <Routes>
-
       <Route
         element={
           <Layout
@@ -137,59 +106,29 @@ function App() {
           />
         }
       >
+        <Route path="/" element={<Home />} />
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/men" element={<Men />} />
 
-        <Route
-          path="/men"
-          element={<Men />}
-        />
+        <Route path="/women" element={<Women />} />
 
-        <Route
-          path="/women"
-          element={<Women />}
-        />
+        <Route path="/kids" element={<Kids />} />
+        <Route path="/Accessories" element={<Accessories />} />
 
-        <Route
-          path="/kids"
-          element={<Kids />}
-        />
-         <Route
-          path="/Accessories"
-          element={<Accessories />}
-        />
+        <Route path="/cart" element={<Cart />} />
 
-        <Route
-          path="/cart"
-          element={<Cart />}
-        />
+        <Route path="/about" element={<About />} />
 
-        <Route
-          path="/about"
-          element={<About />}
-        />
-
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
-        <Route
-    path="/checkout"
-    element={<Checkout />}
-  />
-  <Route
-  path="/orders"
-  element={<OrderHistory />}
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders" element={<OrderHistory />} />
+      <Route
+  path="/order/:id"
+  element={<OrderDetails />}
 />
-<Route path="/search" element={<Search />} />
-
+        <Route path="/search" element={<Search />} />
       </Route>
-
     </Routes>
-
   );
 }
 

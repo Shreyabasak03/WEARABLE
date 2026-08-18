@@ -1,8 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const { clerkMiddleware } = require("@clerk/express");
 
-// Load environment variables FIRST
+// =====================================================
+// LOAD ENVIRONMENT VARIABLES FIRST
+// =====================================================
+
 dotenv.config();
 
 const connectDB = require("./config/db");
@@ -24,14 +28,26 @@ connectDB();
 // =====================================================
 
 app.use(cors());
+
 app.use(express.json());
+
+// =====================================================
+// CLERK AUTHENTICATION
+// =====================================================
+
+// Clerk reads the Authorization token sent by frontend
+// and makes the authenticated user available to routes.
+
+app.use(clerkMiddleware());
 
 // =====================================================
 // ROUTES
 // =====================================================
 
 app.use("/api/products", productRoutes);
+
 app.use("/api/orders", orderRoutes);
+
 app.use("/api/payment", PaymentsRoutes);
 
 // =====================================================

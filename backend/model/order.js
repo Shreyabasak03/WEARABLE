@@ -1,7 +1,20 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
+  
   {
+    
+    // ==========================================
+    // CLERK USER
+    // ==========================================
+
+    clerkUserId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+
+    
     // Products purchased in this order
     products: [
       {
@@ -107,6 +120,10 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending",
     },
+    stockRestored: {
+  type: Boolean,
+  default: false,
+},
   },
   {
     timestamps: true,
