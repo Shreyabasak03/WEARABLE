@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "@clerk/react";
+
 import {
   Search,
   Eye,
@@ -12,103 +15,203 @@ import {
 import "./User.css";
 
 const Users = () => {
+
+  // =====================================================
+  // CLERK AUTH
+  // =====================================================
+
+  const { getToken } = useAuth();
+
+
+  // =====================================================
+  // STATES
+  // =====================================================
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
 
-  const users = [
-    {
-      id: 1,
-      name: "Ananya Sharma",
-      email: "ananya@gmail.com",
-      phone: "+91 98765 43210",
-      orders: 12,
-      spent: 18990,
-      joined: "Aug 10, 2026",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Rahul Das",
-      email: "rahul@gmail.com",
-      phone: "+91 91234 56789",
-      orders: 8,
-      spent: 12450,
-      joined: "Jul 28, 2026",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Priya Singh",
-      email: "priya@gmail.com",
-      phone: "+91 99887 66554",
-      orders: 15,
-      spent: 25600,
-      joined: "Jul 15, 2026",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Arjun Roy",
-      email: "arjun@gmail.com",
-      phone: "+91 87654 32109",
-      orders: 5,
-      spent: 6790,
-      joined: "Jun 30, 2026",
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Sneha Das",
-      email: "sneha@gmail.com",
-      phone: "+91 98712 34567",
-      orders: 3,
-      spent: 3899,
-      joined: "Jun 21, 2026",
-      status: "Blocked",
-    },
-    {
-      id: 6,
-      name: "Riya Sen",
-      email: "riya@gmail.com",
-      phone: "+91 90909 87654",
-      orders: 9,
-      spent: 14590,
-      joined: "Jun 10, 2026",
-      status: "Active",
-    },
-    {
-      id: 7,
-      name: "Amit Roy",
-      email: "amit@gmail.com",
-      phone: "+91 89898 76543",
-      orders: 2,
-      spent: 2198,
-      joined: "May 28, 2026",
-      status: "Active",
-    },
-  ];
+  const [statusFilter, setStatusFilter] =
+    useState("All Status");
 
-  /* =====================================================
-     FILTER USERS
-  ===================================================== */
+  const [users, setUsers] = useState([]);
+
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+
+  const [selectedUser, setSelectedUser] =
+    useState(null);
+
+
+  // =====================================================
+  // FETCH USERS
+  // =====================================================
+
+  const fetchUsers = async () => {
+
+    try {
+
+      setLoading(true);
+
+      // Get Clerk authentication token
+      const token = await getToken();
+
+      // Request users from backend
+      const response = await axios.get(
+        "http://localhost:5001/api/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Save users
+      setUsers(response.data.users || []);
+
+      // Save total Clerk users
+      setTotalUsers(
+        response.data.totalCount || 0
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Error fetching users:",
+        error
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+
+  // =====================================================
+  // FETCH ON PAGE LOAD
+  // =====================================================
+
+  useEffect(() => {
+
+    fetchUsers();
+
+  }, []);
+
+
+  // =====================================================
+  // ACTIVE USERS
+  // =====================================================
+
+  const activeUsers = users.filter(
+    (user) => user.status === "Active"
+  ).length;
+
+
+  // =====================================================
+  // BLOCKED USERS
+  // =====================================================
+
+  const blockedUsers = users.filter(
+    (user) => user.status === "Blocked"
+  ).length;
+
+
+  // =====================================================
+  // NEW USERS THIS MONTH
+  // =====================================================
+
+  const now = new Date();
+
+  const newThisMonth = users.filter((user) => {
+
+    const joinedDate = new Date(
+      user.joined
+    );
+
+    return (
+      joinedDate.getMonth() === now.getMonth() &&
+      joinedDate.getFullYear() ===
+        now.getFullYear()
+    );
+
+  }).length;
+
+
+  // =====================================================
+  // FILTER USERS
+  // =====================================================
 
   const filteredUsers = users.filter((user) => {
-    const searchValue = search.toLowerCase();
+
+    const searchValue =
+      search.toLowerCase().trim();
+
+    const userName =
+      user.name?.toLowerCase() || "";
+
+    const userEmail =
+      user.email?.toLowerCase() || "";
+
+    const userPhone =
+      user.phone?.toLowerCase() || "";
 
     const matchesSearch =
-      user.name.toLowerCase().includes(searchValue) ||
-      user.email.toLowerCase().includes(searchValue) ||
-      user.phone.includes(searchValue);
+      userName.includes(searchValue) ||
+      userEmail.includes(searchValue) ||
+      userPhone.includes(searchValue);
 
     const matchesStatus =
       statusFilter === "All Status" ||
       user.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    return (
+      matchesSearch &&
+      matchesStatus
+    );
+
   });
 
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
+
+    return (
+      <div className="users-page">
+
+        <div className="users-header">
+
+          <div>
+
+            <h1>
+              Users
+            </h1>
+
+            <p>
+              Loading customer accounts...
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
   return (
+
     <div className="users-page">
+
 
       {/* =================================================
           HEADER
@@ -117,11 +220,15 @@ const Users = () => {
       <div className="users-header">
 
         <div>
-          <h1>Users</h1>
+
+          <h1>
+            Users
+          </h1>
 
           <p>
             Manage your customers and their accounts.
           </p>
+
         </div>
 
       </div>
@@ -133,60 +240,81 @@ const Users = () => {
 
       <div className="user-stats">
 
+
+        {/* TOTAL USERS */}
+
         <div className="user-stat-card">
 
           <div className="user-stat-icon total">
+
             <UsersIcon size={19} />
+
           </div>
 
           <div>
-            <span>Total Users</span>
-            <h3>8,942</h3>
+
+            <span>
+              Total Users
+            </span>
+
+            <h3>
+              {totalUsers}
+            </h3>
+
           </div>
 
         </div>
 
+
+        {/* ACTIVE USERS */}
 
         <div className="user-stat-card">
 
           <div className="user-stat-icon active">
+
             <UserCheck size={19} />
+
           </div>
 
           <div>
-            <span>Active Users</span>
-            <h3>8,721</h3>
+
+            <span>
+              Active Users
+            </span>
+
+            <h3>
+              {activeUsers}
+            </h3>
+
           </div>
 
         </div>
 
+
+        {/* NEW USERS */}
 
         <div className="user-stat-card">
 
           <div className="user-stat-icon new">
+
             <UserPlus size={19} />
+
           </div>
 
           <div>
-            <span>New This Month</span>
-            <h3>284</h3>
+
+            <span>
+              New This Month
+            </span>
+
+            <h3>
+              {newThisMonth}
+            </h3>
+
           </div>
 
         </div>
 
-
-        <div className="user-stat-card">
-
-          <div className="user-stat-icon blocked">
-            <UserX size={19} />
-          </div>
-
-          <div>
-            <span>Blocked</span>
-            <h3>221</h3>
-          </div>
-
-        </div>
 
       </div>
 
@@ -204,6 +332,9 @@ const Users = () => {
 
         <div className="users-toolbar">
 
+
+          {/* SEARCH */}
+
           <div className="user-search">
 
             <Search size={17} />
@@ -220,6 +351,8 @@ const Users = () => {
           </div>
 
 
+          {/* STATUS FILTER */}
+
           <select
             className="user-status-filter"
             value={statusFilter}
@@ -228,11 +361,17 @@ const Users = () => {
             }
           >
 
-            <option>All Status</option>
+            <option value="All Status">
+              All Status
+            </option>
 
-            <option>Active</option>
+            <option value="Active">
+              Active
+            </option>
 
-            <option>Blocked</option>
+            {/* <option value="Blocked">
+              Blocked
+            </option> */}
 
           </select>
 
@@ -251,19 +390,33 @@ const Users = () => {
 
               <tr>
 
-                <th>User</th>
+                <th>
+                  User
+                </th>
 
-                <th>Phone</th>
+                <th>
+                  Phone
+                </th>
 
-                <th>Orders</th>
+                <th>
+                  Orders
+                </th>
 
-                <th>Total Spent</th>
+                <th>
+                  Total Spent
+                </th>
 
-                <th>Joined</th>
+                <th>
+                  Joined
+                </th>
 
-                <th>Status</th>
+                <th>
+                  Status
+                </th>
 
-                <th>Action</th>
+                <th>
+                  Action
+                </th>
 
               </tr>
 
@@ -276,19 +429,39 @@ const Users = () => {
 
                 <tr key={user.id}>
 
-                  {/* User */}
+
+                  {/* =================================================
+                      USER
+                  ================================================= */}
 
                   <td>
 
                     <div className="user-info">
 
+
+                      {/* PROFILE IMAGE */}
+
                       <div className="user-avatar">
 
-                        {user.name
-                          .charAt(0)
-                          .toUpperCase()}
+                        {user.imageUrl ? (
+
+                          <img
+                            src={user.imageUrl}
+                            alt={user.name}
+                          />
+
+                        ) : (
+
+                          user.name
+                            ?.charAt(0)
+                            .toUpperCase()
+
+                        )}
 
                       </div>
+
+
+                      {/* NAME + EMAIL */}
 
                       <div>
 
@@ -307,76 +480,119 @@ const Users = () => {
                   </td>
 
 
-                  {/* Phone */}
+                  {/* =================================================
+                      PHONE
+                  ================================================= */}
 
                   <td>
 
                     <span className="user-phone">
+
                       {user.phone}
+
                     </span>
 
                   </td>
 
 
-                  {/* Orders */}
+                  {/* =================================================
+                      ORDERS
+                  ================================================= */}
 
                   <td>
 
                     <span className="user-orders">
+
                       {user.orders}
+
                     </span>
 
                   </td>
 
 
-                  {/* Spent */}
+                  {/* =================================================
+                      TOTAL SPENT
+                  ================================================= */}
 
                   <td>
 
                     <strong className="user-spent">
-                      ₹{user.spent.toLocaleString("en-IN")}
+
+                      ₹
+                      {Number(
+                        user.spent || 0
+                      ).toLocaleString("en-IN")}
+
                     </strong>
 
                   </td>
 
 
-                  {/* Joined */}
+                  {/* =================================================
+                      JOINED
+                  ================================================= */}
 
                   <td>
 
                     <span className="user-joined">
-                      {user.joined}
+
+                      {new Date(
+                        user.joined
+                      ).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
+
                     </span>
 
                   </td>
 
 
-                  {/* Status */}
+                  {/* =================================================
+                      STATUS
+                  ================================================= */}
 
                   <td>
 
                     <span
-                      className={`user-status ${user.status.toLowerCase()}`}
+                      className={`user-status ${
+                        user.status?.toLowerCase()
+                      }`}
                     >
+
                       {user.status}
+
                     </span>
 
                   </td>
 
 
-                  {/* Actions */}
+                  {/* =================================================
+                      ACTIONS
+                  ================================================= */}
 
                   <td>
 
                     <div className="user-actions">
 
-                      <button title="View user">
+
+                      {/* VIEW */}
+
+                      <button
+                        title="View user"
+                        onClick={() =>
+                          setSelectedUser(user)
+                        }
+                      >
+
                         <Eye size={16} />
+
                       </button>
 
-                      <button title="More">
-                        <MoreHorizontal size={17} />
-                      </button>
 
                     </div>
 
@@ -387,6 +603,10 @@ const Users = () => {
               ))}
 
 
+              {/* =================================================
+                  NO USERS
+              ================================================= */}
+
               {filteredUsers.length === 0 && (
 
                 <tr>
@@ -395,7 +615,9 @@ const Users = () => {
                     colSpan="7"
                     className="no-users"
                   >
+
                     No users found.
+
                   </td>
 
                 </tr>
@@ -416,10 +638,15 @@ const Users = () => {
         <div className="users-footer">
 
           <span>
-            Showing {filteredUsers.length} of{" "}
+
+            Showing{" "}
+            {filteredUsers.length} of{" "}
             {users.length} users
+
           </span>
 
+
+          {/* PAGINATION */}
 
           <div className="users-pagination">
 
@@ -448,6 +675,213 @@ const Users = () => {
         </div>
 
       </div>
+
+
+      {/* =================================================
+          USER DETAILS MODAL
+      ================================================= */}
+
+      {selectedUser && (
+
+        <div
+          className="user-modal-overlay"
+          onClick={() =>
+            setSelectedUser(null)
+          }
+        >
+
+          <div
+            className="user-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+
+            {/* HEADER */}
+
+            <div className="user-modal-header">
+
+              <div>
+
+                <h2>
+                  User Details
+                </h2>
+
+                <span>
+                  {selectedUser.id}
+                </span>
+
+              </div>
+
+              <button
+                className="user-modal-close"
+                onClick={() =>
+                  setSelectedUser(null)
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            {/* USER PROFILE */}
+
+            <div className="user-modal-profile">
+
+              <div className="user-modal-avatar">
+
+                {selectedUser.imageUrl ? (
+
+                  <img
+                    src={
+                      selectedUser.imageUrl
+                    }
+                    alt={
+                      selectedUser.name
+                    }
+                  />
+
+                ) : (
+
+                  selectedUser.name
+                    ?.charAt(0)
+                    .toUpperCase()
+
+                )}
+
+              </div>
+
+              <div>
+
+                <h3>
+                  {selectedUser.name}
+                </h3>
+
+                <span>
+                  {selectedUser.email}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            {/* USER INFORMATION */}
+
+            <div className="user-modal-section">
+
+              <h3>
+                Account Information
+              </h3>
+
+              <div className="user-detail-grid">
+
+                <div>
+
+                  <span>
+                    Phone
+                  </span>
+
+                  <strong>
+                    {selectedUser.phone}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Status
+                  </span>
+
+                  <strong>
+                    {selectedUser.status}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Orders
+                  </span>
+
+                  <strong>
+                    {selectedUser.orders}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Total Spent
+                  </span>
+
+                  <strong>
+                    ₹
+                    {Number(
+                      selectedUser.spent || 0
+                    ).toLocaleString(
+                      "en-IN"
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Joined
+                  </span>
+
+                  <strong>
+
+                    {new Date(
+                      selectedUser.joined
+                    ).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      }
+                    )}
+
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* CLERK ID */}
+
+            <div className="user-modal-section">
+
+              <h3>
+                Clerk User ID
+              </h3>
+
+              <p className="user-clerk-id">
+                {selectedUser.id}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   );

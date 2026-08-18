@@ -14,6 +14,8 @@ const connectDB = require("./config/db");
 const productRoutes = require("./routes/ProductRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const PaymentsRoutes = require("./routes/PaymentsRoutes");
+const userRoutes = require("./routes/UserRoutes");
+const settingsRoutes = require("./routes/SettingsRoutes");
 
 const app = express();
 
@@ -49,6 +51,11 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 app.use("/api/payment", PaymentsRoutes);
+app.use("/api/users", userRoutes);
+app.use(
+  "/api/settings",
+  settingsRoutes
+);
 
 // =====================================================
 // SERVER

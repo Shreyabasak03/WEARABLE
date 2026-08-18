@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { useAuth } from "@clerk/react";
 import {
   Search,
   Eye,
@@ -15,6 +15,7 @@ import {
 import "./Orders.css";
 
 const Orders = () => {
+const { getToken } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
 
@@ -28,18 +29,25 @@ const [selectedOrder, setSelectedOrder] = useState(null);
   // =====================================================
 
   const fetchOrders = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5001/api/orders"
-      );
+  try {
+    const token = await getToken();
 
-      setOrders(response.data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const response = await axios.get(
+      "http://localhost:5001/api/orders/admin",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setOrders(response.data);
+  } catch (error) {
+    console.error("Error fetching admin orders:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchOrders();

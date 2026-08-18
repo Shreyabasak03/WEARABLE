@@ -1,5 +1,7 @@
-import React from "react";
-import "./Dashboard.css";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "@clerk/react";
+import { useNavigate } from "react-router-dom";
 
 import {
   DollarSign,
@@ -22,180 +24,341 @@ import {
   Tooltip,
 } from "recharts";
 
+import "./Dashboard.css";
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+  // CLERK
 
-  /* =====================================================
-     STATISTICS
-  ===================================================== */
+  const { getToken } = useAuth();
 
+ 
+  // STATES
+
+  const [orders, setOrders] = useState([]);
+
+  const [products, setProducts] = useState([]);
+
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+
+
+  // FETCH DASHBOARD DATA
+
+
+  const fetchDashboardData = async () => {
+
+    try {
+
+      setLoading(true);
+
+      const token = await getToken();
+
+      // GET ORDERS
+
+      const ordersResponse = await axios.get(
+        "http://localhost:5001/api/orders",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // GET PRODUCTS
+
+      const productsResponse = await axios.get(
+        "http://localhost:5001/api/products"
+      );
+
+      
+      // GET USERS
+  
+      const usersResponse = await axios.get(
+        "http://localhost:5001/api/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+
+      setOrders(
+        ordersResponse.data || []
+      );
+
+
+      setProducts(
+        productsResponse.data.products ||
+        productsResponse.data ||
+        []
+      );
+
+
+      setTotalUsers(
+        usersResponse.data.totalCount || 0
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Dashboard fetch error:",
+        error
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  // FETCH ON PAGE LOAD
+
+
+  useEffect(() => {
+
+    fetchDashboardData();
+
+  }, []);
+
+  // TOTAL REVENUE
+ 
+  const totalRevenue = orders
+    .filter(
+      (order) =>
+        order.status !== "Cancelled"
+    )
+    .reduce(
+      (total, order) =>
+        total +
+        Number(order.totalAmount || 0),
+      0
+    );
+
+
+ 
+  // TOTAL ORDERS
+
+
+  const totalOrders = orders.length;
+
+  // LOW STOCK
+
+  const lowStockProducts = products
+    .filter(
+      (product) =>
+        Number(product.stock || 0) <= 10
+    )
+    .sort(
+      (a, b) =>
+        Number(a.stock || 0) -
+        Number(b.stock || 0)
+    )
+    .slice(0, 5);
+
+
+  
+  // REVENUE GRAPH
+  
+
+  const revenueMap = {};
+
+  orders
+    .filter(
+      (order) =>
+        order.status !== "Cancelled"
+    )
+    .forEach((order) => {
+
+      const date = new Date(
+        order.createdAt
+      );
+
+      const month = date.toLocaleDateString(
+        "en-IN",
+        {
+          month: "short",
+        }
+      );
+
+      if (!revenueMap[month]) {
+
+        revenueMap[month] = 0;
+
+      }
+
+      revenueMap[month] +=
+        Number(order.totalAmount || 0);
+
+    });
+
+
+  const revenueData = Object.keys(
+    revenueMap
+  ).map((month) => ({
+
+    month,
+
+    revenue: revenueMap[month],
+
+  }));
+
+
+  
+  // RECENT ORDERS
+  
+  const recentOrders = [...orders]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt) -
+        new Date(a.createdAt)
+    )
+    .slice(0, 5);
+
+
+  
+  // FORMAT CURRENCY
+ 
+
+  const formatCurrency = (value) => {
+
+    return `₹${Number(
+      value || 0
+    ).toLocaleString("en-IN")}`;
+
+  };
+
+  // LOADING
+ 
+  if (loading) {
+
+    return (
+      <div className="dashboard">
+
+        <div className="dashboard-header">
+
+          <div>
+
+            <h1>
+              Dashboard
+            </h1>
+
+            <p>
+              Loading store data...
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+  // STATISTICS
+  
   const stats = [
+
     {
       title: "Total Revenue",
-      value: "₹2,84,500",
-      change: "+12.5%",
+
+      value:
+        formatCurrency(
+          totalRevenue
+        ),
+
+      change: "Live",
+
       positive: true,
+
       icon: DollarSign,
     },
+
+
     {
       title: "Total Orders",
-      value: "1,248",
-      change: "+8.2%",
+
+      value:
+        totalOrders.toLocaleString(
+          "en-IN"
+        ),
+
+      change: "Live",
+
       positive: true,
+
       icon: ShoppingBag,
     },
+
+
     {
       title: "Total Products",
-      value: "356",
-      change: "+4.6%",
+
+      value:
+        products.length.toLocaleString(
+          "en-IN"
+        ),
+
+      change: "Live",
+
       positive: true,
+
       icon: Package,
     },
+
+
     {
       title: "Total Users",
-      value: "8,942",
-      change: "-2.4%",
-      positive: false,
+
+      value:
+        totalUsers.toLocaleString(
+          "en-IN"
+        ),
+
+      change: "Live",
+
+      positive: true,
+
       icon: Users,
     },
+
   ];
 
-
-  /* =====================================================
-     REVENUE GRAPH DATA
-  ===================================================== */
-
-  const revenueData = [
-    {
-      month: "Feb",
-      revenue: 32000,
-    },
-    {
-      month: "Mar",
-      revenue: 42000,
-    },
-    {
-      month: "Apr",
-      revenue: 36000,
-    },
-    {
-      month: "May",
-      revenue: 48000,
-    },
-    {
-      month: "Jun",
-      revenue: 44000,
-    },
-    {
-      month: "Jul",
-      revenue: 55000,
-    },
-    {
-      month: "Aug",
-      revenue: 62500,
-    },
-  ];
-
-
-  /* =====================================================
-     RECENT ORDERS
-  ===================================================== */
-
-  const orders = [
-    {
-      id: "#ORD-1024",
-      customer: "Ananya Sharma",
-      product: "Classic Oversized T-Shirt",
-      amount: "₹1,598",
-      status: "Delivered",
-    },
-    {
-      id: "#ORD-1023",
-      customer: "Rahul Das",
-      product: "Premium Denim Jacket",
-      amount: "₹2,499",
-      status: "Processing",
-    },
-    {
-      id: "#ORD-1022",
-      customer: "Priya Singh",
-      product: "Women's Casual Sneakers",
-      amount: "₹1,899",
-      status: "Shipped",
-    },
-    {
-      id: "#ORD-1021",
-      customer: "Arjun Roy",
-      product: "Slim Fit Cargo Pants",
-      amount: "₹1,299",
-      status: "Delivered",
-    },
-    {
-      id: "#ORD-1020",
-      customer: "Sneha Das",
-      product: "Minimal Crossbody Bag",
-      amount: "₹999",
-      status: "Pending",
-    },
-  ];
-
-
-  /* =====================================================
-     LOW STOCK PRODUCTS
-  ===================================================== */
-
-  const lowStockProducts = [
-    {
-      name: "Classic White T-Shirt",
-      category: "Men",
-      stock: 4,
-    },
-    {
-      name: "Oversized Hoodie",
-      category: "Women",
-      stock: 7,
-    },
-    {
-      name: "Leather Crossbody Bag",
-      category: "Accessories",
-      stock: 3,
-    },
-    {
-      name: "Slim Fit Jeans",
-      category: "Men",
-      stock: 6,
-    },
-  ];
+  // RENDER
 
 
   return (
+
     <div className="dashboard">
 
 
-      {/* =================================================
-          HEADER
-      ================================================= */}
+      {/* HEADER */}
 
       <div className="dashboard-header">
 
         <div>
-          <h1>Dashboard</h1>
+
+          <h1>
+            Dashboard
+          </h1>
 
           <p>
             Here's what's happening with your store today.
           </p>
-        </div>
 
-        <button className="primary-button">
-          Download Report
-        </button>
+        </div>
 
       </div>
 
 
-      {/* =================================================
-          STAT CARDS
-      ================================================= */}
+
+          {/* STAT CARDS */}
+
 
       <div className="stats-grid">
 
@@ -204,6 +367,7 @@ const Dashboard = () => {
           const Icon = stat.icon;
 
           return (
+
             <div
               className="stat-card"
               key={stat.title}
@@ -212,13 +376,12 @@ const Dashboard = () => {
               <div className="stat-card-top">
 
                 <div className="stat-icon">
+
                   <Icon size={21} />
+
                 </div>
 
-                <button className="stat-more">
-                  <MoreHorizontal size={19} />
-                </button>
-
+               
               </div>
 
 
@@ -242,9 +405,17 @@ const Dashboard = () => {
                 >
 
                   {stat.positive ? (
-                    <ArrowUpRight size={15} />
+
+                    <ArrowUpRight
+                      size={15}
+                    />
+
                   ) : (
-                    <ArrowDownRight size={15} />
+
+                    <ArrowDownRight
+                      size={15}
+                    />
+
                   )}
 
                   <span>
@@ -252,7 +423,7 @@ const Dashboard = () => {
                   </span>
 
                   <small>
-                    vs last month
+                    from backend
                   </small>
 
                 </div>
@@ -260,23 +431,20 @@ const Dashboard = () => {
               </div>
 
             </div>
+
           );
 
         })}
 
       </div>
 
-
-      {/* =================================================
-          REVENUE + LOW STOCK
-      ================================================= */}
+          {/* REVENUE + LOW STOCK
+      */}
 
       <div className="dashboard-grid">
 
-
-        {/* =================================================
-            REVENUE
-        ================================================= */}
+            {/* REVENUE */}
+        
 
         <div className="dashboard-card revenue-section">
 
@@ -289,172 +457,176 @@ const Dashboard = () => {
               </h3>
 
               <p>
-                Monthly revenue performance
+                Revenue from customer orders
               </p>
 
             </div>
 
-
-            <select className="period-select">
-
-              <option>
-                Last 7 months
-              </option>
-
-              <option>
-                Last 30 days
-              </option>
-
-              <option>
-                Last 12 months
-              </option>
-
-            </select>
-
           </div>
 
 
-          {/* Revenue summary */}
+          {/* REVENUE SUMMARY */}
 
           <div className="revenue-summary">
 
             <h2>
-              ₹2,84,500
+              {formatCurrency(
+                totalRevenue
+              )}
             </h2>
 
             <div className="revenue-growth">
 
-              <ArrowUpRight size={16} />
+              <ArrowUpRight
+                size={16}
+              />
 
-              12.5%
+              Live
 
             </div>
 
           </div>
 
 
-          {/* REAL GRAPH */}
+          {/* GRAPH */}
 
           <div className="revenue-chart">
 
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
+            {revenueData.length > 0 ? (
 
-              <AreaChart
-                data={revenueData}
-
-                margin={{
-                  top: 10,
-                  right: 10,
-                  left: 0,
-                  bottom: 0,
-                }}
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
               >
 
-                <defs>
-
-                  <linearGradient
-                    id="revenueGradient"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-
-                    <stop
-                      offset="0%"
-                      stopColor="#6fd6cb"
-                      stopOpacity={0.35}
-                    />
-
-                    <stop
-                      offset="100%"
-                      stopColor="#0f4d45"
-                      stopOpacity={0}
-                    />
-
-                  </linearGradient>
-
-                </defs>
-
-
-                <CartesianGrid
-                  stroke="var(--border)"
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
-
-
-                <XAxis
-                  dataKey="month"
-
-                  axisLine={false}
-                  tickLine={false}
-
-                  tick={{
-                    fill: "var(--text-muted)",
-                    fontSize: 11,
+                <AreaChart
+                  data={revenueData}
+                  margin={{
+                    top: 10,
+                    right: 10,
+                    left: 0,
+                    bottom: 0,
                   }}
-                />
+                >
+
+                  <defs>
+
+                    <linearGradient
+                      id="revenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+
+                      <stop
+                        offset="0%"
+                        stopColor="#6fd6cb"
+                        stopOpacity={0.35}
+                      />
+
+                      <stop
+                        offset="100%"
+                        stopColor="#0f4d45"
+                        stopOpacity={0}
+                      />
+
+                    </linearGradient>
+
+                  </defs>
 
 
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-
-                  tick={{
-                    fill: "var(--text-muted)",
-                    fontSize: 10,
-                  }}
-
-                  tickFormatter={(value) =>
-                    `₹${value / 1000}k`
-                  }
-                />
+                  <CartesianGrid
+                    stroke="var(--border)"
+                    strokeDasharray="3 3"
+                    vertical={false}
+                  />
 
 
-                <Tooltip
-                  contentStyle={{
-                    background: "#14201e",
-                    border:
-                      "1px solid #263d39",
-                    borderRadius: "8px",
-                    color: "#ffffff",
-                  }}
-
-                  formatter={(value) => [
-                    `₹${value.toLocaleString(
-                      "en-IN"
-                    )}`,
-                    "Revenue",
-                  ]}
-                />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fill:
+                        "var(--text-muted)",
+                      fontSize: 11,
+                    }}
+                  />
 
 
-                <Area
-                  type="monotone"
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fill:
+                        "var(--text-muted)",
+                      fontSize: 10,
+                    }}
+                    tickFormatter={(value) =>
+                      `₹${value / 1000}k`
+                    }
+                  />
 
-                  dataKey="revenue"
 
-                  stroke="#6fd6cb"
+                  <Tooltip
+                    contentStyle={{
+                      background:
+                        "#14201e",
 
-                  strokeWidth={2.5}
+                      border:
+                        "1px solid #263d39",
 
-                  fill="url(#revenueGradient)"
+                      borderRadius:
+                        "8px",
 
-                  activeDot={{
-                    r: 5,
-                    fill: "#6fd6cb",
-                    stroke: "#0f4d45",
-                    strokeWidth: 2,
-                  }}
-                />
+                      color:
+                        "#ffffff",
+                    }}
 
-              </AreaChart>
+                    formatter={(value) => [
 
-            </ResponsiveContainer>
+                      formatCurrency(
+                        value
+                      ),
+
+                      "Revenue",
+
+                    ]}
+                  />
+
+
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+
+                    stroke="#6fd6cb"
+
+                    strokeWidth={2.5}
+
+                    fill="url(#revenueGradient)"
+
+                    activeDot={{
+                      r: 5,
+                      fill: "#6fd6cb",
+                      stroke: "#0f4d45",
+                      strokeWidth: 2,
+                    }}
+                  />
+
+                </AreaChart>
+
+              </ResponsiveContainer>
+
+            ) : (
+
+              <div className="empty-chart">
+
+                No revenue data available yet.
+
+              </div>
+
+            )}
 
           </div>
 
@@ -491,65 +663,82 @@ const Dashboard = () => {
 
           <div className="stock-list">
 
-            {lowStockProducts.map(
-              (product) => (
+            {lowStockProducts.length > 0 ? (
 
-                <div
-                  className="stock-item"
-                  key={product.name}
-                >
+              lowStockProducts.map(
+                (product) => (
 
-                  <div className="stock-product">
+                  <div
+                    className="stock-item"
+                    key={product._id}
+                  >
 
-                    <div className="product-placeholder">
+                    <div className="stock-product">
 
-                      <Package size={18} />
+                      <div className="product-placeholder">
+
+                        <Package
+                          size={18}
+                        />
+
+                      </div>
+
+
+                      <div>
+
+                        <h4>
+                          {product.name}
+                        </h4>
+
+                        <span>
+                          {product.category}
+                        </span>
+
+                      </div>
 
                     </div>
 
 
-                    <div>
+                    <div className="stock-number">
 
-                      <h4>
-                        {product.name}
-                      </h4>
+                      <strong>
+                        {product.stock}
+                      </strong>
 
                       <span>
-                        {product.category}
+                        left
                       </span>
 
                     </div>
 
                   </div>
 
-
-                  <div className="stock-number">
-
-                    <strong>
-                      {product.stock}
-                    </strong>
-
-                    <span>
-                      left
-                    </span>
-
-                  </div>
-
-                </div>
-
+                )
               )
+
+            ) : (
+
+              <p className="no-stock-warning">
+
+                All products have sufficient stock.
+
+              </p>
+
             )}
 
           </div>
 
 
-          <button className="view-button">
-
-            View all products
-
-            <ArrowUpRight size={16} />
-
-          </button>
+           <button
+  type="button"
+  className="view-button"
+  onClick={() => {
+    navigate("/admin/products");
+  }}
+>
+  View all Products
+  <ArrowUpRight size={16} />
+</button>
 
         </div>
 
@@ -578,14 +767,16 @@ const Dashboard = () => {
           </div>
 
 
-          <button className="view-button">
-
-            View all
-
-            <ArrowUpRight size={16} />
-
-          </button>
-
+           <button
+  type="button"
+  className="view-button"
+  onClick={() => {
+    navigate("/admin/orders");
+  }}
+>
+  View all
+  <ArrowUpRight size={16} />
+</button>
         </div>
 
 
@@ -626,52 +817,118 @@ const Dashboard = () => {
 
             <tbody>
 
-              {orders.map(
-                (order) => (
+              {recentOrders.length > 0 ? (
 
-                  <tr key={order.id}>
+                recentOrders.map(
+                  (order) => (
 
-                    <td className="order-id">
-                      {order.id}
-                    </td>
+                    <tr
+                      key={order._id}
+                    >
 
-                    <td>
-                      {order.customer}
-                    </td>
+                      <td className="order-id">
 
-                    <td className="order-product">
-                      {order.product}
-                    </td>
+                        #
+                        {order._id.slice(-6)}
 
-                    <td className="order-amount">
-                      {order.amount}
-                    </td>
+                      </td>
 
-                    <td>
 
-                      <span
-                        className={`status ${order.status.toLowerCase()}`}
-                      >
-                        {order.status}
-                      </span>
+                      <td>
 
-                    </td>
+                        {order.customer?.name ||
+                          "Unknown"}
 
-                    <td>
+                      </td>
 
-                      <button className="table-more">
 
-                        <MoreHorizontal
-                          size={18}
-                        />
+                      <td className="order-product">
 
-                      </button>
+                        {order.products?.map(
+                          (item, index) => (
 
-                    </td>
+                            <div
+                              key={index}
+                            >
 
-                  </tr>
+                              {item.name}
 
+                              {" × "}
+
+                              {item.quantity}
+
+                            </div>
+
+                          )
+                        )}
+
+                      </td>
+
+
+                      <td className="order-amount">
+
+                        {formatCurrency(
+                          order.totalAmount
+                        )}
+
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={`status ${order.status
+                            ?.toLowerCase()
+                            .replace(
+                              " ",
+                              "-"
+                            )}`}
+                        >
+
+                          {order.status}
+
+                        </span>
+
+                      </td>
+
+
+                      <td>
+
+                        <button
+                          className="table-more"
+                        >
+
+                          <MoreHorizontal
+                            size={18}
+                          />
+
+                        </button>
+
+                      </td>
+
+                    </tr>
+
+                  )
                 )
+
+              ) : (
+
+                <tr>
+
+                  <td
+                    colSpan="6"
+                    style={{
+                      textAlign: "center",
+                      padding: "30px",
+                    }}
+                  >
+
+                    No orders yet.
+
+                  </td>
+
+                </tr>
+
               )}
 
             </tbody>
@@ -683,7 +940,9 @@ const Dashboard = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 

@@ -129,6 +129,34 @@ router.get("/", async (req, res) => {
     });
   }
 });
+// ===============================
+// ADMIN - GET ALL ORDERS
+// ===============================
+router.get("/admin", async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Admin authentication required",
+      });
+    }
+
+    const orders = await Order.find({})
+      .populate("products.product")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(orders);
+
+  } catch (error) {
+    console.error("Admin get orders error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch all orders",
+      error: error.message,
+    });
+  }
+});
 
 // ===============================
 // GET SINGLE ORDER
