@@ -20,7 +20,7 @@ import Settings from "./pages/Settings.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
 import EditProduct from "./pages/EditProduct.jsx";
 import ViewProduct from "./pages/ViewProduct.jsx";
-
+import Notifications from "./pages/Notification.jsx";
 
 function App() {
   return (
@@ -106,6 +106,10 @@ function App() {
               path="users"
               element={<Users />}
             />
+            <Route
+  path="notifications"
+  element={<Notifications />}
+/>
 
 
             {/* =================================================

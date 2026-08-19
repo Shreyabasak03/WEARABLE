@@ -1,0 +1,300 @@
+/* =========================================================
+   NOTIFICATIONS PAGE
+========================================================= */
+
+.notifications-page {
+  width: 100%;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.notifications-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 28px;
+}
+
+.notifications-header h1 {
+  font-size: 28px;
+
+  font-weight: 600;
+
+  margin-bottom: 7px;
+}
+
+.notifications-header p {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   MARK ALL
+========================================================= */
+
+.mark-all-button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 14px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 8px;
+
+  background: var(--bg-card);
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+.mark-all-button:hover {
+  background: var(--bg-hover);
+
+  color: var(--text-primary);
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.notifications-card {
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+.notification-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid var(--border);
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.notification-card:last-child {
+  border-bottom: none;
+}
+
+.notification-card:hover {
+  background: var(--bg-hover);
+}
+
+
+/* =========================================================
+   UNREAD
+========================================================= */
+
+.notification-card.unread {
+  background: rgba(42, 174, 155, 0.06);
+}
+
+.notification-card.unread::before {
+  content: "";
+
+  width: 6px;
+
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: var(--green-light);
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.notification-icon {
+  width: 38px;
+
+  height: 38px;
+
+  min-width: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: var(--green-deep);
+
+  color: var(--green-light);
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h3 {
+  margin-bottom: 4px;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.notification-content p {
+  margin-bottom: 5px;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+}
+
+.notification-content span {
+  color: var(--text-muted);
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+.notification-delete {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 32px;
+
+  height: 32px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  cursor: pointer;
+}
+
+.notification-delete:hover {
+  background: var(--bg-hover);
+
+  color: #ff6b6b;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-notifications {
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  color: var(--text-muted);
+}
+
+.empty-notifications svg {
+  margin-bottom: 14px;
+}
+
+.empty-notifications h3 {
+  margin-bottom: 6px;
+
+  color: var(--text-primary);
+
+  font-size: 15px;
+}
+
+.empty-notifications p {
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.notifications-loading {
+  padding: 50px;
+
+  text-align: center;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .notifications-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+  .notification-card {
+    padding: 15px;
+  }
+
+}

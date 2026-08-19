@@ -16,6 +16,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const PaymentsRoutes = require("./routes/PaymentsRoutes");
 const userRoutes = require("./routes/UserRoutes");
 const settingsRoutes = require("./routes/SettingsRoutes");
+const notificationRoutes = require("./routes/NotificationRoutes");
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use(
   "/api/settings",
   settingsRoutes
 );
+app.use("/api/notifications", notificationRoutes);
 
 // =====================================================
 // SERVER

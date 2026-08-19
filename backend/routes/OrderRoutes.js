@@ -4,6 +4,7 @@ const { getAuth } = require("@clerk/express");
 
 const Order = require("../model/order");
 const Product = require("../model/product");
+const Notification = require("../model/notification");
 
 
 // ===============================
@@ -54,18 +55,29 @@ router.post("/", async (req, res) => {
         });
       }
     }
-
-    // --------------------------------
     // DECREASE STOCK
-    // --------------------------------
+   
 
-    for (const item of products) {
-      const product = await Product.findById(item.product);
+for (const item of products) {
+  const product = await Product.findById(item.product);
 
-      product.stock -= item.quantity;
+  product.stock -= item.quantity;
 
-      await product.save();
-    }
+  await product.save();
+
+  // --------------------------------
+  // LOW STOCK NOTIFICATION
+  // --------------------------------
+
+  if (product.stock <= 5) {
+    await Notification.create({
+      type: "low_stock",
+      title: "Low Stock Alert",
+      message: `${product.name} has only ${product.stock} items left.`,
+      relatedId: product._id.toString(),
+    });
+  }
+}
 
     // --------------------------------
     // CREATE ORDER
@@ -76,6 +88,12 @@ router.post("/", async (req, res) => {
   clerkUserId: userId,
 });
     const savedOrder = await order.save();
+    await Notification.create({
+  type: "order",
+  title: "New Order Received",
+  message: "A new order has been placed.",
+  relatedId: savedOrder._id.toString(),
+});
 
     res.status(201).json({
       message: "Order created successfully",
