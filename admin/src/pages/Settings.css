@@ -279,49 +279,79 @@
 ========================================================= */
 
 /* Reduce the profile section height */
+/* =========================================================
+   ADMIN PROFILE - COMPACT IMAGE
+========================================================= */
+
 .profile-section {
-  padding: 16px 22px;
-  gap: 12px;
+  display: flex !important;
+  align-items: center !important;
+
+  padding: 16px 22px !important;
+  gap: 14px !important;
+
+  min-height: auto !important;
+  height: auto !important;
+
+  background: var(--bg-card) !important;
+  background-image: none !important;
+
+  position: relative;
+  overflow: hidden;
 }
 
 
-/* Smaller admin image/avatar */
-.large-avatar {
-  width: 45px;
-  height: 45px;
+/* ADMIN PROFILE IMAGE */
 
-  min-width: 45px;
-  min-height: 45px;
+.profile-section img {
+  display: block !important;
 
-  font-size: 16px;
+  width: 55px !important;
+  height: 55px !important;
+
+  min-width: 55px !important;
+  min-height: 55px !important;
+
+  max-width: 55px !important;
+  max-height: 55px !important;
+
+  object-fit: cover !important;
+
+  border-radius: 50% !important;
+
+  position: relative !important;
+
+  margin: 0 !important;
 }
 
 
-/* Reduce profile text size */
+/* PROFILE TEXT */
+
 .profile-section h3 {
-  font-size: 13px;
-  margin-bottom: 2px;
+  font-size: 13px !important;
+  margin-bottom: 3px !important;
 }
 
 .profile-section p {
-  font-size: 9px;
-  margin-bottom: 6px;
+  font-size: 9px !important;
+  margin-bottom: 6px !important;
 }
 
 
-/* Smaller Change Avatar button */
+/* CHANGE AVATAR BUTTON */
+
 .profile-section .secondary-button {
-  padding: 5px 9px;
-  font-size: 9px;
+  padding: 5px 9px !important;
+  font-size: 9px !important;
 }
 
 
-/* Reduce space around profile form */
+/* PROFILE FORM */
+
 .profile-section + .settings-form {
-  padding-top: 18px;
-  padding-bottom: 18px;
+  padding: 18px 22px !important;
+  background: var(--bg-card) !important;
 }
-
 
 /* Make profile card more compact */
 .profile-section + .settings-form .form-group {
