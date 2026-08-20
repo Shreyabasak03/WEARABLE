@@ -1,35 +1,29 @@
 const express = require("express");
 const router = express.Router();
 
-const { clerkClient, getAuth } = require("@clerk/express");
+const {
+  protect,
+  adminOnly,
+} = require("../middleware/authMiddleware");
+
+const User = require("../model/user");
 const Order = require("../model/order");
 
 // =====================================================
 // GET ALL USERS
+// ADMIN ONLY
 // =====================================================
 
-router.get("/", async (req, res) => {
+router.get("/", protect, adminOnly, async (req, res) => {
   try {
     // =================================================
-    // CHECK ADMIN AUTHENTICATION
+    // GET USERS FROM MONGODB
     // =================================================
 
-    const { userId } = getAuth(req);
-
-    if (!userId) {
-      return res.status(401).json({
-        message: "Authentication required",
-      });
-    }
-
-    // =================================================
-    // GET USERS FROM CLERK
-    // =================================================
-
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: 100,
-      orderBy: "-created_at",
-    });
+    const users = await User.find({})
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .lean();
 
     // =================================================
     // GET ORDERS FROM MONGODB
@@ -37,114 +31,89 @@ router.get("/", async (req, res) => {
 
     const orders = await Order.find({}).lean();
 
-    // console.log("Total orders in MongoDB:", orders.length);
-
     // =================================================
     // CREATE USER ORDER STATISTICS
     // =================================================
-const orderStats = {};
 
-orders.forEach((order) => {
+    const orderStats = {};
 
-  if (!order.clerkUserId) {
-    return;
-  }
+    orders.forEach((order) => {
+      if (!order.user) {
+        return;
+      }
 
-  const clerkId = order.clerkUserId;
+      const userId = order.user.toString();
 
-  if (!orderStats[clerkId]) {
-    orderStats[clerkId] = {
-      orders: 0,
-      spent: 0,
-      phone: "",
-    };
-  }
-
-  // Count order
-  orderStats[clerkId].orders += 1;
-
-  // Add total spent
-  orderStats[clerkId].spent +=
-    Number(order.totalAmount) || 0;
-
-  // Get phone from order
-  if (
-    !orderStats[clerkId].phone &&
-    order.customer?.phone
-  ) {
-    orderStats[clerkId].phone =
-      order.customer.phone;
-  }
-});
-
-    // console.log("Order statistics:", orderStats);
-
-    // =================================================
-    // COMBINE CLERK + MONGODB DATA
-    // =================================================
-
-    const users = clerkUsers.data.map((user) => {
-        
-
-      const stats =
-        orderStats[user.id] || {
+      if (!orderStats[userId]) {
+        orderStats[userId] = {
           orders: 0,
           spent: 0,
+          phone: "",
         };
+      }
 
-      // =================================================
-      // NAME
-      // =================================================
+      // Count order
+      orderStats[userId].orders += 1;
 
-      const name =
-        [user.firstName, user.lastName]
-          .filter(Boolean)
-          .join(" ") || "No name";
+      // Add total spent
+      orderStats[userId].spent +=
+        Number(order.totalAmount) || 0;
 
+      // Get phone from order
+      if (
+        !orderStats[userId].phone &&
+        order.customer?.phone
+      ) {
+        orderStats[userId].phone =
+          order.customer.phone;
+      }
+    });
 
-      // =================================================
-      // EMAIL
-      // =================================================
+    // =================================================
+    // COMBINE USER + ORDER DATA
+    // =================================================
 
-      const email =
-        user.primaryEmailAddress?.emailAddress ||
-        user.emailAddresses?.[0]?.emailAddress ||
-        "No email";
+    const formattedUsers = users.map((user) => {
+      const userId = user._id.toString();
 
+      const stats =
+        orderStats[userId] || {
+          orders: 0,
+          spent: 0,
+          phone: "",
+        };
 
       // =================================================
       // PHONE
       // =================================================
 
       const phone =
-  user.primaryPhoneNumber?.phoneNumber ||
-  user.phoneNumbers?.[0]?.phoneNumber ||
-  stats.phone ||
-  "Not provided";
+        user.phone ||
+        stats.phone ||
+        "Not provided";
+
       // =================================================
       // STATUS
       // =================================================
 
-      const status = user.banned
+      const status = user.isBlocked
         ? "Blocked"
         : "Active";
-
 
       // =================================================
       // RETURN USER
       // =================================================
 
       return {
+        id: user._id,
 
-        id: user.id,
+        name: user.name || "No name",
 
-        name,
-
-        email,
+        email: user.email || "No email",
 
         phone,
 
-        imageUrl: user.imageUrl,
+        imageUrl: user.imageUrl || null,
 
         orders: stats.orders,
 
@@ -153,43 +122,29 @@ orders.forEach((order) => {
         joined: user.createdAt,
 
         status,
-
       };
-
     });
-
 
     // =================================================
     // RESPONSE
     // =================================================
 
     res.status(200).json({
-
-      users,
-
-      totalCount:
-        clerkUsers.totalCount ||
-        users.length,
-
+      users: formattedUsers,
+      totalCount: formattedUsers.length,
     });
 
   } catch (error) {
-
     console.error(
       "Get users error:",
       error
     );
 
     res.status(500).json({
-
       message: "Failed to fetch users",
-
       error: error.message,
-
     });
-
   }
 });
-
 
 module.exports = router;

@@ -9,6 +9,7 @@ import {
   Menu,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import "./NavBar.css";
 import logo2 from "../assets/logo.png";
@@ -27,6 +28,7 @@ export const Navbar = ({
   detectLocation,
   onToggleSidebar,
 }) => {
+  const { user, loading } = useAuth();
   const [openDropdown, setOpenDropdown] = useState(false);
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [manualLocation, setManualLocation] = useState("");
@@ -227,6 +229,16 @@ export const Navbar = ({
           )}
         </div>
       </div>
+      {loading ? (
+  <p>Checking login...</p>
+) : user ? (
+  <div>
+    <p>Logged in as: {user.name}</p>
+    <p>Email: {user.email}</p>
+  </div>
+) : (
+  <p>Not logged in</p>
+)}
 
       {/* CENTER: SEARCH BAR */}
       <div className="navbar-search-container">

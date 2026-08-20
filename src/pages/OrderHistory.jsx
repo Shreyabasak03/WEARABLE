@@ -9,19 +9,23 @@ import {
   XCircle,
 } from "lucide-react";
 
-import { useAuth } from "@clerk/react";
+import { useAuth } from "../context/AuthContext";
 
 import "./OrderHistory.css";
 
 export default function OrderHistory() {
+  // ==========================================
+  // JWT AUTHENTICATION
+  // ==========================================
+
+  const { user, loading: authLoading } = useAuth();
+
+  // ==========================================
+  // STATE
+  // ==========================================
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // ==========================================
-  // CLERK AUTHENTICATION
-  // ==========================================
-
-  const { isSignedIn, getToken } = useAuth();
 
   // ==========================================
   // LOAD ORDERS FROM BACKEND
@@ -31,60 +35,54 @@ export default function OrderHistory() {
     const fetchOrders = async () => {
       try {
         // --------------------------------------
-        // USER MUST BE SIGNED IN
+        // USER NOT LOGGED IN
         // --------------------------------------
 
-        if (!isSignedIn) {
+        if (!user) {
           setOrders([]);
           setLoading(false);
           return;
         }
 
         // --------------------------------------
-        // GET CLERK TOKEN
+        // FETCH USER ORDERS
         // --------------------------------------
-
-        const token = await getToken();
-
-        if (!token) {
-          throw new Error(
-            "Authentication token not available"
-          );
-        }
-
-        console.log("Clerk token received");
-
-        // --------------------------------------
-        // SEND TOKEN TO BACKEND
+        // JWT is stored in an HttpOnly cookie.
+        // Browser sends it automatically.
         // --------------------------------------
 
         const response = await fetch(
-          "http://localhost:5001/api/orders",
+          "http://localhost:5000/api/orders",
           {
             method: "GET",
-
+            credentials: "include",
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
         );
 
         // --------------------------------------
-        // HANDLE ERROR
+        // HANDLE BACKEND ERROR
         // --------------------------------------
 
         if (!response.ok) {
-          const errorData = await response.json();
+          let errorMessage = "Failed to fetch orders";
 
-          throw new Error(
-            errorData.message ||
-              "Failed to fetch orders"
-          );
+          try {
+            const errorData = await response.json();
+
+            errorMessage =
+              errorData.message || errorMessage;
+          } catch (error) {
+            // Ignore JSON parsing error
+          }
+
+          throw new Error(errorMessage);
         }
 
         // --------------------------------------
-        // GET DATA
+        // GET RESPONSE DATA
         // --------------------------------------
 
         const data = await response.json();
@@ -93,6 +91,10 @@ export default function OrderHistory() {
           "Orders belonging to current user:",
           data
         );
+
+        // --------------------------------------
+        // HANDLE RESPONSE FORMAT
+        // --------------------------------------
 
         const ordersData = Array.isArray(data)
           ? data
@@ -113,9 +115,14 @@ export default function OrderHistory() {
       }
     };
 
-    fetchOrders();
+    // Wait until AuthContext finishes
+    // checking the current user.
 
-  }, [isSignedIn, getToken]);
+    if (!authLoading) {
+      fetchOrders();
+    }
+
+  }, [user, authLoading]);
 
   // ==========================================
   // STATUS ICON
@@ -132,30 +139,33 @@ export default function OrderHistory() {
       case "cancelled":
         return <XCircle size={18} />;
 
+      case "confirmed":
+        return <CheckCircle size={18} />;
+
       default:
         return <Clock size={18} />;
     }
   };
 
   // ==========================================
-  // LOADING
+  // AUTHENTICATION LOADING
   // ==========================================
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="order-history-page">
         <div className="empty-orders">
-          <h2>Loading orders...</h2>
+          <h2>Loading...</h2>
         </div>
       </div>
     );
   }
 
   // ==========================================
-  // NOT SIGNED IN
+  // NOT LOGGED IN
   // ==========================================
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div className="order-history-page">
         <div className="empty-orders">
@@ -169,10 +179,10 @@ export default function OrderHistory() {
           </p>
 
           <Link
-            to="/"
+            to="/login"
             className="shop-now-btn"
           >
-            Continue Shopping
+            Sign In
           </Link>
 
         </div>
@@ -181,7 +191,21 @@ export default function OrderHistory() {
   }
 
   // ==========================================
-  // EMPTY ORDERS
+  // ORDERS LOADING
+  // ==========================================
+
+  if (loading) {
+    return (
+      <div className="order-history-page">
+        <div className="empty-orders">
+          <h2>Loading orders...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // NO ORDERS
   // ==========================================
 
   if (orders.length === 0) {
@@ -218,12 +242,13 @@ export default function OrderHistory() {
 
       <div className="order-history-container">
 
-        {/* HEADER */}
+        {/* ======================================
+            HEADER
+        ====================================== */}
 
         <div className="order-history-header">
 
           <div>
-
             <h1>
               Order History
             </h1>
@@ -231,7 +256,6 @@ export default function OrderHistory() {
             <p>
               View and track your previous orders
             </p>
-
           </div>
 
           <div className="order-count">
@@ -249,11 +273,17 @@ export default function OrderHistory() {
 
         </div>
 
-        {/* ORDERS */}
+        {/* ======================================
+            ORDERS LIST
+        ====================================== */}
 
         <div className="orders-list">
 
           {orders.map((order) => {
+
+            // ----------------------------------
+            // ORDER INFORMATION
+            // ----------------------------------
 
             const orderId =
               order._id || order.id;
@@ -274,16 +304,21 @@ export default function OrderHistory() {
 
             const status =
               order.status ||
-              "Processing";
+              "Pending";
+
+            // ----------------------------------
+            // ORDER CARD
+            // ----------------------------------
 
             return (
-
               <div
                 className="order-card"
                 key={orderId}
               >
 
-                {/* ORDER HEADER */}
+                {/* ==================================
+                    ORDER HEADER
+                ================================== */}
 
                 <div className="order-card-header">
 
@@ -304,6 +339,8 @@ export default function OrderHistory() {
 
                   </div>
 
+                  {/* ORDER STATUS */}
+
                   <div
                     className={`order-status ${status.toLowerCase()}`}
                   >
@@ -318,7 +355,9 @@ export default function OrderHistory() {
 
                 </div>
 
-                {/* PRODUCTS */}
+                {/* ==================================
+                    PRODUCTS
+                ================================== */}
 
                 <div className="order-products">
 
@@ -326,6 +365,10 @@ export default function OrderHistory() {
 
                     products.map(
                       (item, index) => {
+
+                        // ------------------------------
+                        // PRODUCT DATA
+                        // ------------------------------
 
                         const product =
                           item.product &&
@@ -357,8 +400,11 @@ export default function OrderHistory() {
                           product.price ??
                           0;
 
-                        return (
+                        // ------------------------------
+                        // PRODUCT
+                        // ------------------------------
 
+                        return (
                           <div
                             className="order-product"
                             key={
@@ -368,6 +414,8 @@ export default function OrderHistory() {
                             }
                           >
 
+                            {/* PRODUCT IMAGE */}
+
                             {productImage && (
                               <img
                                 src={productImage}
@@ -375,15 +423,19 @@ export default function OrderHistory() {
                               />
                             )}
 
+                            {/* PRODUCT INFO */}
+
                             <div className="order-product-info">
 
                               <h4>
                                 {productName}
                               </h4>
 
-                              <p>
-                                {productCategory}
-                              </p>
+                              {productCategory && (
+                                <p>
+                                  {productCategory}
+                                </p>
+                              )}
 
                               <span>
                                 Quantity:{" "}
@@ -391,6 +443,8 @@ export default function OrderHistory() {
                               </span>
 
                             </div>
+
+                            {/* PRODUCT PRICE */}
 
                             <div className="order-product-price">
 
@@ -403,7 +457,6 @@ export default function OrderHistory() {
                             </div>
 
                           </div>
-
                         );
                       }
                     )
@@ -411,14 +464,17 @@ export default function OrderHistory() {
                   ) : (
 
                     <p className="no-products">
-                      No product information available.
+                      No product information
+                      available.
                     </p>
 
                   )}
 
                 </div>
 
-                {/* FOOTER */}
+                {/* ==================================
+                    ORDER FOOTER
+                ================================== */}
 
                 <div className="order-card-footer">
 
@@ -445,9 +501,7 @@ export default function OrderHistory() {
                 </div>
 
               </div>
-
             );
-
           })}
 
         </div>

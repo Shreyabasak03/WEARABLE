@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use(
 // ===============================
 
 app.use(express.json());
+app.use(cookieParser());
 
 // ===============================
 // DATABASE

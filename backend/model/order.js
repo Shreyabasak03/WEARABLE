@@ -1,21 +1,22 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
-  
   {
-    
     // ==========================================
-    // CLERK USER
+    // JWT USER
     // ==========================================
 
-    clerkUserId: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },
 
-    
-    // Products purchased in this order
+    // ==========================================
+    // PRODUCTS PURCHASED
+    // ==========================================
+
     products: [
       {
         product: {
@@ -46,7 +47,10 @@ const orderSchema = new mongoose.Schema(
       },
     ],
 
-    // Customer information
+    // ==========================================
+    // CUSTOMER INFORMATION
+    // ==========================================
+
     customer: {
       name: {
         type: String,
@@ -67,7 +71,10 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
-    // Shipping address
+    // ==========================================
+    // SHIPPING ADDRESS
+    // ==========================================
+
     shippingAddress: {
       address: {
         type: String,
@@ -94,21 +101,30 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
-    // Payment
+    // ==========================================
+    // PAYMENT
+    // ==========================================
+
     paymentMethod: {
       type: String,
       enum: ["COD", "Card", "UPI"],
       default: "COD",
     },
 
-    // Total order amount
+    // ==========================================
+    // TOTAL ORDER AMOUNT
+    // ==========================================
+
     totalAmount: {
       type: Number,
       required: true,
       min: 0,
     },
 
-    // Order status
+    // ==========================================
+    // ORDER STATUS
+    // ==========================================
+
     status: {
       type: String,
       enum: [
@@ -120,10 +136,15 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending",
     },
+
+    // ==========================================
+    // STOCK RESTORED
+    // ==========================================
+
     stockRestored: {
-  type: Boolean,
-  default: false,
-},
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

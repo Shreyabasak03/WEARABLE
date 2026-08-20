@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   CreditCard,
   Smartphone,
@@ -7,12 +8,13 @@ import {
   CheckCircle,
   MapPin,
 } from "lucide-react";
+
 import axios from "axios";
 
 import { useCart } from "../context/cartContext.jsx";
-import "./Checkout.css";
+import { useAuth } from "../context/AuthContext";
 
-import { useAuth, useClerk } from "@clerk/react";
+import "./Checkout.css";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -24,15 +26,17 @@ export default function Checkout() {
   } = useCart();
 
   // =====================================================
-  // CLERK AUTHENTICATION
+  // JWT AUTHENTICATION
   // =====================================================
 
   const {
-    isSignedIn,
-    getToken,
+    user,
+    loading: authLoading,
   } = useAuth();
 
-  const { openSignIn } = useClerk();
+  // =====================================================
+  // STATE
+  // =====================================================
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -58,7 +62,9 @@ export default function Checkout() {
 
   useEffect(() => {
     const savedLocation =
-      JSON.parse(localStorage.getItem("userLocation")) || null;
+      JSON.parse(
+        localStorage.getItem("userLocation")
+      ) || null;
 
     if (savedLocation) {
       setShippingAddress((prev) => ({
@@ -71,10 +77,33 @@ export default function Checkout() {
           savedLocation.village ||
           "",
 
-        state: savedLocation.state || "",
+        state:
+          savedLocation.state || "",
       }));
     }
   }, []);
+
+  // =====================================================
+  // OPTIONAL: PREFILL USER INFORMATION
+  // =====================================================
+
+  useEffect(() => {
+    if (user) {
+      setShippingAddress((prev) => ({
+        ...prev,
+
+        fullName:
+          prev.fullName ||
+          user.name ||
+          "",
+
+        email:
+          prev.email ||
+          user.email ||
+          "",
+      }));
+    }
+  }, [user]);
 
   // =====================================================
   // LOAD RAZORPAY SCRIPT
@@ -83,14 +112,17 @@ export default function Checkout() {
   const loadRazorpay = () => {
     return new Promise((resolve) => {
       const existingScript =
-        document.getElementById("razorpay-script");
+        document.getElementById(
+          "razorpay-script"
+        );
 
       if (existingScript) {
         resolve(true);
         return;
       }
 
-      const script = document.createElement("script");
+      const script =
+        document.createElement("script");
 
       script.id = "razorpay-script";
 
@@ -119,26 +151,24 @@ export default function Checkout() {
     razorpayPaymentId = null,
   }) => {
     try {
-      // ================================================
-      // GET CLERK AUTH TOKEN
-      // ================================================
+      // =================================================
+      // CHECK JWT USER
+      // =================================================
 
-      const token = await getToken();
-
-      if (!token) {
+      if (!user) {
         throw new Error(
-          "Authentication token not available. Please sign in again."
+          "You must be logged in to place an order."
         );
       }
 
-      // ================================================
+      // =================================================
       // ORDER DATA
-      // ================================================
+      // =================================================
 
       const orderData = {
-        // ---------------------------------------------
+        // -----------------------------------------------
         // PRODUCTS
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         products: cartItems.map((item) => ({
           product: item.id,
@@ -148,9 +178,9 @@ export default function Checkout() {
           quantity: Number(item.quantity),
         })),
 
-        // ---------------------------------------------
+        // -----------------------------------------------
         // CUSTOMER
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         customer: {
           name: shippingAddress.fullName,
@@ -158,51 +188,63 @@ export default function Checkout() {
           phone: shippingAddress.phone,
         },
 
-        // ---------------------------------------------
+        // -----------------------------------------------
         // SHIPPING ADDRESS
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         shippingAddress: {
-          address: shippingAddress.address,
-          city: shippingAddress.city,
-          state: shippingAddress.state,
-          pincode: shippingAddress.pincode,
+          address:
+            shippingAddress.address,
+
+          city:
+            shippingAddress.city,
+
+          state:
+            shippingAddress.state,
+
+          pincode:
+            shippingAddress.pincode,
         },
 
-        // ---------------------------------------------
+        // -----------------------------------------------
         // PAYMENT
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         paymentMethod,
 
-        totalAmount: Number(totalPrice),
+        totalAmount:
+          Number(totalPrice),
 
         status:
           paymentMethod === "COD"
             ? "Pending"
             : "Confirmed",
 
-        // ---------------------------------------------
+        // -----------------------------------------------
         // RAZORPAY DETAILS
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         razorpayOrderId,
         razorpayPaymentId,
       };
 
-      console.log("ORDER DATA:", orderData);
+      console.log(
+        "ORDER DATA:",
+        orderData
+      );
 
-      // ================================================
-      // SEND ORDER + CLERK TOKEN TO BACKEND
-      // ================================================
+      // =================================================
+      // SEND ORDER TO BACKEND
+      // =================================================
+      // JWT is stored in an HttpOnly cookie.
+      // credentials: "include" sends that cookie.
+      // =================================================
 
       const response = await axios.post(
-        "http://localhost:5001/api/orders",
+        "http://localhost:5000/api/orders",
         orderData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
@@ -226,11 +268,12 @@ export default function Checkout() {
     try {
       setLoading(true);
 
-      // ---------------------------------------------
+      // -----------------------------------------------
       // LOAD RAZORPAY
-      // ---------------------------------------------
+      // -----------------------------------------------
 
-      const razorpayLoaded = await loadRazorpay();
+      const razorpayLoaded =
+        await loadRazorpay();
 
       if (!razorpayLoaded) {
         alert(
@@ -241,118 +284,149 @@ export default function Checkout() {
         return;
       }
 
-      // ---------------------------------------------
+      // -----------------------------------------------
       // CREATE RAZORPAY ORDER
-      // ---------------------------------------------
+      // -----------------------------------------------
 
-      const response = await axios.post(
-        "http://localhost:5001/api/payment/create-order",
-        {
-          amount: totalPrice,
-        }
-      );
+      const response =
+        await axios.post(
+          "http://localhost:5000/api/payment/create-order",
+          {
+            amount: totalPrice,
+          },
+          {
+            withCredentials: true,
+          }
+        );
 
-      const razorpayOrder = response.data.order;
+      const razorpayOrder =
+        response.data.order;
 
-      // ---------------------------------------------
+      // -----------------------------------------------
       // RAZORPAY OPTIONS
-      // ---------------------------------------------
+      // -----------------------------------------------
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key:
+          import.meta.env
+            .VITE_RAZORPAY_KEY_ID,
 
-        amount: razorpayOrder.amount,
+        amount:
+          razorpayOrder.amount,
 
-        currency: razorpayOrder.currency,
+        currency:
+          razorpayOrder.currency,
 
         name: "Wearable",
 
-        description: "E-commerce Purchase",
+        description:
+          "E-commerce Purchase",
 
-        order_id: razorpayOrder.id,
+        order_id:
+          razorpayOrder.id,
 
-        handler: async function (paymentResponse) {
-          try {
-            // ---------------------------------------
-            // VERIFY PAYMENT
-            // ---------------------------------------
+        handler:
+          async function (
+            paymentResponse
+          ) {
+            try {
+              // -------------------------------------
+              // VERIFY PAYMENT
+              // -------------------------------------
 
-            const verifyResponse = await axios.post(
-              "http://localhost:5001/api/payment/verify",
-              {
-                razorpay_order_id:
+              const verifyResponse =
+                await axios.post(
+                  "http://localhost:5000/api/payment/verify",
+                  {
+                    razorpay_order_id:
+                      paymentResponse.razorpay_order_id,
+
+                    razorpay_payment_id:
+                      paymentResponse.razorpay_payment_id,
+
+                    razorpay_signature:
+                      paymentResponse.razorpay_signature,
+                  },
+                  {
+                    withCredentials: true,
+                  }
+                );
+
+              // -------------------------------------
+              // PAYMENT VERIFICATION FAILED
+              // -------------------------------------
+
+              if (
+                !verifyResponse.data.success
+              ) {
+                alert(
+                  "Payment verification failed."
+                );
+
+                setLoading(false);
+                return;
+              }
+
+              // -------------------------------------
+              // SAVE ORDER IN MONGODB
+              // -------------------------------------
+
+              await createDatabaseOrder({
+                paymentMethod:
+                  paymentMethod === "upi"
+                    ? "UPI"
+                    : "Card",
+
+                razorpayOrderId:
                   paymentResponse.razorpay_order_id,
 
-                razorpay_payment_id:
+                razorpayPaymentId:
                   paymentResponse.razorpay_payment_id,
+              });
 
-                razorpay_signature:
-                  paymentResponse.razorpay_signature,
-              }
-            );
+              // -------------------------------------
+              // CLEAR CART
+              // -------------------------------------
 
-            if (!verifyResponse.data.success) {
-              alert("Payment verification failed.");
+              clearCart();
 
               setLoading(false);
 
-              return;
+              setOrderPlaced(true);
+
+            } catch (error) {
+              console.error(
+                "Payment verification error:",
+                error
+              );
+
+              alert(
+                error.response?.data?.message ||
+                  "Payment was completed but order verification failed. Please contact support."
+              );
+
+              setLoading(false);
             }
+          },
 
-            // ---------------------------------------
-            // SAVE ORDER IN MONGODB
-            // ---------------------------------------
-
-            await createDatabaseOrder({
-              paymentMethod:
-                paymentMethod === "upi"
-                  ? "UPI"
-                  : "Card",
-
-              razorpayOrderId:
-                paymentResponse.razorpay_order_id,
-
-              razorpayPaymentId:
-                paymentResponse.razorpay_payment_id,
-            });
-
-            // ---------------------------------------
-            // CLEAR CART
-            // ---------------------------------------
-
-            clearCart();
-
-            setLoading(false);
-
-            setOrderPlaced(true);
-
-          } catch (error) {
-            console.error(
-              "Payment verification error:",
-              error
-            );
-
-            alert(
-              error.response?.data?.message ||
-                "Payment was completed but order verification failed. Please contact support."
-            );
-
-            setLoading(false);
-          }
-        },
-
-        // ---------------------------------------------
+        // -----------------------------------------------
         // PREFILL RAZORPAY
-        // ---------------------------------------------
+        // -----------------------------------------------
 
         prefill: {
-          name: shippingAddress.fullName,
-          email: shippingAddress.email,
-          contact: shippingAddress.phone,
+          name:
+            shippingAddress.fullName,
+
+          email:
+            shippingAddress.email,
+
+          contact:
+            shippingAddress.phone,
         },
 
         notes: {
-          project: "Wearable Ecommerce",
+          project:
+            "Wearable Ecommerce",
         },
 
         theme: {
@@ -360,11 +434,16 @@ export default function Checkout() {
         },
 
         modal: {
-          ondismiss: function () {
-            setLoading(false);
-          },
+          ondismiss:
+            function () {
+              setLoading(false);
+            },
         },
       };
+
+      // -----------------------------------------------
+      // OPEN RAZORPAY
+      // -----------------------------------------------
 
       const razorpay =
         new window.Razorpay(options);
@@ -424,28 +503,35 @@ export default function Checkout() {
   // =====================================================
 
   const handlePlaceOrder = () => {
+    // =================================================
+    // JWT AUTHENTICATION
+    // =================================================
 
-    // =============================================
-    // CHECK CLERK AUTHENTICATION FIRST
-    // =============================================
+    if (!user) {
+      alert(
+        "Please login before placing an order."
+      );
 
-    if (!isSignedIn) {
-      openSignIn();
+      navigate("/login");
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // PAYMENT METHOD
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (!paymentMethod) {
-      alert("Please select a payment method");
+      alert(
+        "Please select a payment method"
+      );
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // SHIPPING ADDRESS
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (
       !shippingAddress.fullName.trim() ||
@@ -456,27 +542,34 @@ export default function Checkout() {
       !shippingAddress.state.trim() ||
       !shippingAddress.pincode.trim()
     ) {
-      alert("Please complete your shipping address");
+      alert(
+        "Please complete your shipping address"
+      );
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // PHONE VALIDATION
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (
-      shippingAddress.phone.length !== 10 ||
-      !/^\d+$/.test(shippingAddress.phone)
+      shippingAddress.phone.length !==
+        10 ||
+      !/^\d+$/.test(
+        shippingAddress.phone
+      )
     ) {
       alert(
         "Please enter a valid 10-digit phone number"
       );
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // EMAIL VALIDATION
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
@@ -486,26 +579,31 @@ export default function Checkout() {
       alert(
         "Please enter a valid email address"
       );
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // PINCODE VALIDATION
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (
-      shippingAddress.pincode.length !== 6 ||
-      !/^\d+$/.test(shippingAddress.pincode)
+      shippingAddress.pincode.length !==
+        6 ||
+      !/^\d+$/.test(
+        shippingAddress.pincode
+      )
     ) {
       alert(
         "Please enter a valid 6-digit PIN code"
       );
+
       return;
     }
 
-    // ---------------------------------------------
+    // -----------------------------------------------
     // PAYMENT
-    // ---------------------------------------------
+    // -----------------------------------------------
 
     if (paymentMethod === "cod") {
       handleCODOrder();
@@ -515,10 +613,27 @@ export default function Checkout() {
   };
 
   // =====================================================
+  // AUTH LOADING
+  // =====================================================
+
+  if (authLoading) {
+    return (
+      <div className="checkout-empty">
+        <h2>
+          Checking login...
+        </h2>
+      </div>
+    );
+  }
+
+  // =====================================================
   // EMPTY CART
   // =====================================================
 
-  if (cartItems.length === 0 && !orderPlaced) {
+  if (
+    cartItems.length === 0 &&
+    !orderPlaced
+  ) {
     return (
       <div className="checkout-empty">
 
@@ -527,7 +642,9 @@ export default function Checkout() {
         </h2>
 
         <button
-          onClick={() => navigate("/men")}
+          onClick={() =>
+            navigate("/men")
+          }
         >
           Continue Shopping
         </button>
@@ -567,13 +684,17 @@ export default function Checkout() {
         >
 
           <button
-            onClick={() => navigate("/orders")}
+            onClick={() =>
+              navigate("/orders")
+            }
           >
             View My Orders
           </button>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() =>
+              navigate("/")
+            }
           >
             Continue Shopping
           </button>
@@ -615,41 +736,44 @@ export default function Checkout() {
                 Your Order
               </h2>
 
-              {cartItems.map((item) => (
+              {cartItems.map(
+                (item) => (
+                  <div
+                    className="checkout-item"
+                    key={item.id}
+                  >
 
-                <div
-                  className="checkout-item"
-                  key={item.id}
-                >
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                    />
 
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                  />
+                    <div>
 
-                  <div>
+                      <h3>
+                        {item.name}
+                      </h3>
 
-                    <h3>
-                      {item.name}
-                    </h3>
+                      <p>
+                        Quantity:{" "}
+                        {item.quantity}
+                      </p>
 
-                    <p>
-                      Quantity: {item.quantity}
-                    </p>
+                      <p>
+                        ₹
+                        {(
+                          Number(item.price) *
+                          Number(
+                            item.quantity
+                          )
+                        ).toFixed(2)}
+                      </p>
 
-                    <p>
-                      ₹
-                      {(
-                        Number(item.price) *
-                        Number(item.quantity)
-                      ).toFixed(2)}
-                    </p>
+                    </div>
 
                   </div>
-
-                </div>
-
-              ))}
+                )
+              )}
 
             </div>
 
@@ -881,12 +1005,16 @@ export default function Checkout() {
                       : ""
                   }`}
                   onClick={() =>
-                    setPaymentMethod("upi")
+                    setPaymentMethod(
+                      "upi"
+                    )
                   }
                   disabled={loading}
                 >
 
-                  <Smartphone size={25} />
+                  <Smartphone
+                    size={25}
+                  />
 
                   <div>
 
@@ -895,8 +1023,8 @@ export default function Checkout() {
                     </strong>
 
                     <p>
-                      Google Pay, PhonePe,
-                      Paytm
+                      Google Pay,
+                      PhonePe, Paytm
                     </p>
 
                   </div>
@@ -913,12 +1041,16 @@ export default function Checkout() {
                       : ""
                   }`}
                   onClick={() =>
-                    setPaymentMethod("card")
+                    setPaymentMethod(
+                      "card"
+                    )
                   }
                   disabled={loading}
                 >
 
-                  <CreditCard size={25} />
+                  <CreditCard
+                    size={25}
+                  />
 
                   <div>
 
@@ -945,12 +1077,16 @@ export default function Checkout() {
                       : ""
                   }`}
                   onClick={() =>
-                    setPaymentMethod("cod")
+                    setPaymentMethod(
+                      "cod"
+                    )
                   }
                   disabled={loading}
                 >
 
-                  <Banknote size={25} />
+                  <Banknote
+                    size={25}
+                  />
 
                   <div>
 
@@ -959,8 +1095,8 @@ export default function Checkout() {
                     </strong>
 
                     <p>
-                      Pay when your order
-                      arrives
+                      Pay when your
+                      order arrives
                     </p>
 
                   </div>
@@ -990,7 +1126,10 @@ export default function Checkout() {
               </span>
 
               <span>
-                ₹{totalPrice.toFixed(2)}
+                ₹
+                {Number(
+                  totalPrice
+                ).toFixed(2)}
               </span>
 
             </div>
@@ -1017,20 +1156,26 @@ export default function Checkout() {
               </span>
 
               <span>
-                ₹{totalPrice.toFixed(2)}
+                ₹
+                {Number(
+                  totalPrice
+                ).toFixed(2)}
               </span>
 
             </div>
 
             <button
               className="place-order-btn"
-              onClick={handlePlaceOrder}
+              onClick={
+                handlePlaceOrder
+              }
               disabled={loading}
             >
 
               {loading
                 ? "Processing..."
-                : paymentMethod === "cod"
+                : paymentMethod ===
+                  "cod"
                 ? "Place Order"
                 : "Pay Now"}
 
