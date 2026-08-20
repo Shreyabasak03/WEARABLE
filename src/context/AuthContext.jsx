@@ -1,0 +1,96 @@
+import React, {
+  createContext,
+  useContext,
+  useState,
+} from "react";
+
+import axios from "axios";
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null
+  );
+
+  const [token, setToken] = useState(
+    localStorage.getItem("token") || null
+  );
+
+  const login = async (email, password) => {
+    const response = await axios.post(
+      "http://localhost:5001/api/auth/login",
+      {
+        email,
+        password,
+      }
+    );
+
+    const { token, user } = response.data;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    );
+
+    setToken(token);
+    setUser(user);
+
+    return user;
+  };
+
+  const register = async (
+    name,
+    email,
+    password
+  ) => {
+    const response = await axios.post(
+      "http://localhost:5001/api/auth/register",
+      {
+        name,
+        email,
+        password,
+      }
+    );
+
+    const { token, user } = response.data;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    );
+
+    setToken(token);
+    setUser(user);
+
+    return user;
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setToken(null);
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

@@ -110,31 +110,25 @@ for (const item of products) {
   }
 });
 
-// ===============================
-// GET ALL ORDERS
-// ===============================
-// ===============================
-// GET MY ORDERS
-// ===============================
 router.get("/", async (req, res) => {
   try {
-    // Get logged-in Clerk user
     const { userId } = getAuth(req);
 
-    // User must be signed in
+    console.log("CURRENT CLERK USER ID:", userId);
+
     if (!userId) {
       return res.status(401).json({
         message: "You must be signed in to view your orders",
       });
     }
 
-    // IMPORTANT:
-    // Only get orders belonging to this Clerk user
     const orders = await Order.find({
       clerkUserId: userId,
     })
       .populate("products.product")
       .sort({ createdAt: -1 });
+
+    console.log("ORDERS FOUND:", orders);
 
     res.status(200).json(orders);
 
@@ -147,7 +141,6 @@ router.get("/", async (req, res) => {
     });
   }
 });
-// ===============================
 // ADMIN - GET ALL ORDERS
 // ===============================
 router.get("/admin", async (req, res) => {

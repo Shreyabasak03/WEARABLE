@@ -263,7 +263,7 @@ export const Navbar = ({
         </NavLink>
 
         {/* CLERK AUTH */}
-        <div className="auth">
+        {/* <div className="auth">
           <Show when="signed-out">
             <SignInButton>
               <button className="signIn">Sign In</button>
@@ -273,7 +273,7 @@ export const Navbar = ({
           <Show when="signed-in">
             <UserButton />
           </Show>
-        </div>
+        </div> */}
       </div>
     </nav>
   );

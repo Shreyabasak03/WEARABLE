@@ -1,11 +1,6 @@
 const express = require("express");
-const cors = require("cors");
 const dotenv = require("dotenv");
-const { clerkMiddleware } = require("@clerk/express");
-
-// =====================================================
-// LOAD ENVIRONMENT VARIABLES FIRST
-// =====================================================
+const cors = require("cors");
 
 dotenv.config();
 
@@ -17,51 +12,51 @@ const PaymentsRoutes = require("./routes/PaymentsRoutes");
 const userRoutes = require("./routes/UserRoutes");
 const settingsRoutes = require("./routes/SettingsRoutes");
 const notificationRoutes = require("./routes/NotificationRoutes");
+const authRoutes = require("./routes/AuthRoutes");
 
 const app = express();
 
-// =====================================================
-// DATABASE
-// =====================================================
+// ===============================
+// CORS
+// ===============================
 
-connectDB();
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
-// =====================================================
-// MIDDLEWARE
-// =====================================================
 
-app.use(cors());
+// ===============================
+// BODY PARSER
+// ===============================
 
 app.use(express.json());
 
-// =====================================================
-// CLERK AUTHENTICATION
-// =====================================================
+// ===============================
+// DATABASE
+// ===============================
 
-// Clerk reads the Authorization token sent by frontend
-// and makes the authenticated user available to routes.
+connectDB();
 
-app.use(clerkMiddleware());
-
-// =====================================================
+// ===============================
 // ROUTES
-// =====================================================
+// ===============================
 
 app.use("/api/products", productRoutes);
-
 app.use("/api/orders", orderRoutes);
-
 app.use("/api/payment", PaymentsRoutes);
 app.use("/api/users", userRoutes);
-app.use(
-  "/api/settings",
-  settingsRoutes
-);
+app.use("/api/settings", settingsRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/auth", authRoutes);
 
-// =====================================================
+// ===============================
 // SERVER
-// =====================================================
+// ===============================
 
 const PORT = process.env.PORT || 5001;
 

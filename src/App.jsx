@@ -16,6 +16,9 @@ import Checkout from "./pages/Checkout.jsx";
 import OrderHistory from "./pages/OrderHistory.jsx";
 import Search from "./components/Search.jsx";
 import OrderDetails from "./pages/OrderDetails.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+
 
 function App() {
   const [location, setLocation] = useState(() => {
@@ -127,6 +130,9 @@ function App() {
   element={<OrderDetails />}
 />
         <Route path="/search" element={<Search />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
       </Route>
     </Routes>
   );
