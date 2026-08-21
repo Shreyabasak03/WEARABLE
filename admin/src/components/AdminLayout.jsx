@@ -34,7 +34,7 @@ const AdminLayout = () => {
 
         const latest = notifications[0];
 
-        console.log("LATEST NOTIFICATION:", latest);
+        // // console.log("LATEST NOTIFICATION:", latest);
 
         // -----------------------------------------
         // FIRST LOAD
@@ -50,7 +50,7 @@ const AdminLayout = () => {
         // -----------------------------------------
 
         if (latest._id !== lastNotificationId) {
-          console.log("NEW NOTIFICATION RECEIVED!");
+          // console.log("NEW NOTIFICATION RECEIVED!");
 
           setPopupNotification(latest);
 

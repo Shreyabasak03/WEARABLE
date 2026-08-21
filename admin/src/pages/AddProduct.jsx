@@ -155,10 +155,10 @@ const AddProduct = () => {
         productData
       );
 
-      console.log(
-        "Product created:",
-        response.data
-      );
+      // console.log(
+      //   "Product created:",
+      //   response.data
+      // );
 
       setSuccess("Product added successfully!");
 

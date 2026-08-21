@@ -1,27 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import axios from "axios";
-import { useAuth } from "@clerk/react";
 
 import {
   Search,
   Eye,
-  MoreHorizontal,
   Users as UsersIcon,
   UserCheck,
-  UserX,
   UserPlus,
 } from "lucide-react";
 
 import "./User.css";
 
+const API_URL = "http://localhost:5001/api";
+
 const Users = () => {
-
-  // =====================================================
-  // CLERK AUTH
-  // =====================================================
-
-  const { getToken } = useAuth();
-
 
   // =====================================================
   // STATES
@@ -34,9 +30,11 @@ const Users = () => {
 
   const [users, setUsers] = useState([]);
 
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalUsers, setTotalUsers] =
+    useState(0);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
   const [selectedUser, setSelectedUser] =
     useState(null);
@@ -52,25 +50,26 @@ const Users = () => {
 
       setLoading(true);
 
-      // Get Clerk authentication token
-      const token = await getToken();
-
-      // Request users from backend
       const response = await axios.get(
-        "http://localhost:5001/api/users",
+        `${API_URL}/users`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
-      // Save users
-      setUsers(response.data.users || []);
+      // console.log(
+      //   "USERS RESPONSE:",
+      //   response.data
+      // );
 
-      // Save total Clerk users
+      setUsers(
+        response.data.users || []
+      );
+
       setTotalUsers(
-        response.data.totalCount || 0
+        response.data.totalCount ||
+        response.data.users?.length ||
+        0
       );
 
     } catch (error) {
@@ -79,6 +78,20 @@ const Users = () => {
         "Error fetching users:",
         error
       );
+
+      if (error.response) {
+
+        console.error(
+          "Status:",
+          error.response.status
+        );
+
+        console.error(
+          "Message:",
+          error.response.data
+        );
+
+      }
 
     } finally {
 
@@ -89,7 +102,7 @@ const Users = () => {
 
 
   // =====================================================
-  // FETCH ON PAGE LOAD
+  // FETCH USERS ON PAGE LOAD
   // =====================================================
 
   useEffect(() => {
@@ -103,18 +116,22 @@ const Users = () => {
   // ACTIVE USERS
   // =====================================================
 
-  const activeUsers = users.filter(
-    (user) => user.status === "Active"
-  ).length;
+  const activeUsers =
+    users.filter(
+      (user) =>
+        user.status === "Active"
+    ).length;
 
 
   // =====================================================
   // BLOCKED USERS
   // =====================================================
 
-  const blockedUsers = users.filter(
-    (user) => user.status === "Blocked"
-  ).length;
+  const blockedUsers =
+    users.filter(
+      (user) =>
+        user.status === "Blocked"
+    ).length;
 
 
   // =====================================================
@@ -123,54 +140,72 @@ const Users = () => {
 
   const now = new Date();
 
-  const newThisMonth = users.filter((user) => {
+  const newThisMonth =
+    users.filter((user) => {
 
-    const joinedDate = new Date(
-      user.joined
-    );
+      const joinedDate =
+        new Date(user.joined);
 
-    return (
-      joinedDate.getMonth() === now.getMonth() &&
-      joinedDate.getFullYear() ===
-        now.getFullYear()
-    );
+      return (
+        joinedDate.getMonth() ===
+          now.getMonth() &&
+        joinedDate.getFullYear() ===
+          now.getFullYear()
+      );
 
-  }).length;
+    }).length;
 
 
   // =====================================================
   // FILTER USERS
   // =====================================================
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers =
+    users.filter((user) => {
 
-    const searchValue =
-      search.toLowerCase().trim();
+      const searchValue =
+        search
+          .toLowerCase()
+          .trim();
 
-    const userName =
-      user.name?.toLowerCase() || "";
+      const userName =
+        user.name
+          ?.toLowerCase() || "";
 
-    const userEmail =
-      user.email?.toLowerCase() || "";
+      const userEmail =
+        user.email
+          ?.toLowerCase() || "";
 
-    const userPhone =
-      user.phone?.toLowerCase() || "";
+      const userPhone =
+        user.phone
+          ?.toLowerCase() || "";
 
-    const matchesSearch =
-      userName.includes(searchValue) ||
-      userEmail.includes(searchValue) ||
-      userPhone.includes(searchValue);
 
-    const matchesStatus =
-      statusFilter === "All Status" ||
-      user.status === statusFilter;
+      const matchesSearch =
+        userName.includes(
+          searchValue
+        ) ||
+        userEmail.includes(
+          searchValue
+        ) ||
+        userPhone.includes(
+          searchValue
+        );
 
-    return (
-      matchesSearch &&
-      matchesStatus
-    );
 
-  });
+      const matchesStatus =
+        statusFilter ===
+          "All Status" ||
+        user.status ===
+          statusFilter;
+
+
+      return (
+        matchesSearch &&
+        matchesStatus
+      );
+
+    });
 
 
   // =====================================================
@@ -180,6 +215,7 @@ const Users = () => {
   if (loading) {
 
     return (
+
       <div className="users-page">
 
         <div className="users-header">
@@ -199,6 +235,7 @@ const Users = () => {
         </div>
 
       </div>
+
     );
 
   }
@@ -247,7 +284,9 @@ const Users = () => {
 
           <div className="user-stat-icon total">
 
-            <UsersIcon size={19} />
+            <UsersIcon
+              size={19}
+            />
 
           </div>
 
@@ -272,7 +311,9 @@ const Users = () => {
 
           <div className="user-stat-icon active">
 
-            <UserCheck size={19} />
+            <UserCheck
+              size={19}
+            />
 
           </div>
 
@@ -297,7 +338,9 @@ const Users = () => {
 
           <div className="user-stat-icon new">
 
-            <UserPlus size={19} />
+            <UserPlus
+              size={19}
+            />
 
           </div>
 
@@ -337,14 +380,18 @@ const Users = () => {
 
           <div className="user-search">
 
-            <Search size={17} />
+            <Search
+              size={17}
+            />
 
             <input
               type="text"
               placeholder="Search users..."
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
             />
 
@@ -357,7 +404,9 @@ const Users = () => {
             className="user-status-filter"
             value={statusFilter}
             onChange={(e) =>
-              setStatusFilter(e.target.value)
+              setStatusFilter(
+                e.target.value
+              )
             }
           >
 
@@ -369,9 +418,9 @@ const Users = () => {
               Active
             </option>
 
-            {/* <option value="Blocked">
+            <option value="Blocked">
               Blocked
-            </option> */}
+            </option>
 
           </select>
 
@@ -425,189 +474,195 @@ const Users = () => {
 
             <tbody>
 
-              {filteredUsers.map((user) => (
+              {filteredUsers.map(
+                (user) => (
 
-                <tr key={user.id}>
-
-
-                  {/* =================================================
-                      USER
-                  ================================================= */}
-
-                  <td>
-
-                    <div className="user-info">
+                  <tr
+                    key={user.id}
+                  >
 
 
-                      {/* PROFILE IMAGE */}
+                    {/* USER */}
 
-                      <div className="user-avatar">
+                    <td>
 
-                        {user.imageUrl ? (
+                      <div className="user-info">
 
-                          <img
-                            src={user.imageUrl}
-                            alt={user.name}
-                          />
 
-                        ) : (
+                        {/* PROFILE IMAGE */}
 
-                          user.name
-                            ?.charAt(0)
-                            .toUpperCase()
+                        <div className="user-avatar">
 
+                          {user.imageUrl ? (
+
+                            <img
+                              src={
+                                user.imageUrl
+                              }
+                              alt={
+                                user.name
+                              }
+                            />
+
+                          ) : (
+
+                            user.name
+                              ?.charAt(
+                                0
+                              )
+                              .toUpperCase()
+
+                          )}
+
+                        </div>
+
+
+                        {/* NAME + EMAIL */}
+
+                        <div>
+
+                          <h4>
+                            {user.name}
+                          </h4>
+
+                          <span>
+                            {user.email}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    </td>
+
+
+                    {/* PHONE */}
+
+                    <td>
+
+                      <span className="user-phone">
+
+                        {user.phone ||
+                          "Not provided"}
+
+                      </span>
+
+                    </td>
+
+
+                    {/* ORDERS */}
+
+                    <td>
+
+                      <span className="user-orders">
+
+                        {user.orders ||
+                          0}
+
+                      </span>
+
+                    </td>
+
+
+                    {/* TOTAL SPENT */}
+
+                    <td>
+
+                      <strong className="user-spent">
+
+                        ₹
+                        {Number(
+                          user.spent ||
+                            0
+                        ).toLocaleString(
+                          "en-IN"
                         )}
 
-                      </div>
+                      </strong>
+
+                    </td>
 
 
-                      {/* NAME + EMAIL */}
+                    {/* JOINED */}
 
-                      <div>
+                    <td>
 
-                        <h4>
-                          {user.name}
-                        </h4>
+                      <span className="user-joined">
 
-                        <span>
-                          {user.email}
-                        </span>
+                        {user.joined
+                          ? new Date(
+                              user.joined
+                            ).toLocaleDateString(
+                              "en-IN",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )
+                          : "N/A"}
 
-                      </div>
+                      </span>
 
-                    </div>
-
-                  </td>
-
-
-                  {/* =================================================
-                      PHONE
-                  ================================================= */}
-
-                  <td>
-
-                    <span className="user-phone">
-
-                      {user.phone}
-
-                    </span>
-
-                  </td>
+                    </td>
 
 
-                  {/* =================================================
-                      ORDERS
-                  ================================================= */}
+                    {/* STATUS */}
 
-                  <td>
+                    <td>
 
-                    <span className="user-orders">
-
-                      {user.orders}
-
-                    </span>
-
-                  </td>
-
-
-                  {/* =================================================
-                      TOTAL SPENT
-                  ================================================= */}
-
-                  <td>
-
-                    <strong className="user-spent">
-
-                      ₹
-                      {Number(
-                        user.spent || 0
-                      ).toLocaleString("en-IN")}
-
-                    </strong>
-
-                  </td>
-
-
-                  {/* =================================================
-                      JOINED
-                  ================================================= */}
-
-                  <td>
-
-                    <span className="user-joined">
-
-                      {new Date(
-                        user.joined
-                      ).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-
-                    </span>
-
-                  </td>
-
-
-                  {/* =================================================
-                      STATUS
-                  ================================================= */}
-
-                  <td>
-
-                    <span
-                      className={`user-status ${
-                        user.status?.toLowerCase()
-                      }`}
-                    >
-
-                      {user.status}
-
-                    </span>
-
-                  </td>
-
-
-                  {/* =================================================
-                      ACTIONS
-                  ================================================= */}
-
-                  <td>
-
-                    <div className="user-actions">
-
-
-                      {/* VIEW */}
-
-                      <button
-                        title="View user"
-                        onClick={() =>
-                          setSelectedUser(user)
-                        }
+                      <span
+                        className={`user-status ${
+                          user.status
+                            ?.toLowerCase() ||
+                          ""
+                        }`}
                       >
 
-                        <Eye size={16} />
+                        {user.status ||
+                          "Active"}
 
-                      </button>
+                      </span>
 
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              ))}
+                    </td>
 
 
-              {/* =================================================
-                  NO USERS
-              ================================================= */}
+                    {/* ACTION */}
 
-              {filteredUsers.length === 0 && (
+                    <td>
+
+                      <div className="user-actions">
+
+                        <button
+                          type="button"
+                          title="View user"
+                          onClick={() =>
+                            setSelectedUser(
+                              user
+                            )
+                          }
+                        >
+
+                          <Eye
+                            size={16}
+                          />
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                )
+              )}
+
+
+              {/* NO USERS */}
+
+              {filteredUsers.length ===
+                0 && (
 
                 <tr>
 
@@ -640,13 +695,12 @@ const Users = () => {
           <span>
 
             Showing{" "}
-            {filteredUsers.length} of{" "}
+            {filteredUsers.length}{" "}
+            of{" "}
             {users.length} users
 
           </span>
 
-
-          {/* PAGINATION */}
 
           <div className="users-pagination">
 
@@ -714,13 +768,17 @@ const Users = () => {
 
               </div>
 
+
               <button
+                type="button"
                 className="user-modal-close"
                 onClick={() =>
                   setSelectedUser(null)
                 }
               >
+
                 ×
+
               </button>
 
             </div>
@@ -753,6 +811,7 @@ const Users = () => {
 
               </div>
 
+
               <div>
 
                 <h3>
@@ -776,7 +835,9 @@ const Users = () => {
                 Account Information
               </h3>
 
+
               <div className="user-detail-grid">
+
 
                 <div>
 
@@ -785,7 +846,8 @@ const Users = () => {
                   </span>
 
                   <strong>
-                    {selectedUser.phone}
+                    {selectedUser.phone ||
+                      "Not provided"}
                   </strong>
 
                 </div>
@@ -798,7 +860,8 @@ const Users = () => {
                   </span>
 
                   <strong>
-                    {selectedUser.status}
+                    {selectedUser.status ||
+                      "Active"}
                   </strong>
 
                 </div>
@@ -811,7 +874,8 @@ const Users = () => {
                   </span>
 
                   <strong>
-                    {selectedUser.orders}
+                    {selectedUser.orders ||
+                      0}
                   </strong>
 
                 </div>
@@ -824,12 +888,15 @@ const Users = () => {
                   </span>
 
                   <strong>
+
                     ₹
                     {Number(
-                      selectedUser.spent || 0
+                      selectedUser.spent ||
+                        0
                     ).toLocaleString(
                       "en-IN"
                     )}
+
                   </strong>
 
                 </div>
@@ -843,32 +910,35 @@ const Users = () => {
 
                   <strong>
 
-                    {new Date(
-                      selectedUser.joined
-                    ).toLocaleDateString(
-                      "en-IN",
-                      {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      }
-                    )}
+                    {selectedUser.joined
+                      ? new Date(
+                          selectedUser.joined
+                        ).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        )
+                      : "N/A"}
 
                   </strong>
 
                 </div>
+
 
               </div>
 
             </div>
 
 
-            {/* CLERK ID */}
+            {/* USER ID */}
 
             <div className="user-modal-section">
 
               <h3>
-                Clerk User ID
+                User ID
               </h3>
 
               <p className="user-clerk-id">
@@ -877,6 +947,7 @@ const Users = () => {
 
             </div>
 
+
           </div>
 
         </div>
@@ -884,6 +955,7 @@ const Users = () => {
       )}
 
     </div>
+
   );
 };
 

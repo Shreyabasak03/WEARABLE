@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  protect,
-  adminOnly,
-} = require("../middleware/authMiddleware");
+const adminAuth = require("../middleware/adminAuth");
 
 const User = require("../model/user");
 const Order = require("../model/order");
@@ -14,7 +11,7 @@ const Order = require("../model/order");
 // ADMIN ONLY
 // =====================================================
 
-router.get("/", protect, adminOnly, async (req, res) => {
+router.get("/", adminAuth, async (req, res) => {
   try {
     // =================================================
     // GET USERS FROM MONGODB

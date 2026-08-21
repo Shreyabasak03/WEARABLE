@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useClerk } from "@clerk/react";
+import { useAuth } from "../context/AuthContext";
 
 import {
   LayoutDashboard,
@@ -11,18 +11,15 @@ import {
   LogOut,
 } from "lucide-react";
 
-// import "./Sidebar.css";
-
 const Sidebar = () => {
-  const { signOut } = useClerk();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      logout();
 
-      // After logout, go to admin login
-      navigate("/admin/login");
+      navigate("/admin/login", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -31,19 +28,32 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
 
-      {/* =================================================
+      {/* ===============================
           LOGO
-      ================================================= */}
+      =============================== */}
 
       <div className="sidebar-logo">
         <span>WEAR</span>
         <span>ABLE</span>
       </div>
 
+      {/* ===============================
+          ADMIN INFO
+      =============================== */}
 
-      {/* =================================================
+      <div className="sidebar-user">
+        <strong>
+          {user?.name || "Admin"}
+        </strong>
+
+        <span>
+          {user?.email || ""}
+        </span>
+      </div>
+
+      {/* ===============================
           NAVIGATION
-      ================================================= */}
+      =============================== */}
 
       <nav className="sidebar-nav">
 
@@ -57,7 +67,6 @@ const Sidebar = () => {
           <span>Dashboard</span>
         </NavLink>
 
-
         <NavLink
           to="/admin/products"
           className={({ isActive }) =>
@@ -67,7 +76,6 @@ const Sidebar = () => {
           <Package size={20} />
           <span>Products</span>
         </NavLink>
-
 
         <NavLink
           to="/admin/orders"
@@ -79,7 +87,6 @@ const Sidebar = () => {
           <span>Orders</span>
         </NavLink>
 
-
         <NavLink
           to="/admin/users"
           className={({ isActive }) =>
@@ -89,7 +96,6 @@ const Sidebar = () => {
           <Users size={20} />
           <span>Users</span>
         </NavLink>
-
 
         <NavLink
           to="/admin/settings"
@@ -103,10 +109,9 @@ const Sidebar = () => {
 
       </nav>
 
-
-      {/* =================================================
+      {/* ===============================
           LOGOUT
-      ================================================= */}
+      =============================== */}
 
       <button
         type="button"

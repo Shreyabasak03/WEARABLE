@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import axios from "axios";
-import { useAuth } from "@clerk/react";
+
 import {
   Search,
   Eye,
-  MoreHorizontal,
   Package,
   Truck,
   CheckCircle,
@@ -14,59 +17,93 @@ import {
 
 import "./Orders.css";
 
+const API_URL = "http://localhost:5001/api";
+
 const Orders = () => {
-const { getToken } = useAuth();
+
+  // =====================================================
+  // STATES
+  // =====================================================
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
+
+  const [statusFilter, setStatusFilter] =
+    useState("All Status");
 
   const [orders, setOrders] = useState([]);
-const [loading, setLoading] = useState(true);
 
-const [selectedOrder, setSelectedOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedOrder, setSelectedOrder] =
+    useState(null);
+
 
   // =====================================================
   // FETCH ORDERS FROM BACKEND
   // =====================================================
 
   const fetchOrders = async () => {
-  try {
-    const token = await getToken();
+    try {
 
-    const response = await axios.get(
-      "http://localhost:5001/api/orders/admin",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      const response = await axios.get(
+        `${API_URL}/orders/admin`,
+        {
+          withCredentials: true,
+        }
+      );
 
-    setOrders(response.data);
-  } catch (error) {
-    console.error("Error fetching admin orders:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      setOrders(response.data);
+
+    } catch (error) {
+
+      console.error(
+        "Error fetching admin orders:",
+        error
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+
+  // =====================================================
+  // FETCH ORDERS WHEN PAGE LOADS
+  // =====================================================
 
   useEffect(() => {
+
     fetchOrders();
+
   }, []);
+
 
   // =====================================================
   // UPDATE ORDER STATUS
   // =====================================================
 
-  const updateStatus = async (orderId, newStatus) => {
+  const updateStatus = async (
+    orderId,
+    newStatus
+  ) => {
+
     try {
+
       const response = await axios.put(
-        `http://localhost:5001/api/orders/${orderId}`,
+        `${API_URL}/orders/${orderId}`,
         {
           status: newStatus,
+        },
+        {
+          withCredentials: true,
         }
       );
 
+
       // Update UI immediately
+
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === orderId
@@ -76,105 +113,190 @@ const [selectedOrder, setSelectedOrder] = useState(null);
       );
 
     } catch (error) {
-      console.error("Error updating order status:", error);
 
-      alert("Failed to update order status.");
+      console.error(
+        "Error updating order status:",
+        error
+      );
+
+      alert(
+        "Failed to update order status."
+      );
+
     }
   };
+
 
   // =====================================================
   // FILTER ORDERS
   // =====================================================
 
-  const filteredOrders = orders.filter((order) => {
-    const customerName =
-      order.customer?.name?.toLowerCase() || "";
+  const filteredOrders = orders.filter(
+    (order) => {
 
-    const productNames =
-      order.products
-        ?.map((item) => item.name)
-        .join(" ")
-        .toLowerCase() || "";
+      const customerName =
+        order.customer?.name
+          ?.toLowerCase() || "";
 
-    const orderId =
-      order._id?.toLowerCase() || "";
+      const productNames =
+        order.products
+          ?.map(
+            (item) => item.name
+          )
+          .join(" ")
+          .toLowerCase() || "";
 
-    const searchText = search.toLowerCase();
+      const orderId =
+        order._id?.toLowerCase() || "";
 
-    const matchesSearch =
-      orderId.includes(searchText) ||
-      customerName.includes(searchText) ||
-      productNames.includes(searchText);
+      const searchText =
+        search.toLowerCase();
 
-    const matchesStatus =
-      statusFilter === "All Status" ||
-      order.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesSearch =
+        orderId.includes(searchText) ||
+        customerName.includes(
+          searchText
+        ) ||
+        productNames.includes(
+          searchText
+        );
+
+
+      const matchesStatus =
+        statusFilter ===
+          "All Status" ||
+        order.status ===
+          statusFilter;
+
+
+      return (
+        matchesSearch &&
+        matchesStatus
+      );
+    }
+  );
+
 
   // =====================================================
   // STATUS ICON
   // =====================================================
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (
+    status
+  ) => {
+
     switch (status) {
+
       case "Delivered":
-        return <CheckCircle size={14} />;
+        return (
+          <CheckCircle
+            size={14}
+          />
+        );
 
       case "Shipped":
-        return <Truck size={14} />;
+        return (
+          <Truck
+            size={14}
+          />
+        );
 
       case "Confirmed":
-        return <Package size={14} />;
+        return (
+          <Package
+            size={14}
+          />
+        );
 
       case "Pending":
-        return <Clock size={14} />;
+        return (
+          <Clock
+            size={14}
+          />
+        );
 
       case "Cancelled":
-        return <XCircle size={14} />;
+        return (
+          <XCircle
+            size={14}
+          />
+        );
 
       default:
         return null;
     }
   };
 
+
   // =====================================================
   // ORDER STATISTICS
   // =====================================================
 
-  const totalOrders = orders.length;
+  const totalOrders =
+    orders.length;
 
-  const pendingOrders = orders.filter(
-    (order) => order.status === "Pending"
-  ).length;
 
-  const confirmedOrders = orders.filter(
-    (order) => order.status === "Confirmed"
-  ).length;
+  const pendingOrders =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "Pending"
+    ).length;
 
-  const deliveredOrders = orders.filter(
-    (order) => order.status === "Delivered"
-  ).length;
+
+  const confirmedOrders =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "Confirmed"
+    ).length;
+
+
+  const deliveredOrders =
+    orders.filter(
+      (order) =>
+        order.status ===
+        "Delivered"
+    ).length;
+
 
   // =====================================================
   // LOADING
   // =====================================================
 
   if (loading) {
+
     return (
       <div className="orders-page">
+
         <div className="orders-header">
+
           <div>
-            <h1>Orders</h1>
-            <p>Loading customer orders...</p>
+
+            <h1>
+              Orders
+            </h1>
+
+            <p>
+              Loading customer orders...
+            </p>
+
           </div>
+
         </div>
+
       </div>
     );
   }
 
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
   return (
+
     <div className="orders-page">
 
       {/* =================================================
@@ -184,6 +306,7 @@ const [selectedOrder, setSelectedOrder] = useState(null);
       <div className="orders-header">
 
         <div>
+
           <h1>
             Orders
           </h1>
@@ -191,6 +314,7 @@ const [selectedOrder, setSelectedOrder] = useState(null);
           <p>
             Manage and track customer orders.
           </p>
+
         </div>
 
       </div>
@@ -202,15 +326,21 @@ const [selectedOrder, setSelectedOrder] = useState(null);
 
       <div className="order-stats">
 
-        {/* Total Orders */}
+
+        {/* TOTAL ORDERS */}
 
         <div className="order-stat-card">
 
           <div className="order-stat-icon all">
-            <Package size={19} />
+
+            <Package
+              size={19}
+            />
+
           </div>
 
           <div>
+
             <span>
               Total Orders
             </span>
@@ -218,20 +348,26 @@ const [selectedOrder, setSelectedOrder] = useState(null);
             <h3>
               {totalOrders}
             </h3>
+
           </div>
 
         </div>
 
 
-        {/* Pending */}
+        {/* PENDING */}
 
         <div className="order-stat-card">
 
           <div className="order-stat-icon pending">
-            <Clock size={19} />
+
+            <Clock
+              size={19}
+            />
+
           </div>
 
           <div>
+
             <span>
               Pending
             </span>
@@ -239,20 +375,26 @@ const [selectedOrder, setSelectedOrder] = useState(null);
             <h3>
               {pendingOrders}
             </h3>
+
           </div>
 
         </div>
 
 
-        {/* Confirmed */}
+        {/* CONFIRMED */}
 
         <div className="order-stat-card">
 
           <div className="order-stat-icon processing">
-            <Package size={19} />
+
+            <Package
+              size={19}
+            />
+
           </div>
 
           <div>
+
             <span>
               Confirmed
             </span>
@@ -260,20 +402,26 @@ const [selectedOrder, setSelectedOrder] = useState(null);
             <h3>
               {confirmedOrders}
             </h3>
+
           </div>
 
         </div>
 
 
-        {/* Delivered */}
+        {/* DELIVERED */}
 
         <div className="order-stat-card">
 
           <div className="order-stat-icon delivered">
-            <CheckCircle size={19} />
+
+            <CheckCircle
+              size={19}
+            />
+
           </div>
 
           <div>
+
             <span>
               Delivered
             </span>
@@ -281,6 +429,7 @@ const [selectedOrder, setSelectedOrder] = useState(null);
             <h3>
               {deliveredOrders}
             </h3>
+
           </div>
 
         </div>
@@ -294,33 +443,45 @@ const [selectedOrder, setSelectedOrder] = useState(null);
 
       <div className="orders-card">
 
+
         {/* =================================================
             TOOLBAR
         ================================================= */}
 
         <div className="orders-toolbar">
 
+
+          {/* SEARCH */}
+
           <div className="order-search">
 
-            <Search size={17} />
+            <Search
+              size={17}
+            />
 
             <input
               type="text"
               placeholder="Search orders, customers..."
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
             />
 
           </div>
 
 
+          {/* STATUS FILTER */}
+
           <select
             className="order-status-filter"
             value={statusFilter}
             onChange={(e) =>
-              setStatusFilter(e.target.value)
+              setStatusFilter(
+                e.target.value
+              )
             }
           >
 
@@ -400,188 +561,221 @@ const [selectedOrder, setSelectedOrder] = useState(null);
 
             <tbody>
 
-              {filteredOrders.map((order) => (
+              {filteredOrders.map(
+                (order) => (
 
-                <tr key={order._id}>
-
-                  {/* Order */}
-
-                  <td>
-
-                    <span className="order-number">
-                      #{order._id.slice(-6)}
-                    </span>
-
-                  </td>
+                  <tr
+                    key={order._id}
+                  >
 
 
-                  {/* Customer */}
+                    {/* ORDER */}
 
-                  <td>
+                    <td>
 
-                    <div className="customer-info">
+                      <span className="order-number">
 
-                      <div className="customer-avatar">
+                        #
+                        {order._id.slice(-6)}
 
-                        {order.customer?.name
-                          ?.charAt(0)
-                          .toUpperCase()}
+                      </span>
+
+                    </td>
+
+
+                    {/* CUSTOMER */}
+
+                    <td>
+
+                      <div className="customer-info">
+
+                        <div className="customer-avatar">
+
+                          {order.customer?.name
+                            ?.charAt(0)
+                            .toUpperCase()}
+
+                        </div>
+
+                        <div>
+
+                          <h4>
+                            {order.customer?.name}
+                          </h4>
+
+                          <span>
+                            {order.customer?.email}
+                          </span>
+
+                        </div>
 
                       </div>
 
-                      <div>
-
-                        <h4>
-                          {order.customer?.name}
-                        </h4>
-
-                        <span>
-                          {order.customer?.email}
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                  </td>
+                    </td>
 
 
-                  {/* Product */}
+                    {/* PRODUCT */}
 
-                  <td>
+                    <td>
 
-                    <div className="order-product-name">
+                      <div className="order-product-name">
 
-                      {order.products?.map(
-                        (item, index) => (
-                          <div key={index}>
-                            {item.name} × {item.quantity}
-                          </div>
-                        )
-                      )}
+                        {order.products?.map(
+                          (
+                            item,
+                            index
+                          ) => (
 
-                    </div>
+                            <div
+                              key={index}
+                            >
 
-                  </td>
+                              {item.name}
+                              {" × "}
+                              {item.quantity}
 
+                            </div>
 
-                  {/* Amount */}
-
-                  <td>
-
-                    <strong className="order-total">
-                      ₹
-                      {order.totalAmount?.toLocaleString(
-                        "en-IN"
-                      )}
-                    </strong>
-
-                  </td>
-
-
-                  {/* Date */}
-
-                  <td>
-
-                    <span className="order-date">
-
-                      {new Date(
-                        order.createdAt
-                      ).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-
-                    </span>
-
-                  </td>
-
-
-                  {/* Status */}
-
-                  <td>
-
-                    <div className="order-status-wrapper">
-
-                      {getStatusIcon(order.status)}
-
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          updateStatus(
-                            order._id,
-                            e.target.value
                           )
-                        }
-                        className={`order-status-select ${order.status
-                          .toLowerCase()
-                          .replace(" ", "-")}`}
-                      >
+                        )}
 
-                        <option value="Pending">
-                          Pending
-                        </option>
+                      </div>
 
-                        <option value="Confirmed">
-                          Confirmed
-                        </option>
-
-                        <option value="Shipped">
-                          Shipped
-                        </option>
-
-                        <option value="Delivered">
-                          Delivered
-                        </option>
-
-                        <option value="Cancelled">
-                          Cancelled
-                        </option>
-
-                      </select>
-
-                    </div>
-
-                  </td>
+                    </td>
 
 
-                  {/* Actions */}
+                    {/* AMOUNT */}
 
-                  <td>
+                    <td>
 
-                    <div className="order-actions">
+                      <strong className="order-total">
 
-                     <button
-  title="View order"
-  onClick={() => setSelectedOrder(order)}
->
-  <Eye size={16} />
-</button>
+                        ₹
+                        {Number(
+                          order.totalAmount ||
+                            0
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
 
-                      {/* <button
-                        title="More"
-                      >
-                        <MoreHorizontal
-                          size={17}
-                        />
-                      </button> */}
+                      </strong>
 
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              ))}
+                    </td>
 
 
-              {/* No Orders */}
+                    {/* DATE */}
 
-              {filteredOrders.length === 0 && (
+                    <td>
+
+                      <span className="order-date">
+
+                        {new Date(
+                          order.createdAt
+                        ).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+
+                      </span>
+
+                    </td>
+
+
+                    {/* STATUS */}
+
+                    <td>
+
+                      <div className="order-status-wrapper">
+
+                        {getStatusIcon(
+                          order.status
+                        )}
+
+                        <select
+                          value={
+                            order.status
+                          }
+                          onChange={(e) =>
+                            updateStatus(
+                              order._id,
+                              e.target.value
+                            )
+                          }
+                          className={`order-status-select ${order.status
+                            ?.toLowerCase()
+                            .replace(
+                              " ",
+                              "-"
+                            )}`}
+                        >
+
+                          <option value="Pending">
+                            Pending
+                          </option>
+
+                          <option value="Confirmed">
+                            Confirmed
+                          </option>
+
+                          <option value="Shipped">
+                            Shipped
+                          </option>
+
+                          <option value="Delivered">
+                            Delivered
+                          </option>
+
+                          <option value="Cancelled">
+                            Cancelled
+                          </option>
+
+                        </select>
+
+                      </div>
+
+                    </td>
+
+
+                    {/* ACTION */}
+
+                    <td>
+
+                      <div className="order-actions">
+
+                        <button
+                          type="button"
+                          title="View order"
+                          onClick={() =>
+                            setSelectedOrder(
+                              order
+                            )
+                          }
+                        >
+
+                          <Eye
+                            size={16}
+                          />
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                )
+              )}
+
+
+              {/* NO ORDERS */}
+
+              {filteredOrders.length ===
+                0 && (
 
                 <tr>
 
@@ -589,7 +783,9 @@ const [selectedOrder, setSelectedOrder] = useState(null);
                     colSpan="7"
                     className="no-orders"
                   >
+
                     No orders found.
+
                   </td>
 
                 </tr>
@@ -610,8 +806,12 @@ const [selectedOrder, setSelectedOrder] = useState(null);
         <div className="orders-footer">
 
           <span>
-            Showing {filteredOrders.length} of{" "}
+
+            Showing{" "}
+            {filteredOrders.length}{" "}
+            of{" "}
             {orders.length} orders
+
           </span>
 
 
@@ -642,228 +842,339 @@ const [selectedOrder, setSelectedOrder] = useState(null);
         </div>
 
       </div>
-{/* =================================================
-    ORDER DETAILS MODAL
-================================================= */}
 
-{selectedOrder && (
-  <div
-    className="order-modal-overlay"
-    onClick={() => setSelectedOrder(null)}
-  >
 
-    <div
-      className="order-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
+      {/* =================================================
+          ORDER DETAILS MODAL
+      ================================================= */}
 
-      {/* Modal Header */}
+      {selectedOrder && (
 
-      <div className="order-modal-header">
-
-        <div>
-          <h2>
-            Order Details
-          </h2>
-
-          <span>
-            #{selectedOrder._id.slice(-6)}
-          </span>
-        </div>
-
-        <button
-          className="order-modal-close"
-          onClick={() => setSelectedOrder(null)}
+        <div
+          className="order-modal-overlay"
+          onClick={() =>
+            setSelectedOrder(null)
+          }
         >
-          ×
-        </button>
 
-      </div>
-
-
-      {/* Customer */}
-
-      <div className="order-modal-section">
-
-        <h3>
-          Customer Information
-        </h3>
-
-        <div className="order-detail-grid">
-
-          <div>
-            <span>Name</span>
-            <strong>
-              {selectedOrder.customer?.name}
-            </strong>
-          </div>
-
-          <div>
-            <span>Email</span>
-            <strong>
-              {selectedOrder.customer?.email}
-            </strong>
-          </div>
-
-          <div>
-            <span>Phone</span>
-            <strong>
-              {selectedOrder.customer?.phone}
-            </strong>
-          </div>
-
-        </div>
-
-      </div>
+          <div
+            className="order-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
 
 
-      {/* Products */}
+            {/* MODAL HEADER */}
 
-      <div className="order-modal-section">
+            <div className="order-modal-header">
 
-        <h3>
-          Products
-        </h3>
+              <div>
 
-        <div className="order-products-list">
+                <h2>
+                  Order Details
+                </h2>
 
-          {selectedOrder.products?.map(
-            (item, index) => (
+                <span>
 
-              <div
-                className="order-product-row"
-                key={index}
-              >
-
-                <div className="order-product-details">
-
-                  {item.image && (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                    />
+                  #
+                  {selectedOrder._id.slice(
+                    -6
                   )}
 
-                  <div>
-                    <strong>
-                      {item.name}
-                    </strong>
+                </span>
 
-                    <span>
-                      Quantity: {item.quantity}
-                    </span>
-                  </div>
+              </div>
+
+
+              <button
+                type="button"
+                className="order-modal-close"
+                onClick={() =>
+                  setSelectedOrder(null)
+                }
+              >
+
+                ×
+
+              </button>
+
+            </div>
+
+
+            {/* CUSTOMER INFORMATION */}
+
+            <div className="order-modal-section">
+
+              <h3>
+                Customer Information
+              </h3>
+
+
+              <div className="order-detail-grid">
+
+
+                <div>
+
+                  <span>
+                    Name
+                  </span>
+
+                  <strong>
+                    {
+                      selectedOrder
+                        .customer?.name
+                    }
+                  </strong>
 
                 </div>
 
+
+                <div>
+
+                  <span>
+                    Email
+                  </span>
+
+                  <strong>
+                    {
+                      selectedOrder
+                        .customer?.email
+                    }
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Phone
+                  </span>
+
+                  <strong>
+                    {
+                      selectedOrder
+                        .customer?.phone
+                    }
+                  </strong>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+
+            {/* PRODUCTS */}
+
+            <div className="order-modal-section">
+
+              <h3>
+                Products
+              </h3>
+
+
+              <div className="order-products-list">
+
+                {selectedOrder.products?.map(
+                  (
+                    item,
+                    index
+                  ) => (
+
+                    <div
+                      className="order-product-row"
+                      key={index}
+                    >
+
+
+                      <div className="order-product-details">
+
+
+                        {item.image && (
+
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                          />
+
+                        )}
+
+
+                        <div>
+
+                          <strong>
+                            {item.name}
+                          </strong>
+
+                          <span>
+                            Quantity:{" "}
+                            {item.quantity}
+                          </span>
+
+                        </div>
+
+
+                      </div>
+
+
+                      <strong>
+
+                        ₹
+                        {(
+                          Number(
+                            item.price || 0
+                          ) *
+                          Number(
+                            item.quantity || 0
+                          )
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
+
+                      </strong>
+
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* SHIPPING ADDRESS */}
+
+            <div className="order-modal-section">
+
+              <h3>
+                Shipping Address
+              </h3>
+
+
+              <p className="shipping-address">
+
+                {
+                  selectedOrder
+                    .shippingAddress
+                    ?.address
+                }
+
+                <br />
+
+                {
+                  selectedOrder
+                    .shippingAddress
+                    ?.city
+                }
+                ,{" "}
+                {
+                  selectedOrder
+                    .shippingAddress
+                    ?.state
+                }
+
+                <br />
+
+                PIN:{" "}
+                {
+                  selectedOrder
+                    .shippingAddress
+                    ?.pincode
+                }
+
+              </p>
+
+            </div>
+
+
+            {/* PAYMENT + STATUS */}
+
+            <div className="order-modal-bottom">
+
+
+              <div>
+
+                <span>
+                  Payment
+                </span>
+
                 <strong>
-                  ₹
-                  {(
-                    item.price * item.quantity
-                  ).toLocaleString("en-IN")}
+                  {
+                    selectedOrder
+                      .paymentMethod
+                  }
                 </strong>
 
               </div>
 
-            )
-          )}
+
+              <div>
+
+                <span>
+                  Status
+                </span>
+
+                <strong>
+                  {
+                    selectedOrder
+                      .status
+                  }
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Total Amount
+                </span>
+
+                <strong className="modal-total">
+
+                  ₹
+                  {Number(
+                    selectedOrder
+                      .totalAmount ||
+                      0
+                  ).toLocaleString(
+                    "en-IN"
+                  )}
+
+                </strong>
+
+              </div>
+
+
+            </div>
+
+
+            {/* ORDER DATE */}
+
+            <div className="order-modal-date">
+
+              Order placed on{" "}
+
+              {new Date(
+                selectedOrder.createdAt
+              ).toLocaleString(
+                "en-IN"
+              )}
+
+            </div>
+
+
+          </div>
 
         </div>
 
-      </div>
+      )}
 
-
-      {/* Shipping Address */}
-
-      <div className="order-modal-section">
-
-        <h3>
-          Shipping Address
-        </h3>
-
-        <p className="shipping-address">
-
-          {selectedOrder.shippingAddress?.address}
-          <br />
-
-          {selectedOrder.shippingAddress?.city},{" "}
-          {selectedOrder.shippingAddress?.state}
-          <br />
-
-          PIN:{" "}
-          {selectedOrder.shippingAddress?.pincode}
-
-        </p>
-
-      </div>
-
-
-      {/* Payment + Status */}
-
-      <div className="order-modal-bottom">
-
-        <div>
-
-          <span>
-            Payment
-          </span>
-
-          <strong>
-            {selectedOrder.paymentMethod}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span>
-            Status
-          </span>
-
-          <strong>
-            {selectedOrder.status}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span>
-            Total Amount
-          </span>
-
-          <strong className="modal-total">
-
-            ₹
-            {selectedOrder.totalAmount?.toLocaleString(
-              "en-IN"
-            )}
-
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      {/* Order Date */}
-
-      <div className="order-modal-date">
-
-        Order placed on{" "}
-
-        {new Date(
-          selectedOrder.createdAt
-        ).toLocaleString("en-IN")}
-
-      </div>
-
-    </div>
-
-  </div>
-)}
     </div>
   );
 };

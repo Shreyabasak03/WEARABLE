@@ -1,12 +1,18 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useUser } from "@clerk/react";
+import { useAuth } from "../context/AuthContext";
 
 const AdminProtectedRoute = () => {
-  const { isLoaded, isSignedIn } = useUser();
+  const {
+    user,
+    loading,
+  } = useAuth();
 
-  // Clerk is checking authentication
-  if (!isLoaded) {
+  // ==========================================
+  // CHECKING AUTHENTICATION
+  // ==========================================
+
+  if (loading) {
     return (
       <div
         style={{
@@ -23,12 +29,36 @@ const AdminProtectedRoute = () => {
     );
   }
 
-  // User is NOT logged in
-  if (!isSignedIn) {
-    return <Navigate to="/admin/login" replace />;
+  // ==========================================
+  // NOT LOGGED IN
+  // ==========================================
+
+  if (!user) {
+    return (
+      <Navigate
+        to="/admin/login"
+        replace
+      />
+    );
   }
 
-  // User IS logged in
+  // ==========================================
+  // CHECK ADMIN ROLE
+  // ==========================================
+
+  if (user.role !== "admin") {
+    return (
+      <Navigate
+        to="/admin/login"
+        replace
+      />
+    );
+  }
+
+  // ==========================================
+  // ADMIN AUTHENTICATED
+  // ==========================================
+
   return <Outlet />;
 };
 

@@ -1,25 +1,20 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  protect,
-  adminOnly,
-} = require("../middleware/authMiddleware");
+const userAuth = require("../middleware/userAuth");
+const adminAuth = require("../middleware/adminAuth");
 
 const Order = require("../model/order");
 const Product = require("../model/product");
 const Notification = require("../model/notification");
 
-// ===============================
+// =====================================================
 // CREATE ORDER
 // USER ONLY
-// ===============================
-router.post("/", protect, async (req, res) => {
-  try {
-    // ==========================================
-    // JWT AUTHENTICATION
-    // ==========================================
+// =====================================================
 
+router.post("/", userAuth, async (req, res) => {
+  try {
     const userId = req.user.id;
 
     if (!userId) {
@@ -93,7 +88,7 @@ router.post("/", protect, async (req, res) => {
       ...req.body,
 
       // IMPORTANT:
-      // Do NOT take user ID from frontend
+      // Never trust user ID from frontend
       user: userId,
     });
 
@@ -114,7 +109,6 @@ router.post("/", protect, async (req, res) => {
       message: "Order created successfully",
       order: savedOrder,
     });
-
   } catch (error) {
     console.error("Create order error:", error);
 
@@ -126,11 +120,12 @@ router.post("/", protect, async (req, res) => {
 });
 
 
-// ===============================
+// =====================================================
 // GET MY ORDERS
-// USER
-// ===============================
-router.get("/", protect, async (req, res) => {
+// USER ONLY
+// =====================================================
+
+router.get("/", userAuth, async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -140,11 +135,10 @@ router.get("/", protect, async (req, res) => {
       .populate("products.product")
       .sort({ createdAt: -1 });
 
-    console.log("CURRENT JWT USER ID:", userId);
-    console.log("ORDERS FOUND:", orders.length);
+    // console.log("CURRENT USER ID:", userId);
+    // console.log("ORDERS FOUND:", orders.length);
 
     res.status(200).json(orders);
-
   } catch (error) {
     console.error("Get my orders error:", error);
 
@@ -156,39 +150,36 @@ router.get("/", protect, async (req, res) => {
 });
 
 
-// ===============================
+// =====================================================
 // ADMIN - GET ALL ORDERS
-// ===============================
-router.get(
-  "/admin",
-  protect,
-  adminOnly,
-  async (req, res) => {
-    try {
-      const orders = await Order.find({})
-        .populate("products.product")
-        .populate("user", "name email")
-        .sort({ createdAt: -1 });
+// ADMIN ONLY
+// =====================================================
 
-      res.status(200).json(orders);
+router.get("/admin", adminAuth, async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("products.product")
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
 
-    } catch (error) {
-      console.error("Admin get orders error:", error);
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Admin get orders error:", error);
 
-      res.status(500).json({
-        message: "Failed to fetch all orders",
-        error: error.message,
-      });
-    }
+    res.status(500).json({
+      message: "Failed to fetch all orders",
+      error: error.message,
+    });
   }
-);
+});
 
 
-// ===============================
-// GET SINGLE ORDER
-// USER / ADMIN
-// ===============================
-router.get("/:id", protect, async (req, res) => {
+// =====================================================
+// USER - GET SINGLE ORDER
+// USER ONLY
+// =====================================================
+
+router.get("/:id", userAuth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate("products.product")
@@ -200,22 +191,19 @@ router.get("/:id", protect, async (req, res) => {
       });
     }
 
-    // Admin can view any order
-    if (req.user.role === "admin") {
-      return res.status(200).json(order);
-    }
-
-    // Normal user can only view their own order
-    if (order.user._id.toString() !== req.user.id.toString()) {
+    // User can only see their own order
+    if (
+      !order.user ||
+      order.user._id.toString() !== req.user.id.toString()
+    ) {
       return res.status(403).json({
         message: "You are not allowed to view this order",
       });
     }
 
     res.status(200).json(order);
-
   } catch (error) {
-    console.error("Get single order error:", error);
+    console.error("Get single user order error:", error);
 
     res.status(500).json({
       message: "Failed to fetch order",
@@ -225,106 +213,124 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 
-// ===============================
+// =====================================================
+// ADMIN - GET SINGLE ORDER
+// ADMIN ONLY
+// =====================================================
+
+router.get("/admin/:id", adminAuth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("products.product")
+      .populate("user", "name email");
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found",
+      });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Admin get single order error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch order",
+      error: error.message,
+    });
+  }
+});
+
+
+// =====================================================
 // UPDATE ORDER STATUS
 // ADMIN ONLY
-// ===============================
-router.put(
-  "/:id",
-  protect,
-  adminOnly,
-  async (req, res) => {
-    try {
-      const { status } = req.body;
+// =====================================================
 
-      const order = await Order.findById(req.params.id);
+router.put("/:id", adminAuth, async (req, res) => {
+  try {
+    const { status } = req.body;
 
-      if (!order) {
-        return res.status(404).json({
-          message: "Order not found",
-        });
-      }
+    const order = await Order.findById(req.params.id);
 
-      // --------------------------------
-      // RESTORE STOCK WHEN CANCELLED
-      // --------------------------------
-
-      if (
-        status === "Cancelled" &&
-        order.status !== "Cancelled" &&
-        !order.stockRestored
-      ) {
-        for (const item of order.products) {
-          const product = await Product.findById(item.product);
-
-          if (product) {
-            product.stock += item.quantity;
-
-            await product.save();
-          }
-        }
-
-        // Mark stock as restored
-        order.stockRestored = true;
-      }
-
-      // --------------------------------
-      // UPDATE STATUS
-      // --------------------------------
-
-      order.status = status;
-
-      const updatedOrder = await order.save();
-
-      res.status(200).json({
-        message: "Order status updated successfully",
-        order: updatedOrder,
-      });
-
-    } catch (error) {
-      console.error("Update order error:", error);
-
-      res.status(500).json({
-        message: "Failed to update order",
-        error: error.message,
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found",
       });
     }
+
+    // --------------------------------
+    // RESTORE STOCK WHEN CANCELLED
+    // --------------------------------
+
+    if (
+      status === "Cancelled" &&
+      order.status !== "Cancelled" &&
+      !order.stockRestored
+    ) {
+      for (const item of order.products) {
+        const product = await Product.findById(item.product);
+
+        if (product) {
+          product.stock += item.quantity;
+
+          await product.save();
+        }
+      }
+
+      order.stockRestored = true;
+    }
+
+    // --------------------------------
+    // UPDATE STATUS
+    // --------------------------------
+
+    order.status = status;
+
+    const updatedOrder = await order.save();
+
+    res.status(200).json({
+      message: "Order status updated successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Update order error:", error);
+
+    res.status(500).json({
+      message: "Failed to update order",
+      error: error.message,
+    });
   }
-);
+});
 
 
-// ===============================
+// =====================================================
 // DELETE ORDER
 // ADMIN ONLY
-// ===============================
-router.delete(
-  "/:id",
-  protect,
-  adminOnly,
-  async (req, res) => {
-    try {
-      const order = await Order.findByIdAndDelete(req.params.id);
+// =====================================================
 
-      if (!order) {
-        return res.status(404).json({
-          message: "Order not found",
-        });
-      }
+router.delete("/:id", adminAuth, async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
 
-      res.status(200).json({
-        message: "Order deleted successfully",
-      });
-
-    } catch (error) {
-      console.error("Delete order error:", error);
-
-      res.status(500).json({
-        message: "Failed to delete order",
-        error: error.message,
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found",
       });
     }
+
+    res.status(200).json({
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete order error:", error);
+
+    res.status(500).json({
+      message: "Failed to delete order",
+      error: error.message,
+    });
   }
-);
+});
 
 
 module.exports = router;

@@ -8,27 +8,55 @@ const {
   deleteProduct,
 } = require("../controller/productController");
 
+const adminAuth = require("../middleware/adminAuth");
+
 const router = express.Router();
 
 
-// =====================================================
-// PRODUCT ROUTES
-// =====================================================
 
-// Get all products
+// PRODUCT ROUTES
+
+// GET ALL PRODUCTS
+// PUBLIC / USER
+
+
 router.get("/", getAllProducts);
 
-// Get single product
+// GET SINGLE PRODUCT
+// PUBLIC / USER
+
+
 router.get("/:id", getProductById);
 
-// Create product
-router.post("/", createProduct);
 
-// Update product
-router.put("/:id", updateProduct);
+// CREATE PRODUCT
+// ADMIN ONLY
 
-// Delete product
-router.delete("/:id", deleteProduct);
+router.post(
+  "/",
+  adminAuth,
+  createProduct
+);
+
+// UPDATE PRODUCT
+// ADMIN ONLY
+
+
+router.put(
+  "/:id",
+  adminAuth,
+  updateProduct
+);
+
+// DELETE PRODUCT
+// ADMIN ONLY
+
+
+router.delete(
+  "/:id",
+  adminAuth,
+  deleteProduct
+);
 
 
 module.exports = router;

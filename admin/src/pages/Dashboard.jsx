@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "@clerk/react";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -26,107 +26,116 @@ import {
 
 import "./Dashboard.css";
 
+const API_URL = "http://localhost:5001/api";
+
 const Dashboard = () => {
-    const navigate = useNavigate();
-  // CLERK
+  const navigate = useNavigate();
 
-  const { getToken } = useAuth();
+  // ==========================================
+  // JWT AUTHENTICATION
+  // ==========================================
 
- 
+  const { user } = useAuth();
+
+  // ==========================================
   // STATES
+  // ==========================================
 
   const [orders, setOrders] = useState([]);
-
   const [products, setProducts] = useState([]);
-
   const [totalUsers, setTotalUsers] = useState(0);
-
   const [loading, setLoading] = useState(true);
 
-
+  // ==========================================
   // FETCH DASHBOARD DATA
-
+  // ==========================================
 
   const fetchDashboardData = async () => {
-
     try {
-
       setLoading(true);
 
-      const token = await getToken();
-
+      // ========================================
       // GET ORDERS
+      // JWT COOKIE IS SENT AUTOMATICALLY
+      // ========================================
 
       const ordersResponse = await axios.get(
-        "http://localhost:5001/api/orders",
+        `${API_URL}/orders`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
+      // ========================================
       // GET PRODUCTS
+      // ========================================
 
       const productsResponse = await axios.get(
-        "http://localhost:5001/api/products"
-      );
-
-      
-      // GET USERS
-  
-      const usersResponse = await axios.get(
-        "http://localhost:5001/api/users",
+        `${API_URL}/products`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
+      // ========================================
+      // GET USERS
+      // ========================================
+
+      const usersResponse = await axios.get(
+        `${API_URL}/users`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      // ========================================
+      // SET ORDERS
+      // ========================================
 
       setOrders(
         ordersResponse.data || []
       );
 
+      // ========================================
+      // SET PRODUCTS
+      // ========================================
 
       setProducts(
         productsResponse.data.products ||
-        productsResponse.data ||
-        []
+          productsResponse.data ||
+          []
       );
 
+      // ========================================
+      // SET TOTAL USERS
+      // ========================================
 
       setTotalUsers(
         usersResponse.data.totalCount || 0
       );
 
     } catch (error) {
-
       console.error(
         "Dashboard fetch error:",
         error
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-  // FETCH ON PAGE LOAD
-
+  // ==========================================
+  // FETCH WHEN PAGE LOADS
+  // ==========================================
 
   useEffect(() => {
-
     fetchDashboardData();
-
   }, []);
 
+  // ==========================================
   // TOTAL REVENUE
- 
+  // ==========================================
+
   const totalRevenue = orders
     .filter(
       (order) =>
@@ -139,14 +148,15 @@ const Dashboard = () => {
       0
     );
 
-
- 
+  // ==========================================
   // TOTAL ORDERS
-
+  // ==========================================
 
   const totalOrders = orders.length;
 
-  // LOW STOCK
+  // ==========================================
+  // LOW STOCK PRODUCTS
+  // ==========================================
 
   const lowStockProducts = products
     .filter(
@@ -160,10 +170,9 @@ const Dashboard = () => {
     )
     .slice(0, 5);
 
-
-  
+  // ==========================================
   // REVENUE GRAPH
-  
+  // ==========================================
 
   const revenueMap = {};
 
@@ -173,44 +182,37 @@ const Dashboard = () => {
         order.status !== "Cancelled"
     )
     .forEach((order) => {
-
       const date = new Date(
         order.createdAt
       );
 
-      const month = date.toLocaleDateString(
-        "en-IN",
-        {
-          month: "short",
-        }
-      );
+      const month =
+        date.toLocaleDateString(
+          "en-IN",
+          {
+            month: "short",
+          }
+        );
 
       if (!revenueMap[month]) {
-
         revenueMap[month] = 0;
-
       }
 
       revenueMap[month] +=
         Number(order.totalAmount || 0);
-
     });
-
 
   const revenueData = Object.keys(
     revenueMap
   ).map((month) => ({
-
     month,
-
     revenue: revenueMap[month],
-
   }));
 
-
-  
+  // ==========================================
   // RECENT ORDERS
-  
+  // ==========================================
+
   const recentOrders = [...orders]
     .sort(
       (a, b) =>
@@ -219,155 +221,120 @@ const Dashboard = () => {
     )
     .slice(0, 5);
 
-
-  
+  // ==========================================
   // FORMAT CURRENCY
- 
+  // ==========================================
 
   const formatCurrency = (value) => {
-
     return `₹${Number(
       value || 0
     ).toLocaleString("en-IN")}`;
-
   };
 
+  // ==========================================
   // LOADING
- 
-  if (loading) {
+  // ==========================================
 
+  if (loading) {
     return (
       <div className="dashboard">
-
         <div className="dashboard-header">
-
           <div>
-
-            <h1>
-              Dashboard
-            </h1>
+            <h1>Dashboard</h1>
 
             <p>
               Loading store data...
             </p>
-
           </div>
-
         </div>
-
       </div>
     );
-
   }
 
+  // ==========================================
   // STATISTICS
-  
-  const stats = [
+  // ==========================================
 
+  const stats = [
     {
       title: "Total Revenue",
-
       value:
         formatCurrency(
           totalRevenue
         ),
-
       change: "Live",
-
       positive: true,
-
       icon: DollarSign,
     },
 
-
     {
       title: "Total Orders",
-
       value:
         totalOrders.toLocaleString(
           "en-IN"
         ),
-
       change: "Live",
-
       positive: true,
-
       icon: ShoppingBag,
     },
 
-
     {
       title: "Total Products",
-
       value:
         products.length.toLocaleString(
           "en-IN"
         ),
-
       change: "Live",
-
       positive: true,
-
       icon: Package,
     },
 
-
     {
       title: "Total Users",
-
       value:
         totalUsers.toLocaleString(
           "en-IN"
         ),
-
       change: "Live",
-
       positive: true,
-
       icon: Users,
     },
-
   ];
 
+  // ==========================================
   // RENDER
-
+  // ==========================================
 
   return (
-
     <div className="dashboard">
 
-
-      {/* HEADER */}
+      {/* ======================================
+          HEADER
+      ====================================== */}
 
       <div className="dashboard-header">
-
         <div>
-
           <h1>
             Dashboard
           </h1>
 
           <p>
-            Here's what's happening with your store today.
+            Here's what's happening with your
+            store today.
           </p>
-
         </div>
-
       </div>
 
-
-
-          {/* STAT CARDS */}
-
+      {/* ======================================
+          STAT CARDS
+      ====================================== */}
 
       <div className="stats-grid">
 
         {stats.map((stat) => {
-
           const Icon = stat.icon;
 
           return (
-
             <div
               className="stat-card"
               key={stat.title}
@@ -376,14 +343,10 @@ const Dashboard = () => {
               <div className="stat-card-top">
 
                 <div className="stat-icon">
-
                   <Icon size={21} />
-
                 </div>
 
-               
               </div>
-
 
               <div className="stat-info">
 
@@ -395,7 +358,6 @@ const Dashboard = () => {
                   {stat.value}
                 </h2>
 
-
                 <div
                   className={`stat-change ${
                     stat.positive
@@ -405,17 +367,13 @@ const Dashboard = () => {
                 >
 
                   {stat.positive ? (
-
                     <ArrowUpRight
                       size={15}
                     />
-
                   ) : (
-
                     <ArrowDownRight
                       size={15}
                     />
-
                   )}
 
                   <span>
@@ -431,27 +389,26 @@ const Dashboard = () => {
               </div>
 
             </div>
-
           );
-
         })}
 
       </div>
 
-          {/* REVENUE + LOW STOCK
-      */}
+      {/* ======================================
+          REVENUE + LOW STOCK
+      ====================================== */}
 
       <div className="dashboard-grid">
 
-            {/* REVENUE */}
-        
+        {/* ====================================
+            REVENUE
+        ==================================== */}
 
         <div className="dashboard-card revenue-section">
 
           <div className="section-header">
 
             <div>
-
               <h3>
                 Revenue Overview
               </h3>
@@ -459,11 +416,9 @@ const Dashboard = () => {
               <p>
                 Revenue from customer orders
               </p>
-
             </div>
 
           </div>
-
 
           {/* REVENUE SUMMARY */}
 
@@ -486,7 +441,6 @@ const Dashboard = () => {
             </div>
 
           </div>
-
 
           {/* GRAPH */}
 
@@ -535,13 +489,11 @@ const Dashboard = () => {
 
                   </defs>
 
-
                   <CartesianGrid
                     stroke="var(--border)"
                     strokeDasharray="3 3"
                     vertical={false}
                   />
-
 
                   <XAxis
                     dataKey="month"
@@ -553,7 +505,6 @@ const Dashboard = () => {
                       fontSize: 11,
                     }}
                   />
-
 
                   <YAxis
                     axisLine={false}
@@ -568,48 +519,36 @@ const Dashboard = () => {
                     }
                   />
 
-
                   <Tooltip
                     contentStyle={{
                       background:
                         "#14201e",
-
                       border:
                         "1px solid #263d39",
-
                       borderRadius:
                         "8px",
-
                       color:
                         "#ffffff",
                     }}
-
                     formatter={(value) => [
-
                       formatCurrency(
                         value
                       ),
-
                       "Revenue",
-
                     ]}
                   />
-
 
                   <Area
                     type="monotone"
                     dataKey="revenue"
-
                     stroke="#6fd6cb"
-
                     strokeWidth={2.5}
-
                     fill="url(#revenueGradient)"
-
                     activeDot={{
                       r: 5,
                       fill: "#6fd6cb",
-                      stroke: "#0f4d45",
+                      stroke:
+                        "#0f4d45",
                       strokeWidth: 2,
                     }}
                   />
@@ -621,9 +560,7 @@ const Dashboard = () => {
             ) : (
 
               <div className="empty-chart">
-
                 No revenue data available yet.
-
               </div>
 
             )}
@@ -632,10 +569,9 @@ const Dashboard = () => {
 
         </div>
 
-
-        {/* =================================================
+        {/* ====================================
             LOW STOCK
-        ================================================= */}
+        ==================================== */}
 
         <div className="dashboard-card low-stock-section">
 
@@ -660,7 +596,6 @@ const Dashboard = () => {
 
           </div>
 
-
           <div className="stock-list">
 
             {lowStockProducts.length > 0 ? (
@@ -683,7 +618,6 @@ const Dashboard = () => {
 
                       </div>
 
-
                       <div>
 
                         <h4>
@@ -697,7 +631,6 @@ const Dashboard = () => {
                       </div>
 
                     </div>
-
 
                     <div className="stock-number">
 
@@ -719,38 +652,38 @@ const Dashboard = () => {
             ) : (
 
               <p className="no-stock-warning">
-
-                All products have sufficient stock.
-
+                All products have sufficient
+                stock.
               </p>
 
             )}
 
           </div>
 
-
-           <button
-  type="button"
-  className="view-button"
-  onClick={() => {
-    navigate("/admin/products");
-  }}
->
-  View all Products
-  <ArrowUpRight size={16} />
-</button>
+          <button
+            type="button"
+            className="view-button"
+            onClick={() => {
+              navigate(
+                "/admin/products"
+              );
+            }}
+          >
+            View all Products
+            <ArrowUpRight
+              size={16}
+            />
+          </button>
 
         </div>
 
       </div>
 
-
-      {/* =================================================
+      {/* ======================================
           RECENT ORDERS
-      ================================================= */}
+      ====================================== */}
 
       <div className="dashboard-card orders-section">
-
 
         <div className="section-header">
 
@@ -761,24 +694,28 @@ const Dashboard = () => {
             </h3>
 
             <p>
-              Latest orders from your customers
+              Latest orders from your
+              customers
             </p>
 
           </div>
 
+          <button
+            type="button"
+            className="view-button"
+            onClick={() => {
+              navigate(
+                "/admin/orders"
+              );
+            }}
+          >
+            View all
+            <ArrowUpRight
+              size={16}
+            />
+          </button>
 
-           <button
-  type="button"
-  className="view-button"
-  onClick={() => {
-    navigate("/admin/orders");
-  }}
->
-  View all
-  <ArrowUpRight size={16} />
-</button>
         </div>
-
 
         <div className="orders-table-wrapper">
 
@@ -814,7 +751,6 @@ const Dashboard = () => {
 
             </thead>
 
-
             <tbody>
 
               {recentOrders.length > 0 ? (
@@ -833,14 +769,12 @@ const Dashboard = () => {
 
                       </td>
 
-
                       <td>
 
                         {order.customer?.name ||
                           "Unknown"}
 
                       </td>
-
 
                       <td className="order-product">
 
@@ -864,7 +798,6 @@ const Dashboard = () => {
 
                       </td>
 
-
                       <td className="order-amount">
 
                         {formatCurrency(
@@ -872,7 +805,6 @@ const Dashboard = () => {
                         )}
 
                       </td>
-
 
                       <td>
 
@@ -891,10 +823,10 @@ const Dashboard = () => {
 
                       </td>
 
-
                       <td>
 
                         <button
+                          type="button"
                           className="table-more"
                         >
 
@@ -918,13 +850,12 @@ const Dashboard = () => {
                   <td
                     colSpan="6"
                     style={{
-                      textAlign: "center",
+                      textAlign:
+                        "center",
                       padding: "30px",
                     }}
                   >
-
                     No orders yet.
-
                   </td>
 
                 </tr>
@@ -940,10 +871,7 @@ const Dashboard = () => {
       </div>
 
     </div>
-
   );
-
 };
-
 
 export default Dashboard;

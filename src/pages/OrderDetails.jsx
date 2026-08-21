@@ -34,7 +34,7 @@ export default function OrderDetails() {
           `http://localhost:5001/api/orders/${id}`
         );
 
-        console.log("Order details:", response.data);
+        // console.log("Order details:", response.data);
 
         setOrder(response.data);
       } catch (error) {

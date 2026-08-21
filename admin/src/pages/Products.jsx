@@ -39,7 +39,7 @@ const Products = () => {
         "http://localhost:5001/api/products"
       );
 
-      console.log("Products received:", response.data);
+      // console.log("Products received:", response.data);
 
       setProducts(response.data.products || []);
     } catch (err) {

@@ -29,7 +29,7 @@ function App() {
 
   const detectLocation = () => {
     return new Promise((resolve, reject) => {
-      console.log("detectLocation function called");
+      // console.log("detectLocation function called");
 
       if (!navigator.geolocation) {
         alert("Geolocation is not supported by your browser.");
@@ -41,7 +41,7 @@ function App() {
         async (position) => {
           const { latitude, longitude } = position.coords;
 
-          console.log("Coordinates:", latitude, longitude);
+          // console.log("Coordinates:", latitude, longitude);
 
           try {
             const response = await axios.get(
@@ -57,7 +57,7 @@ function App() {
 
             const address = response.data.address;
 
-            console.log("API address:", address);
+            // console.log("API address:", address);
 
             setLocation(address);
 

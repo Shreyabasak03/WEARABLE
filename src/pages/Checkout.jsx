@@ -228,10 +228,10 @@ export default function Checkout() {
         razorpayPaymentId,
       };
 
-      console.log(
-        "ORDER DATA:",
-        orderData
-      );
+      // console.log(
+      //   "ORDER DATA:",
+      //   orderData
+      // );
 
       // =================================================
       // SEND ORDER TO BACKEND
@@ -241,7 +241,7 @@ export default function Checkout() {
       // =================================================
 
       const response = await axios.post(
-        "http://localhost:5000/api/orders",
+        "http://localhost:5001/api/orders",
         orderData,
         {
           withCredentials: true,

@@ -52,7 +52,7 @@ export default function OrderHistory() {
         // --------------------------------------
 
         const response = await fetch(
-          "http://localhost:5000/api/orders",
+          "http://localhost:5001/api/orders",
           {
             method: "GET",
             credentials: "include",
@@ -87,10 +87,10 @@ export default function OrderHistory() {
 
         const data = await response.json();
 
-        console.log(
-          "Orders belonging to current user:",
-          data
-        );
+        // console.log(
+        //   "Orders belonging to current user:",
+        //   data
+        // );
 
         // --------------------------------------
         // HANDLE RESPONSE FORMAT
