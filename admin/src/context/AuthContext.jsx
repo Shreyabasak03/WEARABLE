@@ -5,11 +5,9 @@ import React, {
   useState,
 } from "react";
 
-import axios from "axios";
+import axios from "../api/axios";
 
 const AuthContext = createContext(null);
-
-const API_URL = "http://localhost:5001/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,18 +20,20 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/auth/admin/me`,
-        {
-          withCredentials: true,
-        }
+        "/auth/admin/me"
       );
 
+      console.log("ADMIN ME:", response.data);
+
       setUser(response.data.admin);
-
     } catch (error) {
-      console.log("Admin not authenticated");
-      setUser(null);
+      console.log(
+        "Admin authentication failed:",
+        error.response?.status,
+        error.response?.data
+      );
 
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -53,27 +53,19 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await axios.post(
-      `${API_URL}/auth/admin/login`,
+      "/auth/admin/login",
       {
         email,
         password,
-      },
-      {
-        withCredentials: true,
       }
     );
 
-    // console.log(
-    //   "ADMIN LOGIN RESPONSE:",
-    //   response.data
-    // );
+    console.log(
+      "ADMIN LOGIN RESPONSE:",
+      response.data
+    );
 
     const loggedInAdmin = response.data.admin;
-
-    // console.log(
-    //   "LOGGED IN ADMIN:",
-    //   loggedInAdmin
-    // );
 
     if (loggedInAdmin.role !== "admin") {
       throw new Error(
@@ -93,19 +85,13 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await axios.post(
-        `${API_URL}/auth/admin/logout`,
-        {},
-        {
-          withCredentials: true,
-        }
+        "/auth/admin/logout"
       );
-
     } catch (error) {
       console.error(
         "Admin logout error:",
         error
       );
-
     } finally {
       setUser(null);
     }

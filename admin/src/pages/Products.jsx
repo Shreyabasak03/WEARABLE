@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -36,7 +36,7 @@ const Products = () => {
       setError("");
 
       const response = await axios.get(
-        "http://localhost:5001/api/products"
+        "/products"
       );
 
       // console.log("Products received:", response.data);
@@ -90,7 +90,7 @@ const handleDelete = async (productId) => {
 
   try {
     await axios.delete(
-      `http://localhost:5001/api/products/${productId}`
+      `/products/${productId}`
     );
 
     // Remove the product from the current UI
@@ -223,8 +223,10 @@ const handleDelete = async (productId) => {
             Manage your store products and inventory.
           </p>
         </div>
-
-        <button className="add-product-button" onClick={() => navigate("/products/add")}>
+<button
+  className="add-product-button"
+  onClick={() => navigate("/admin/products/add")}
+>
           <Plus size={18} />
           
           Add Product
@@ -464,17 +466,17 @@ const handleDelete = async (productId) => {
                         <button
   title="View"
   onClick={() =>
-    navigate(`/products/view/${product._id}`)
+    navigate(`/admin/products/view/${product._id}`)
   }
 >
   <Eye size={16} />
 </button>
 
 
-                         <button
+                    <button
   title="Edit"
   onClick={() =>
-    navigate(`/products/edit/${product._id}`)
+    navigate(`/admin/products/edit/${product._id}`)
   }
 >
   <Edit size={16} />

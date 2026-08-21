@@ -15,7 +15,7 @@ import {
   EyeOff,
 } from "lucide-react";
 
-import axios from "axios";
+import axios from "../api/axios";
 
 import { useAuth } from "../context/AuthContext";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/axios";
 import { ArrowLeft, Package } from "lucide-react";
 
 import "./ViewProduct.css";
@@ -17,7 +17,10 @@ const ViewProduct = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/products/${id}`
+          `/products/${id}`,
+           {
+    withCredentials: true,
+  }
         );
 
         setProduct(response.data.product);
@@ -55,7 +58,7 @@ const ViewProduct = () => {
 
         <button
           className="back-button"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/admin/products")}
         >
           <ArrowLeft size={17} />
           Back to Products
@@ -84,7 +87,7 @@ const ViewProduct = () => {
 
         <button
           className="back-button"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/admin/products")}
         >
           <ArrowLeft size={17} />
           Back to Products
@@ -254,7 +257,7 @@ const ViewProduct = () => {
             <button
               className="edit-product-button"
               onClick={() =>
-                navigate(`/products/edit/${product._id}`)
+                navigate(`/admin/products/edit/${product._id}`)
               }
             >
               Edit Product

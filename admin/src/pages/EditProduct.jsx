@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./AddProduct.css";
@@ -38,7 +38,10 @@ const EditProduct = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/products/${id}`
+       `/products/${id}`,
+           {
+    withCredentials: true,
+  }
         );
 
         const product = response.data.product;
@@ -194,14 +197,17 @@ const EditProduct = () => {
       };
 
       await axios.put(
-        `http://localhost:5001/api/products/${id}`,
-        productData
+         `/products/${id}`,
+        productData,
+         {
+    withCredentials: true,
+  }
       );
 
       setSuccess("Product updated successfully!");
 
       setTimeout(() => {
-        navigate("/products");
+navigate("/admin/products");
       }, 800);
     } catch (err) {
       console.error(err);
@@ -240,7 +246,7 @@ const EditProduct = () => {
           <p>{error}</p>
 
           <button
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/admin/products")}
           >
             Back to Products
           </button>
@@ -258,7 +264,7 @@ const EditProduct = () => {
 
         <button
           className="back-button"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/admin/products")}
         >
           <ArrowLeft size={17} />
           Back to Products
@@ -631,7 +637,7 @@ const EditProduct = () => {
           <button
             type="button"
             className="cancel-button"
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/admin/products")}
           >
             Cancel
           </button>
