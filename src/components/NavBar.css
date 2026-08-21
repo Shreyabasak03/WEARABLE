@@ -104,377 +104,6 @@
 }
 
 
-/* =========================================================
-   LOCATION WRAPPER
-   ========================================================= */
-
-.location-wrapper {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-
-  min-width: 0;
-}
-
-
-/* =========================================================
-   LOCATION CLICK AREA
-   ========================================================= */
-
-.loc {
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  min-width: 0;
-
-  color: white;
-
-  cursor: pointer;
-
-  padding: 7px 8px;
-
-  border-radius: 10px;
-
-  transition:
-    background 0.25s ease;
-}
-
-.loc:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-
-/* =========================================================
-   LOCATION ICON
-   ========================================================= */
-
-.loc > svg {
-  flex-shrink: 0;
-}
-
-
-/* =========================================================
-   LOCATION TEXT
-   ========================================================= */
-
-.location-text {
-  display: flex;
-  flex-direction: column;
-
-  min-width: 0;
-
-  line-height: 1.2;
-}
-
-.location-text p {
-  margin: 0;
-
-  color: white;
-
-  font-size: 13px;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  max-width: 150px;
-}
-
-.location-text p:first-child {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.location-text p:last-child {
-  margin-top: 2px;
-
-  font-size: 11px;
-
-  opacity: 0.85;
-}
-
-
-/* =========================================================
-   LOCATION DROPDOWN
-   ========================================================= */
-
-.location-dropdown {
-  position: absolute;
-
-  top: calc(100% + 14px);
-
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  /*
-     IMPORTANT:
-     Keep a fixed desktop/tablet width.
-     This prevents the dropdown from becoming
-     extremely narrow.
-  */
-
-  width: 460px;
-  min-width: 460px;
-  max-width: 460px;
-
-  box-sizing: border-box;
-
-  padding: 24px;
-
-  background: #ffffff;
-
-  color: #1d5f54;
-
-  border-radius: 18px;
-
-  border: 1px solid rgba(29, 95, 84, 0.08);
-
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.18);
-
-  z-index: 9999;
-
-  animation: locationDropdownOpen 0.2s ease;
-}
-
-
-/* =========================================================
-   DROPDOWN TRIANGLE
-   ========================================================= */
-
-.location-dropdown::before {
-  content: "";
-
-  position: absolute;
-
-  top: -8px;
-
-  left: 50%;
-
-  width: 16px;
-  height: 16px;
-
-  background: white;
-
-  transform: translateX(-50%) rotate(45deg);
-
-  border-left: 1px solid rgba(29, 95, 84, 0.05);
-  border-top: 1px solid rgba(29, 95, 84, 0.05);
-}
-
-
-/* =========================================================
-   DROPDOWN HEADER
-   ========================================================= */
-
-.dropdown-title {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  margin-bottom: 18px;
-
-  color: #1d5f54;
-}
-
-.dropdown-title svg {
-  flex-shrink: 0;
-}
-
-.dropdown-title span {
-  font-size: 22px;
-
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   CURRENT LOCATION LABEL
-   ========================================================= */
-
-.dropdown-current {
-  margin: 0 0 10px;
-
-  color: #777;
-
-  font-size: 14px;
-
-  font-weight: 500;
-}
-
-
-/* =========================================================
-   CURRENT LOCATION CARD
-   ========================================================= */
-
-.current-location {
-  width: 100%;
-
-  min-height: 70px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-
-  gap: 14px;
-
-  padding: 14px 16px;
-
-  margin-bottom: 18px;
-
-  background: #e8f7f3;
-
-  border-radius: 12px;
-
-  color: #1d5f54;
-}
-
-.current-location > svg {
-  flex-shrink: 0;
-}
-
-.current-location > div {
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.current-location strong {
-  display: block;
-
-  color: #1d5f54;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-}
-
-.current-location span {
-  display: block;
-
-  margin-top: 3px;
-
-  color: #6b7d79;
-
-  font-size: 13px;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-}
-
-
-/* =========================================================
-   ALL LOCATION BUTTONS
-   ========================================================= */
-
-.current-location-btn,
-.change-location-btn,
-.save-location-btn {
-  width: 100%;
-
-  min-height: 48px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 8px;
-
-  padding: 12px 16px;
-
-  border: none;
-
-  border-radius: 10px;
-
-  font-family: inherit;
-
-  font-size: 15px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.25s ease,
-    transform 0.2s ease,
-    box-shadow 0.25s ease;
-}
-
-
-/* =========================================================
-   USE CURRENT LOCATION
-   ========================================================= */
-
-.current-location-btn {
-  margin-bottom: 12px;
-
-  background: #e8f7f3;
-
-  color: #1d5f54;
-}
-
-.current-location-btn:hover {
-  background: #d5f0ea;
-
-  transform: translateY(-1px);
-}
-
-.current-location-btn:active {
-  transform: scale(0.98);
-}
-
-
-/* =========================================================
-   CHANGE LOCATION
-   ========================================================= */
-
-.change-location-btn {
-  background: #1d5f54;
-
-  color: white;
-}
-
-.change-location-btn:hover {
-  background: #14483f;
-
-  box-shadow:
-    0 5px 15px rgba(29, 95, 84, 0.2);
-
-  transform: translateY(-1px);
-}
-
-.change-location-btn:active {
-  transform: scale(0.98);
-}
-
-
-/* =========================================================
-   LOCATION FORM
-   ========================================================= */
-
-.location-form {
-  width: 100%;
-}
 
 
 /* =========================================================
@@ -540,111 +169,6 @@
 }
 
 
-/* =========================================================
-   FORM LABEL
-   ========================================================= */
-
-.location-form label {
-  display: block;
-
-  margin-bottom: 8px;
-
-  color: #6b7d79;
-
-  font-size: 14px;
-
-  font-weight: 500;
-}
-
-
-/* =========================================================
-   LOCATION INPUT
-   ========================================================= */
-
-.location-input {
-  width: 100%;
-  height: 50px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  padding: 0 14px;
-
-  margin-bottom: 16px;
-
-  background: #ffffff;
-
-  border: 1px solid #d5e5e1;
-
-  border-radius: 10px;
-
-  color: #1d5f54;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.location-input:focus-within {
-  border-color: #2aae9b;
-
-  box-shadow:
-    0 0 0 3px rgba(42, 174, 155, 0.12);
-}
-
-.location-input svg {
-  flex-shrink: 0;
-}
-
-.location-input input {
-  width: 100%;
-
-  min-width: 0;
-
-  border: none;
-
-  outline: none;
-
-  background: transparent;
-
-  color: #333;
-
-  font-family: inherit;
-
-  font-size: 15px;
-}
-
-.location-input input::placeholder {
-  color: #999;
-}
-
-
-/* =========================================================
-   SAVE LOCATION
-   ========================================================= */
-
-.save-location-btn {
-  background: #1d5f54;
-
-  color: white;
-}
-
-.save-location-btn:hover {
-  background: #14483f;
-
-  box-shadow:
-    0 5px 15px rgba(29, 95, 84, 0.2);
-
-  transform: translateY(-1px);
-}
-
-.save-location-btn:active {
-  transform: scale(0.98);
-}
 
 
 /* =========================================================
@@ -730,43 +254,423 @@
   border: 2px solid #1f7b70;
 }
 
-
 /* =========================================================
-   AUTH
+   ACCOUNT WRAPPER
    ========================================================= */
 
-.auth {
-  display: flex;
+.account-wrapper {
+  position: relative;
 
+  display: flex;
   align-items: center;
-  justify-content: center;
 
   flex-shrink: 0;
 }
 
 
 /* =========================================================
-   SIGN IN
+   ACCOUNT BUTTON
    ========================================================= */
 
-.signIn {
-  min-height: 38px;
+.account-button {
+  min-height: 46px;
 
-  padding: 8px 16px;
+  display: flex;
+  align-items: center;
 
-  border: none;
+  gap: 9px;
 
-  border-radius: 20px;
+  padding: 5px 10px 5px 6px;
 
-  background: #1d5f54;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  border-radius: 25px;
+
+  background: rgba(255, 255, 255, 0.13);
 
   color: white;
 
+  cursor: pointer;
+
   font-family: inherit;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.account-button:hover {
+  background: rgba(255, 255, 255, 0.22);
+
+  border-color: rgba(255, 255, 255, 0.4);
+
+  transform: translateY(-1px);
+}
+
+.account-button-active {
+  background: rgba(255, 255, 255, 0.24);
+
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   ACCOUNT AVATAR
+   ========================================================= */
+
+.account-avatar {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #1d5f54;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ACCOUNT INFO
+   ========================================================= */
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  line-height: 1.15;
+
+  min-width: 65px;
+}
+
+.account-label {
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-weight: 500;
+}
+
+.account-name {
+  max-width: 100px;
+
+  margin-top: 2px;
+
+  color: white;
 
   font-size: 13px;
 
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ACCOUNT ARROW
+   ========================================================= */
+
+.account-arrow {
+  transition: transform 0.25s ease;
+}
+
+.account-arrow.rotate {
+  transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   ACCOUNT DROPDOWN
+   ========================================================= */
+
+.account-dropdown {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 360px;
+  min-width: 360px;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #dcebe7;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.18);
+
+  z-index: 9999;
+
+  animation: accountDropdownOpen 0.2s ease;
+}
+
+
+/* =========================================================
+   ACCOUNT DROPDOWN HEADER
+   ========================================================= */
+
+.account-dropdown-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+/* =========================================================
+   BIG ACCOUNT AVATAR
+   ========================================================= */
+
+.account-big-avatar {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #e8f7f3;
+
+  color: #1d5f54;
+}
+
+
+/* =========================================================
+   USER DETAILS
+   ========================================================= */
+
+.account-user-details {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.account-user-details strong {
+  color: #1d5f54;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.account-user-details span {
+  margin-top: 4px;
+
+  color: #71817d;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.account-divider {
+  height: 1px;
+
+  margin: 16px 0;
+
+  background: #e5eeeb;
+}
+
+
+/* =========================================================
+   ACCOUNT STATUS
+   ========================================================= */
+
+.account-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px;
+
+  margin-bottom: 12px;
+
+  background: #f0faf7;
+
+  border: 1px solid #d9eee8;
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   STATUS DOT
+   ========================================================= */
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #22a06b;
+
+  box-shadow:
+    0 0 0 4px rgba(34, 160, 107, 0.12);
+}
+
+
+/* =========================================================
+   STATUS TEXT
+   ========================================================= */
+
+.account-status > div:last-child {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.status-title {
+  color: #1d5f54;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.status-email {
+  margin-top: 2px;
+
+  max-width: 220px;
+
+  color: #71817d;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   LOGOUT BUTTON
+   ========================================================= */
+
+.logout-button {
+  width: 100%;
+
+  min-height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 1px solid #f0cccc;
+
+  border-radius: 10px;
+
+  background: #fff5f5;
+
+  color: #d64545;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
   font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #ffe5e5;
+
+  color: #c53030;
+
+  transform: translateY(-1px);
+}
+
+.logout-button:active {
+  transform: scale(0.98);
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.login-button {
+  min-height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 8px 17px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  color: #1d5f54;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 700;
 
   cursor: pointer;
 
@@ -774,9 +678,62 @@
 
   transition:
     background 0.25s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
 }
 
+.login-button:hover {
+  background: #e8f7f3;
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.12);
+
+  transform: translateY(-1px);
+}
+
+.login-button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================================
+   ACCOUNT LOADING
+   ========================================================= */
+
+.account-loading {
+  min-height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 12px;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ACCOUNT DROPDOWN ANIMATION
+   ========================================================= */
+
+@keyframes accountDropdownOpen {
+
+  from {
+    opacity: 0;
+
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+
+}
 .signIn:hover {
   background: #14483f;
 
@@ -788,15 +745,6 @@
 }
 
 
-/* =========================================================
-   CLERK USER AVATAR
-   ========================================================= */
-
-.cl-userButtonBox,
-.cl-avatarBox {
-  width: 38px !important;
-  height: 38px !important;
-}
 
 
 /* =========================================================
@@ -832,8 +780,8 @@
 @media (max-width: 1100px) {
 
   .navbar {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .image1 {

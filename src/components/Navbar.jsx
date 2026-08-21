@@ -1,57 +1,56 @@
 import React, { useState } from "react";
 import {
-  MapPin,
-  ChevronDown,
-  Navigation,
   Search,
   X,
   ShoppingCart,
   Menu,
+  User,
+  ChevronDown,
+  LogOut,
 } from "lucide-react";
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/cartContext.jsx";
 
 import "./NavBar.css";
 import logo2 from "../assets/logo.png";
 
-import {
-  Show,
-  SignInButton,
-  UserButton,
-} from "@clerk/react";
-
-import { useCart } from "../context/cartContext.jsx";
-
 export const Navbar = ({
-  location,
-  setLocation,
-  detectLocation,
   onToggleSidebar,
 }) => {
-  const { user, loading } = useAuth();
-  const [openDropdown, setOpenDropdown] = useState(false);
-  const [showLocationForm, setShowLocationForm] = useState(false);
-  const [manualLocation, setManualLocation] = useState("");
-  
-  // Search State
+  const { user, loading, logout } = useAuth();
+
+  const [openAccount, setOpenAccount] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
   const navigate = useNavigate();
 
-  // GET CART FROM CONTEXT
+  // ==========================================
+  // CART
+  // ==========================================
+
   const { cartItems } = useCart();
 
-  // CALCULATE TOTAL CART QUANTITY
   const cartCount = cartItems.reduce(
-    (total, item) => total + (Number(item.quantity) || 1),
+    (total, item) =>
+      total + (Number(item.quantity) || 1),
     0
   );
 
-  // SEARCH SUBMIT HANDLER
+  // ==========================================
+  // SEARCH
+  // ==========================================
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+
     if (searchQuery.trim()) {
-      // Navigates to a search page or passes query param
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(
+        `/search?q=${encodeURIComponent(
+          searchQuery.trim()
+        )}`
+      );
     }
   };
 
@@ -59,55 +58,41 @@ export const Navbar = ({
     setSearchQuery("");
   };
 
-  // LOCATION DROPDOWN
-  const toggleDropDown = () => {
-    setOpenDropdown((prev) => !prev);
-    if (showLocationForm) {
-      setShowLocationForm(false);
+  // ==========================================
+  // LOGOUT
+  // ==========================================
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+
+      setOpenAccount(false);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 
-  // SAVE MANUAL LOCATION
-  const handleSaveLocation = () => {
-    const value = manualLocation.trim();
-    if (!value) {
-      alert("Please enter a location");
-      return;
-    }
+  // ==========================================
+  // ACCOUNT DROPDOWN
+  // ==========================================
 
-    const newLocation = {
-      county: value,
-      state: "",
-      manual: true,
-    };
-
-    setLocation(newLocation);
-    localStorage.setItem("userLocation", JSON.stringify(newLocation));
-
-    setManualLocation("");
-    setShowLocationForm(false);
-    setOpenDropdown(false);
-  };
-
-  // USE CURRENT LOCATION
-  const handleUseCurrentLocation = () => {
-    if (typeof detectLocation !== "function") {
-      console.error("detectLocation is not available");
-      return;
-    }
-
-    localStorage.removeItem("userLocation");
-    detectLocation();
-
-    setShowLocationForm(false);
-    setOpenDropdown(false);
+  const toggleAccount = () => {
+    setOpenAccount((prev) => !prev);
   };
 
   return (
     <nav className="navbar">
-      {/* LEFT SIDE */}
+
+      {/* =================================================
+          LEFT SIDE
+      ================================================= */}
+
       <div className="logo1">
-        {/* Sidebar button */}
+
+        {/* SIDEBAR BUTTON */}
+
         <button
           type="button"
           className="menu-toggle-btn"
@@ -117,139 +102,45 @@ export const Navbar = ({
           <Menu size={24} />
         </button>
 
-        {/* Logo */}
+
+        {/* LOGO */}
+
         <NavLink to="/">
-          <img src={logo2} alt="Logo" className="image1" />
+          <img
+            src={logo2}
+            alt="Logo"
+            className="image1"
+          />
         </NavLink>
 
-        {/* LOCATION */}
-        <div className="location-wrapper">
-          <div className="loc" onClick={toggleDropDown}>
-            <MapPin size={20} />
-            <div className="location-text">
-              {location ? (
-                <>
-                  <p>
-                    {location.county ||
-                      location.city ||
-                      location.town ||
-                      location.village ||
-                      "Unknown"}
-                  </p>
-                  {location.state && <p>{location.state}</p>}
-                </>
-              ) : (
-                <p>Detecting location...</p>
-              )}
-            </div>
-            <ChevronDown
-              size={18}
-              className={openDropdown ? "arrow rotate" : "arrow"}
-            />
-          </div>
-
-          {/* LOCATION DROPDOWN */}
-          {openDropdown && (
-            <div className="location-dropdown">
-              {!showLocationForm ? (
-                <>
-                  <div className="dropdown-title">
-                    <Navigation size={18} />
-                    <span>Location</span>
-                  </div>
-                  <p className="dropdown-current">Your current location</p>
-                  <div className="current-location">
-                    <MapPin size={18} />
-                    <div>
-                      <strong>
-                        {location?.county ||
-                          location?.city ||
-                          location?.town ||
-                          location?.village ||
-                          "Unknown location"}
-                      </strong>
-                      <span>{location?.state || ""}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="current-location-btn"
-                    onClick={handleUseCurrentLocation}
-                  >
-                    <Navigation size={18} />
-                    Use Current Location
-                  </button>
-
-                  <button
-                    type="button"
-                    className="change-location-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowLocationForm(true);
-                    }}
-                  >
-                    Change Location
-                  </button>
-                </>
-              ) : (
-                <div className="location-form">
-                  <div className="form-header">
-                    <h3>Change Location</h3>
-                    <button
-                      type="button"
-                      className="close-btn"
-                      onClick={() => setShowLocationForm(false)}
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-
-                  <label>Enter your location</label>
-                  <div className="location-input">
-                    <Search size={18} />
-                    <input
-                      type="text"
-                      value={manualLocation}
-                      onChange={(e) => setManualLocation(e.target.value)}
-                      placeholder="Enter city or area"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    className="save-location-btn"
-                    onClick={handleSaveLocation}
-                  >
-                    Save Location
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </div>
-      {loading ? (
-  <p>Checking login...</p>
-) : user ? (
-  <div>
-    <p>Logged in as: {user.name}</p>
-    <p>Email: {user.email}</p>
-  </div>
-) : (
-  <p>Not logged in</p>
-)}
 
-      {/* CENTER: SEARCH BAR */}
+
+      {/* =================================================
+          CENTER SEARCH
+      ================================================= */}
+
       <div className="navbar-search-container">
-        <form className="navbar-search-bar" onSubmit={handleSearchSubmit}>
-          <Search size={18} className="search-icon" />
+
+        <form
+          className="navbar-search-bar"
+          onSubmit={handleSearchSubmit}
+        >
+
+          <Search
+            size={18}
+            className="search-icon"
+          />
+
           <input
             type="text"
             placeholder="Search clothes, brands, or categories..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) =>
+              setSearchQuery(e.target.value)
+            }
           />
+
           {searchQuery && (
             <button
               type="button"
@@ -259,34 +150,204 @@ export const Navbar = ({
               <X size={16} />
             </button>
           )}
-          <button type="submit" className="search-submit-btn">
+
+          <button
+            type="submit"
+            className="search-submit-btn"
+          >
             Search
           </button>
+
         </form>
+
       </div>
 
-      {/* RIGHT SIDE */}
+
+      {/* =================================================
+          RIGHT SIDE
+      ================================================= */}
+
       <div className="product">
-        {/* CART */}
-        <NavLink to="/cart" className="cart-link">
+
+        {/* =================================================
+            CART
+        ================================================= */}
+
+        <NavLink
+          to="/cart"
+          className="cart-link"
+        >
+
           <ShoppingCart size={22} />
+
           <span>Cart</span>
-          {cartCount > 0 && <div className="cart-count">{cartCount}</div>}
+
+          {cartCount > 0 && (
+            <div className="cart-count">
+              {cartCount}
+            </div>
+          )}
+
         </NavLink>
 
-        {/* CLERK AUTH */}
-        {/* <div className="auth">
-          <Show when="signed-out">
-            <SignInButton>
-              <button className="signIn">Sign In</button>
-            </SignInButton>
-          </Show>
 
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
-        </div> */}
+        {/* =================================================
+            ACCOUNT
+        ================================================= */}
+
+        <div className="account-wrapper">
+
+          {loading ? (
+
+            <div className="account-loading">
+              Checking...
+            </div>
+
+          ) : user ? (
+
+            <>
+
+              {/* ACCOUNT BUTTON */}
+
+              <button
+                type="button"
+                className={`account-button ${
+                  openAccount
+                    ? "account-button-active"
+                    : ""
+                }`}
+                onClick={toggleAccount}
+              >
+
+                <div className="account-avatar">
+                  <User size={19} />
+                </div>
+
+                <div className="account-info">
+
+                  <span className="account-label">
+                    Account
+                  </span>
+
+                  <span className="account-name">
+                    {user.name || "User"}
+                  </span>
+
+                </div>
+
+                <ChevronDown
+                  size={17}
+                  className={
+                    openAccount
+                      ? "account-arrow rotate"
+                      : "account-arrow"
+                  }
+                />
+
+              </button>
+
+
+              {/* ACCOUNT DROPDOWN */}
+
+              {openAccount && (
+
+                <div className="account-dropdown">
+
+                  {/* USER HEADER */}
+
+                  <div className="account-dropdown-header">
+
+                    <div className="account-big-avatar">
+                      <User size={24} />
+                    </div>
+
+                    <div className="account-user-details">
+
+                      <strong>
+                        {user.name || "User"}
+                      </strong>
+
+                      <span>
+                        {user.email}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  {/* DIVIDER */}
+
+                  <div className="account-divider" />
+
+
+                  {/* ACCOUNT STATUS */}
+
+                  <div className="account-status">
+
+                    <div className="status-dot" />
+
+                    <div>
+                      <span className="status-title">
+                        Signed in
+                      </span>
+
+                      <span className="status-email">
+                        {user.email}
+                      </span>
+                    </div>
+
+                  </div>
+
+
+                  {/* LOGOUT */}
+
+                  <button
+                    type="button"
+                    className="logout-button"
+                    onClick={handleLogout}
+                  >
+
+                    <LogOut size={18} />
+
+                    <span>
+                      Logout
+                    </span>
+
+                  </button>
+
+                </div>
+
+              )}
+
+            </>
+
+          ) : (
+
+            /* =================================================
+               NOT LOGGED IN
+            ================================================= */
+
+            <button
+              type="button"
+              className="login-button"
+              onClick={() => navigate("/login")}
+            >
+
+              <User size={18} />
+
+              <span>
+                Login
+              </span>
+
+            </button>
+
+          )}
+
+        </div>
+
       </div>
+
     </nav>
   );
 };
