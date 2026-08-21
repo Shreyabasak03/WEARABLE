@@ -1,0 +1,40 @@
+/* Sidebar slide in/out transition */
+.admin-sidebar {
+  width: 260px;
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+  will-change: transform;
+}
+
+.admin-sidebar.closed {
+  transform: translateX(-100%);
+}
+
+@media (min-width: 769px) {
+  /* On desktop: collapse to mini bar */
+  .admin-sidebar.closed {
+    width: 72px;
+    transform: translateX(0);
+  }
+}
+
+/* Button Icon Animation */
+.menu-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toggle-icon-open,
+.toggle-icon-close {
+  animation: rotateIn 0.25s ease-in-out;
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}

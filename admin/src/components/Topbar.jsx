@@ -18,16 +18,20 @@ const Topbar = () => {
   return (
     <header className="topbar">
 
-      {/* SEARCH */}
-      <div className="search-box">
-        <Search size={20} />
+     {/* SEARCH */}
+<div>
+  {/* <Search size={20} />
 
-        <input
-          type="text"
-          placeholder="Search..."
-        />
-      </div>
-
+  <input
+    type="search"
+    name="admin_search_query"
+    id="admin-search-input"
+    autoComplete="off"
+    data-lpignore="true"
+    data-form-type="other"
+    placeholder="Search..."
+  /> */}
+</div>
 
       <div className="topbar-right">
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo2 from "../assets/logo.png";
 
 import {
   LayoutDashboard,
@@ -32,24 +33,44 @@ const Sidebar = () => {
           LOGO
       =============================== */}
 
-      <div className="sidebar-logo">
-        <span>WEAR</span>
-        <span>ABLE</span>
-      </div>
+     <div
+  className="sidebar-logo"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "clamp(10px, 2vw, 20px)",
+    minWidth: 0,
+    width: "100%",
+  
+    boxSizing: "border-box",
+    overflow: "hidden",
+  }}
+>
+  <NavLink
+    to="/"
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      textDecoration: "none",
+      outline: "none",
+    }}
+  >
+    <img
+      src={logo2}
+      alt="Logo"
+      className="image1"
+      style={{
+        height: "auto",
+        maxHeight: "160px",
+        maxWidth: "100%",
+        objectFit: "contain",
+        display: "block",
+      }}
+    />
+  </NavLink>
+</div>
 
-      {/* ===============================
-          ADMIN INFO
-      =============================== */}
-
-      <div className="sidebar-user">
-        <strong>
-          {user?.name || "Admin"}
-        </strong>
-
-        <span>
-          {user?.email || ""}
-        </span>
-      </div>
 
       {/* ===============================
           NAVIGATION

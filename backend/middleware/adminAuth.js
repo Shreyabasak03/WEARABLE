@@ -2,7 +2,12 @@ const jwt = require("jsonwebtoken");
 
 const adminAuth = (req, res, next) => {
   try {
-    const token = req.cookies.adminToken;
+    // 1. Check cookie or Bearer header
+    let token = req.cookies?.adminToken;
+
+    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
       return res.status(401).json({
@@ -21,7 +26,11 @@ const adminAuth = (req, res, next) => {
       });
     }
 
-    req.admin = decoded;
+    // Support both decoded.id and decoded._id
+    req.admin = {
+      ...decoded,
+      id: decoded.id || decoded._id,
+    };
 
     next();
   } catch (error) {
