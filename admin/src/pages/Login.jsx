@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate,NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
 import "./Login.css";
+import logo2 from "../assets/logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,9 +25,7 @@ const Login = () => {
     setError("");
 
     if (!email || !password) {
-      setError(
-        "Please enter email and password."
-      );
+      setError("Please enter email and password.");
       return;
     }
 
@@ -37,21 +34,15 @@ const Login = () => {
 
       await login(email, password);
 
-      // Login successful
-   navigate("/admin/dashboard");
-
+      navigate("/admin/dashboard");
     } catch (error) {
-      console.error(
-        "Admin login error:",
-        error
-      );
+      console.error("Admin login error:", error);
 
       setError(
         error.response?.data?.message ||
           error.message ||
           "Invalid email or password."
       );
-
     } finally {
       setLoading(false);
     }
@@ -59,22 +50,73 @@ const Login = () => {
 
   return (
     <div className="login-page">
-
       <div className="login-container">
 
-        <h1>Admin Login</h1>
+        {/* LOGO / BRAND */}
+      <div
+  className="sidebar-logo"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 0,
+    width: "100%",
+    height: "auto",
+    padding: 0,
+    margin: 0,
+    boxSizing: "border-box",
+    overflow: "hidden",
+    lineHeight: 0,
+  }}
+>
+  <NavLink
+    to="/"
+    style={{
+      display: "flex",
+        alignItems: "center",
+    justifyContent: "center",
+      width: "100%",
+      height: "auto",
+      padding: 0,
+      margin: 0,
+      textDecoration: "none",
+      outline: "none",
+      lineHeight: 0,
+    }}
+  >
+    <img
+      src={logo2}
+      alt="Logo"
+      className="image1"
+      style={{
+        display: "block",
+        width: "auto",
+        height: "auto",
+        maxHeight: "160px",
+        maxWidth: "100%",
+        objectFit: "contain",
+        padding: 0,
+        margin: 0,
+        lineHeight: 0,
+      }}
+    />
+  </NavLink>
+</div>
+        {/* HEADER */}
+        <div className="login-header">
+          <h2>Welcome Back</h2>
 
-        <p>
-          Sign in to access the admin dashboard.
-        </p>
+          <p>
+            Sign in to access your admin dashboard.
+          </p>
+        </div>
 
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
 
           {/* EMAIL */}
-
           <div className="form-group">
-
-            <label>Email</label>
+            <label>Email Address</label>
 
             <input
               type="email"
@@ -84,14 +126,12 @@ const Login = () => {
               }
               placeholder="Enter admin email"
               disabled={loading}
+              autoComplete="email"
             />
-
           </div>
 
           {/* PASSWORD */}
-
           <div className="form-group">
-
             <label>Password</label>
 
             <input
@@ -100,35 +140,44 @@ const Login = () => {
               onChange={(e) =>
                 setPassword(e.target.value)
               }
-              placeholder="Enter password"
+              placeholder="Enter your password"
               disabled={loading}
+              autoComplete="current-password"
             />
-
           </div>
 
           {/* ERROR */}
-
           {error && (
             <div className="login-error">
-              {error}
+              <span className="error-icon">!</span>
+
+              <span>{error}</span>
             </div>
           )}
 
           {/* BUTTON */}
-
           <button
             type="submit"
+            className="login-button"
             disabled={loading}
           >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+            {loading ? (
+              <>
+                <span className="button-spinner"></span>
+                Logging in...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </button>
-
         </form>
 
-      </div>
+        {/* FOOTER */}
+        <div className="login-footer">
+          <span>Secure administrator access</span>
+        </div>
 
+      </div>
     </div>
   );
 };
