@@ -6,7 +6,7 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
-} = require("../controller/productController");
+} = require("../controller/ProductController");
 
 const adminAuth = require("../middleware/adminAuth");
 
