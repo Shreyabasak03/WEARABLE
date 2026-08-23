@@ -5,7 +5,7 @@ import React, {
   useState,
 } from "react";
 
-import api from "../api/api"; // Adjust import path if needed
+import api from "../api/Axios"; // Adjust import path if needed
 
 const AuthContext = createContext();
 
