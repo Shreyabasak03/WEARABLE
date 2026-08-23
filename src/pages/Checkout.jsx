@@ -9,7 +9,7 @@ import {
   MapPin,
 } from "lucide-react";
 
-import api from "../services/api.js"; // Adjust import path if needed
+import api from "../api/api"; // Adjust import path if needed
 
 import { useCart } from "../context/cartContext.jsx";
 import { useAuth } from "../context/AuthContext";
