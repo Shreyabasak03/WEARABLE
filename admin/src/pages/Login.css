@@ -173,17 +173,18 @@
 
 .login-brand h1 {
   margin: 0;
-
   font-size: 22px;
-
   font-weight: 800;
-
   letter-spacing: 3px;
-
   background: linear-gradient(135deg, #8de3d8, #2aae9b, #1f7b70);
 
+  background-clip: text;
   -webkit-background-clip: text;
+  
+  color: transparent;
   -webkit-text-fill-color: transparent;
+
+  display: inline-block;
 }
 
 .login-brand span {
