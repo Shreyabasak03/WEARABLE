@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../api/api"; // adjust path to your axios instance
+import api from "../api/Axios"; // adjust path to your axios instance
 
 import {
   ArrowLeft,

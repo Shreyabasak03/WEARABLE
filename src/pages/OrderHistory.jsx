@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../api/api"; // or wherever your axios `api` instance is located
+import api from "../api/Axios"; // or wherever your axios `api` instance is located
 
 import {
   Package,
