@@ -30,28 +30,69 @@ export default function OrderDetails() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        setLoading(true);
+
+        // ==========================================
+        // USER JWT
+        // ==========================================
+
+        const token = localStorage.getItem("userToken");
+
+        console.log("Order ID:", id);
+        console.log("User token exists:", !!token);
+
+        // ==========================================
+        // API REQUEST
+        // ==========================================
+
         const response = await axios.get(
-          `http://localhost:5001/api/orders/${id}`
+          `http://localhost:5001/api/orders/${id}`,
+          {
+            headers: token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {},
+            withCredentials: true,
+          }
         );
 
-        // console.log("Order details:", response.data);
+        console.log(
+          "Order details response:",
+          response.data
+        );
 
-        setOrder(response.data);
+        // ==========================================
+        // HANDLE DIFFERENT RESPONSE FORMATS
+        // ==========================================
+
+        const orderData =
+          response.data?.order ||
+          response.data;
+
+        setOrder(orderData);
+
       } catch (error) {
         console.error(
-          "Error fetching order:",
-          error
+          "ERROR FETCHING ORDER:",
+          error.response?.data || error.message
         );
+
+        setOrder(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrder();
+    if (id) {
+      fetchOrder();
+    } else {
+      setLoading(false);
+    }
   }, [id]);
 
   // ==========================================
-  // GET LOCATION FROM NAVBAR / LOCAL STORAGE
+  // GET LOCATION FROM LOCAL STORAGE
   // ==========================================
 
   const savedLocation = (() => {
@@ -84,6 +125,7 @@ export default function OrderDetails() {
         return <Truck size={18} />;
 
       case "cancelled":
+      case "canceled":
         return <XCircle size={18} />;
 
       case "confirmed":
@@ -101,11 +143,9 @@ export default function OrderDetails() {
   if (loading) {
     return (
       <div className="order-details-page">
-
         <div className="order-details-loading">
           Loading order...
         </div>
-
       </div>
     );
   }
@@ -117,9 +157,7 @@ export default function OrderDetails() {
   if (!order) {
     return (
       <div className="order-details-page">
-
         <div className="order-not-found">
-
           <Package size={60} />
 
           <h2>
@@ -135,9 +173,7 @@ export default function OrderDetails() {
           >
             Back to Orders
           </button>
-
         </div>
-
       </div>
     );
   }
@@ -183,7 +219,43 @@ export default function OrderDetails() {
     "";
 
   // ==========================================
-  // ORDER DETAILS
+  // ORDER ID
+  // ==========================================
+
+  const orderId =
+    order._id ||
+    order.id ||
+    id;
+
+  // ==========================================
+  // ORDER STATUS
+  // ==========================================
+
+  const orderStatus =
+    order.status || "Pending";
+
+  // ==========================================
+  // PAYMENT METHOD
+  // ==========================================
+
+  const paymentMethod =
+    order.paymentMethod ||
+    "Not available";
+
+  // ==========================================
+  // PAYMENT STATUS
+  // ==========================================
+
+  const paymentStatus =
+    order.paymentStatus ||
+    (
+      paymentMethod.toLowerCase() === "cod"
+        ? "Pending"
+        : "Paid"
+    );
+
+  // ==========================================
+  // RENDER
   // ==========================================
 
   return (
@@ -191,22 +263,23 @@ export default function OrderDetails() {
 
       <div className="order-details-container">
 
-        {/* ================================== */}
-        {/* BACK BUTTON */}
-        {/* ================================== */}
+        {/* ==================================
+            BACK BUTTON
+        ================================== */}
 
         <button
           className="back-orders-btn"
           onClick={() => navigate("/orders")}
         >
           <ArrowLeft size={17} />
+
           Back to Orders
         </button>
 
 
-        {/* ================================== */}
-        {/* HEADER */}
-        {/* ================================== */}
+        {/* ==================================
+            HEADER
+        ================================== */}
 
         <div className="order-details-header">
 
@@ -217,8 +290,7 @@ export default function OrderDetails() {
             </h1>
 
             <p>
-              Order ID: #
-              {order._id || order.id}
+              Order ID: #{orderId}
             </p>
 
           </div>
@@ -226,16 +298,17 @@ export default function OrderDetails() {
 
           <div
             className={`order-details-status ${
-              order.status
+              orderStatus
                 ?.toLowerCase()
-                .replace(" ", "-") || "pending"
+                .replace(/\s+/g, "-") ||
+              "pending"
             }`}
           >
 
-            {getStatusIcon(order.status)}
+            {getStatusIcon(orderStatus)}
 
             <span>
-              {order.status || "Pending"}
+              {orderStatus}
             </span>
 
           </div>
@@ -243,21 +316,22 @@ export default function OrderDetails() {
         </div>
 
 
-        {/* ================================== */}
-        {/* ORDER DETAILS GRID */}
-        {/* ================================== */}
+        {/* ==================================
+            ORDER DETAILS GRID
+        ================================== */}
 
         <div className="order-details-grid">
 
 
-          {/* ================================== */}
-          {/* PRODUCTS */}
-          {/* ================================== */}
+          {/* ==================================
+              PRODUCTS
+          ================================== */}
 
           <div className="order-details-card">
 
             <h2>
               <Package size={20} />
+
               Ordered Products
             </h2>
 
@@ -268,21 +342,9 @@ export default function OrderDetails() {
 
                 products.map((item, index) => {
 
-                  /*
-                    Your backend may return:
-
-                    item.product = {
-                      name,
-                      image,
-                      price
-                    }
-
-                    OR directly:
-
-                    item.name
-                    item.image
-                    item.price
-                  */
+                  // ==================================
+                  // PRODUCT OBJECT
+                  // ==================================
 
                   const product =
                     item.product &&
@@ -291,39 +353,62 @@ export default function OrderDetails() {
                       : item;
 
 
+                  // ==================================
+                  // PRODUCT NAME
+                  // ==================================
+
                   const productName =
-                    product.name ||
-                    item.name ||
+                    product?.name ||
+                    item?.name ||
                     "Product";
 
 
+                  // ==================================
+                  // PRODUCT IMAGE
+                  // ==================================
+
                   const productImage =
-                    product.image ||
-                    item.image ||
+                    product?.image ||
+                    item?.image ||
                     "";
 
 
+                  // ==================================
+                  // PRICE
+                  // ==================================
+
                   const price =
-                    item.price ??
-                    product.price ??
+                    item?.price ??
+                    product?.price ??
                     0;
 
 
+                  // ==================================
+                  // QUANTITY
+                  // ==================================
+
                   const quantity =
-                    item.quantity ||
+                    item?.quantity ||
                     1;
 
 
-                  return (
+                  // ==================================
+                  // PRODUCT ID
+                  // ==================================
 
+                  const productId =
+                    item?._id ||
+                    product?._id ||
+                    index;
+
+
+                  return (
                     <div
                       className="details-product"
-                      key={
-                        item._id ||
-                        product._id ||
-                        index
-                      }
+                      key={productId}
                     >
+
+                      {/* IMAGE */}
 
                       {productImage ? (
 
@@ -340,6 +425,8 @@ export default function OrderDetails() {
 
                       )}
 
+
+                      {/* INFO */}
 
                       <div className="details-product-info">
 
@@ -363,6 +450,8 @@ export default function OrderDetails() {
                       </div>
 
 
+                      {/* ITEM TOTAL */}
+
                       <strong>
 
                         ₹
@@ -376,9 +465,7 @@ export default function OrderDetails() {
                       </strong>
 
                     </div>
-
                   );
-
                 })
 
               ) : (
@@ -394,9 +481,9 @@ export default function OrderDetails() {
           </div>
 
 
-          {/* ================================== */}
-          {/* CUSTOMER INFORMATION */}
-          {/* ================================== */}
+          {/* ==================================
+              CUSTOMER INFORMATION
+          ================================== */}
 
           <div className="order-details-card">
 
@@ -406,6 +493,8 @@ export default function OrderDetails() {
 
 
             <div className="customer-details">
+
+              {/* NAME */}
 
               <div>
 
@@ -422,6 +511,8 @@ export default function OrderDetails() {
               </div>
 
 
+              {/* EMAIL */}
+
               <div>
 
                 <span>
@@ -430,11 +521,14 @@ export default function OrderDetails() {
 
                 <strong>
                   {order.customer?.email ||
+                    order.shippingAddress?.email ||
                     "Not available"}
                 </strong>
 
               </div>
 
+
+              {/* PHONE */}
 
               <div>
 
@@ -455,9 +549,9 @@ export default function OrderDetails() {
           </div>
 
 
-          {/* ================================== */}
-          {/* SHIPPING LOCATION */}
-          {/* ================================== */}
+          {/* ==================================
+              SHIPPING LOCATION
+          ================================== */}
 
           <div className="order-details-card">
 
@@ -506,7 +600,7 @@ export default function OrderDetails() {
                       {shippingAddress.city}
 
                       {shippingAddress.city &&
-                        shippingAddress.state
+                      shippingAddress.state
                         ? ", "
                         : ""}
 
@@ -602,9 +696,9 @@ export default function OrderDetails() {
           </div>
 
 
-          {/* ================================== */}
-          {/* PAYMENT INFORMATION */}
-          {/* ================================== */}
+          {/* ==================================
+              PAYMENT INFORMATION
+          ================================== */}
 
           <div className="order-details-card">
 
@@ -615,6 +709,8 @@ export default function OrderDetails() {
 
             <div className="payment-details">
 
+              {/* PAYMENT METHOD */}
+
               <div>
 
                 <span>
@@ -622,12 +718,13 @@ export default function OrderDetails() {
                 </span>
 
                 <strong>
-                  {order.paymentMethod ||
-                    "Not available"}
+                  {paymentMethod}
                 </strong>
 
               </div>
 
+
+              {/* PAYMENT STATUS */}
 
               <div>
 
@@ -636,17 +733,13 @@ export default function OrderDetails() {
                 </span>
 
                 <strong>
-                  {order.paymentStatus ||
-                    (
-                      order.paymentMethod ===
-                      "cod"
-                        ? "Pending"
-                        : "Paid"
-                    )}
+                  {paymentStatus}
                 </strong>
 
               </div>
 
+
+              {/* TOTAL */}
 
               <div>
 

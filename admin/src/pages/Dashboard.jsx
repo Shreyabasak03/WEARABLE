@@ -380,9 +380,7 @@ const Dashboard = () => {
                     {stat.change}
                   </span>
 
-                  <small>
-                    from backend
-                  </small>
+                 
 
                 </div>
 

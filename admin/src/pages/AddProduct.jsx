@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./AddProduct.css";
@@ -151,7 +151,7 @@ const AddProduct = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5001/api/products",
+        "/products",
         productData
       );
 
@@ -164,7 +164,7 @@ const AddProduct = () => {
 
       // Wait briefly so admin can see success message
       setTimeout(() => {
-        navigate("/products");
+        navigate("/admin/products");
       }, 800);
 
     } catch (err) {
@@ -192,7 +192,7 @@ const AddProduct = () => {
         <div>
           <button
             className="back-button"
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/admin/products")}
           >
             <ArrowLeft size={17} />
             Back to Products
@@ -605,7 +605,7 @@ const AddProduct = () => {
             type="button"
             className="cancel-button"
             onClick={() =>
-              navigate("/products")
+              navigate("/admin/products")
             }
           >
             Cancel

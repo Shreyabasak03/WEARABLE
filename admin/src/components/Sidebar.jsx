@@ -48,7 +48,7 @@ const Sidebar = () => {
   }}
 >
   <NavLink
-    to="/"
+    to="/admin/dashboard"
     style={{
       display: "inline-flex",
       alignItems: "center",
