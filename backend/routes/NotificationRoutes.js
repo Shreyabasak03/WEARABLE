@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const Notification = require("../model/notification");
+const Notification = require("../model/Notification");
 
 // ==========================================
 // GET ALL NOTIFICATIONS

@@ -6,7 +6,7 @@ const adminAuth = require("../middleware/adminAuth");
 
 const Order = require("../model/order");
 const Product = require("../model/product");
-const Notification = require("../model/notification");
+const Notification = require("../model/Notification");
 
 // =====================================================
 // CREATE ORDER
