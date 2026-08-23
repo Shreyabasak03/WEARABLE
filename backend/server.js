@@ -27,12 +27,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without origin (e.g., Postman, mobile apps, server-to-server)
       if (!origin) {
         return callback(null, true);
       }
 
-      // Check allowed explicit URLs or any preview deployments from your Vercel project
       if (
         allowedOrigins.includes(origin) ||
         origin.endsWith(".vercel.app")
@@ -51,7 +49,23 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-connectDB();
+// =====================================================
+// SERVERLESS DATABASE HANDLER
+// =====================================================
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
+// =====================================================
+// ROUTES
+// =====================================================
 
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
@@ -61,7 +75,6 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/auth", authRoutes);
 
-
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -69,13 +82,11 @@ app.get("/", (req, res) => {
   });
 });
 
-
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
-
 
 module.exports = app;
