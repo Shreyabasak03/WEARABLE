@@ -423,7 +423,6 @@ router.post("/logout", (req, res) => {
 // =====================================================
 // ADMIN - LOGOUT
 // POST /api/auth/admin/logout
-// =====================================================
 
 router.post(
   "/admin/logout",
