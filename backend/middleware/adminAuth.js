@@ -2,23 +2,49 @@ const jwt = require("jsonwebtoken");
 
 const adminAuth = (req, res, next) => {
   try {
-    // 1. Check cookie or Bearer header
+    // ==========================================
+    // CHECK COOKIE
+    // ==========================================
+
     let token = req.cookies?.adminToken;
 
-    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
-      token = req.headers.authorization.split(" ")[1];
+    // ==========================================
+    // CHECK AUTHORIZATION HEADER
+    // ==========================================
+
+    if (
+      !token &&
+      req.headers.authorization?.startsWith(
+        "Bearer "
+      )
+    ) {
+      token =
+        req.headers.authorization.split(" ")[1];
     }
+
+    // ==========================================
+    // NO TOKEN
+    // ==========================================
 
     if (!token) {
       return res.status(401).json({
-        message: "Admin authentication required",
+        message:
+          "Admin authentication required",
       });
     }
+
+    // ==========================================
+    // VERIFY TOKEN
+    // ==========================================
 
     const decoded = jwt.verify(
       token,
       process.env.JWT_ADMIN_SECRET
     );
+
+    // ==========================================
+    // CHECK ROLE
+    // ==========================================
 
     if (decoded.role !== "admin") {
       return res.status(403).json({
@@ -26,7 +52,10 @@ const adminAuth = (req, res, next) => {
       });
     }
 
-    // Support both decoded.id and decoded._id
+    // ==========================================
+    // STORE ADMIN
+    // ==========================================
+
     req.admin = {
       ...decoded,
       id: decoded.id || decoded._id,
@@ -34,8 +63,14 @@ const adminAuth = (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error(
+      "ADMIN AUTH ERROR:",
+      error.message
+    );
+
     return res.status(401).json({
-      message: "Invalid or expired admin token",
+      message:
+        "Invalid or expired admin token",
     });
   }
 };

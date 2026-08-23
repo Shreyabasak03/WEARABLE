@@ -1,14 +1,44 @@
 const mongoose = require("mongoose");
 
+let cachedConnection = null;
+
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    // Already connected
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
 
-    // console.log("MongoDB connected successfully");
-    // console.log("Database:", conn.connection.name);
+    // Reuse cached connection
+    if (cachedConnection) {
+      return cachedConnection;
+    }
+
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI is not defined");
+    }
+
+    cachedConnection = mongoose.connect(
+      process.env.MONGO_URI
+    );
+
+    const connection = await cachedConnection;
+
+    console.log(
+      `MongoDB connected: ${connection.connection.name}`
+    );
+
+    return connection;
+
   } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
+    cachedConnection = null;
+
+    console.error(
+      "MongoDB connection error:",
+      error
+    );
+
+    throw error;
   }
 };
 

@@ -17,7 +17,6 @@ const generateUserToken = (user) => {
   );
 };
 
-
 // ==========================================
 // ADMIN TOKEN
 // ==========================================
@@ -34,7 +33,6 @@ const generateAdminToken = (admin) => {
     }
   );
 };
-
 
 module.exports = {
   generateUserToken,

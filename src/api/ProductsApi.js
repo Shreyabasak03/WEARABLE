@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5001/api/products",
+  baseURL: `${import.meta.env.VITE_API_URL}/products`,
 });
 
 // ==========================================
@@ -14,7 +14,6 @@ export const getAllProducts = async () => {
   return res.data.products;
 };
 
-
 // ==========================================
 // GET PRODUCT BY ID
 // ==========================================
@@ -25,12 +24,13 @@ export const getProductById = async (id) => {
   return res.data.product;
 };
 
-
 // ==========================================
 // GET PRODUCTS BY CATEGORY
 // ==========================================
 
-export const getProductsByCategory = async (category) => {
+export const getProductsByCategory = async (
+  category
+) => {
   const res = await API.get("/");
 
   const products = res.data.products;
@@ -41,7 +41,6 @@ export const getProductsByCategory = async (category) => {
       category.toLowerCase()
   );
 };
-
 
 // ==========================================
 // SEARCH PRODUCTS
@@ -59,7 +58,6 @@ export const searchProducts = async (query) => {
   );
 };
 
-
 // ==========================================
 // GET CATEGORIES
 // ==========================================
@@ -71,11 +69,11 @@ export const getCategories = async () => {
 
   const categories = [
     ...new Set(
-      products.map((product) => product.category)
+      products.map(
+        (product) => product.category
+      )
     ),
   ];
 
   return categories;
 };
-
-

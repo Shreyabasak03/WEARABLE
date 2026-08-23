@@ -17,82 +17,65 @@ const authRoutes = require("./routes/AuthRoutes");
 
 const app = express();
 
-// =====================================================
-// CORS
-// =====================================================
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // User frontend
-      "http://localhost:5174", // Admin frontend
-    ],
+    origin: function (origin, callback) {
+      // Allow requests without origin (e.g., Postman, mobile apps, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
 
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "OPTIONS",
-    ],
+      // Check allowed explicit URLs or any preview deployments from your Vercel project
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
 
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
-
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-
-// =====================================================
-// BODY PARSER
-// =====================================================
-
 app.use(express.json());
-
-
-// =====================================================
-// COOKIE PARSER
-// =====================================================
-
 app.use(cookieParser());
-
-
-// =====================================================
-// DATABASE
-// =====================================================
 
 connectDB();
 
-
-// =====================================================
-// ROUTES
-// =====================================================
-
 app.use("/api/products", productRoutes);
-
 app.use("/api/orders", orderRoutes);
-
 app.use("/api/payment", PaymentsRoutes);
-
 app.use("/api/users", userRoutes);
-
 app.use("/api/settings", settingsRoutes);
-
 app.use("/api/notifications", notificationRoutes);
-
 app.use("/api/auth", authRoutes);
 
 
-// =====================================================
-// SERVER
-// =====================================================
-
-const PORT = process.env.PORT || 5001;
-
-app.listen(PORT, () => {
-  // console.log(`Server running on port ${PORT}`);
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Wearable API is running",
+  });
 });
+
+
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+
+module.exports = app;

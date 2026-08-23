@@ -14,6 +14,25 @@ const adminAuth = require("../middleware/adminAuth");
 
 const router = express.Router();
 
+// =====================================================
+// COOKIE OPTIONS
+// =====================================================
+
+const getCookieOptions = (maxAge) => ({
+  httpOnly: true,
+
+  // HTTPS on Vercel
+  secure: process.env.NODE_ENV === "production",
+
+  // Required when frontend and backend are on
+  // different Vercel domains
+  sameSite:
+    process.env.NODE_ENV === "production"
+      ? "none"
+      : "lax",
+
+  maxAge,
+});
 
 // =====================================================
 // USER - CHECK AUTHENTICATION
@@ -40,52 +59,52 @@ router.get("/me", userAuth, async (req, res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
-    console.error("User me error:", error);
+    console.error("USER ME ERROR:", error);
 
     res.status(500).json({
       message: "Server error",
     });
   }
 });
-
 
 // =====================================================
 // ADMIN - CHECK AUTHENTICATION
 // GET /api/auth/admin/me
 // =====================================================
 
-router.get("/admin/me", adminAuth, async (req, res) => {
-  try {
-    const admin = await Admin.findById(req.admin.id).select(
-      "-password"
-    );
+router.get(
+  "/admin/me",
+  adminAuth,
+  async (req, res) => {
+    try {
+      const admin = await Admin.findById(
+        req.admin.id
+      ).select("-password");
 
-    if (!admin) {
-      return res.status(404).json({
-        message: "Admin not found",
+      if (!admin) {
+        return res.status(404).json({
+          message: "Admin not found",
+        });
+      }
+
+      res.status(200).json({
+        admin: {
+          id: admin._id,
+          name: admin.name,
+          email: admin.email,
+          role: "admin",
+        },
+      });
+    } catch (error) {
+      console.error("ADMIN ME ERROR:", error);
+
+      res.status(500).json({
+        message: "Server error",
       });
     }
-
-    res.status(200).json({
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: "admin",
-      },
-    });
-
-  } catch (error) {
-    console.error("Admin me error:", error);
-
-    res.status(500).json({
-      message: "Server error",
-    });
   }
-});
-
+);
 
 // =====================================================
 // USER - REGISTER
@@ -94,9 +113,6 @@ router.get("/admin/me", adminAuth, async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    // console.log("REGISTER ROUTE HIT");
-    // console.log("BODY:", req.body);
-
     const {
       name,
       email,
@@ -104,7 +120,7 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
     // -----------------------------------------
-    // VALIDATE INPUT
+    // VALIDATE
     // -----------------------------------------
 
     if (!name || !email || !password) {
@@ -118,7 +134,7 @@ router.post("/register", async (req, res) => {
     // -----------------------------------------
 
     const existingUser = await User.findOne({
-      email,
+      email: email.toLowerCase().trim(),
     });
 
     if (existingUser) {
@@ -142,13 +158,13 @@ router.post("/register", async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase().trim(),
       password: hashedPassword,
       role: "user",
     });
 
     // -----------------------------------------
-    // CREATE USER TOKEN
+    // CREATE TOKEN
     // -----------------------------------------
 
     const token = generateUserToken(user);
@@ -157,13 +173,13 @@ router.post("/register", async (req, res) => {
     // USER COOKIE
     // -----------------------------------------
 
-    res.cookie("userToken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge:
-        7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+      "userToken",
+      token,
+      getCookieOptions(
+        7 * 24 * 60 * 60 * 1000
+      )
+    );
 
     // -----------------------------------------
     // RESPONSE
@@ -179,10 +195,9 @@ router.post("/register", async (req, res) => {
         role: "user",
       },
     });
-
   } catch (error) {
     console.error(
-      "User registration error:",
+      "USER REGISTRATION ERROR:",
       error
     );
 
@@ -191,7 +206,6 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
 
 // =====================================================
 // USER - LOGIN
@@ -206,11 +220,22 @@ router.post("/login", async (req, res) => {
     } = req.body;
 
     // -----------------------------------------
+    // VALIDATE
+    // -----------------------------------------
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message:
+          "Email and password are required",
+      });
+    }
+
+    // -----------------------------------------
     // FIND USER
     // -----------------------------------------
 
     const user = await User.findOne({
-      email,
+      email: email.toLowerCase().trim(),
     });
 
     if (!user) {
@@ -224,11 +249,10 @@ router.post("/login", async (req, res) => {
     // CHECK PASSWORD
     // -----------------------------------------
 
-    const isMatch =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!isMatch) {
       return res.status(401).json({
@@ -241,20 +265,19 @@ router.post("/login", async (req, res) => {
     // CREATE USER TOKEN
     // -----------------------------------------
 
-    const token =
-      generateUserToken(user);
+    const token = generateUserToken(user);
 
     // -----------------------------------------
     // USER COOKIE
     // -----------------------------------------
 
-    res.cookie("userToken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge:
-        7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+      "userToken",
+      token,
+      getCookieOptions(
+        7 * 24 * 60 * 60 * 1000
+      )
+    );
 
     // -----------------------------------------
     // RESPONSE
@@ -270,110 +293,132 @@ router.post("/login", async (req, res) => {
         role: "user",
       },
     });
-
   } catch (error) {
-    console.error(
-      "User login error:",
-      error
-    );
+    console.error("USER LOGIN ERROR:", error);
 
     res.status(500).json({
       message: "Server error",
     });
   }
 });
-
 
 // =====================================================
 // ADMIN - LOGIN
 // POST /api/auth/admin/login
 // =====================================================
-router.post("/admin/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // console.log("================================");
-    // console.log("ADMIN LOGIN");
-    // console.log("EMAIL:", email);
+router.post(
+  "/admin/login",
+  async (req, res) => {
+    try {
+      const {
+        email,
+        password,
+      } = req.body;
 
-    // console.log("DATABASE NAME:", Admin.db.name);
-    // console.log("COLLECTION NAME:", Admin.collection.name);
+      // -----------------------------------------
+      // VALIDATE
+      // -----------------------------------------
 
-    const admin = await Admin.findOne({ email });
+      if (!email || !password) {
+        return res.status(400).json({
+          message:
+            "Email and password are required",
+        });
+      }
 
-    // console.log("ADMIN FOUND:", admin);
+      // -----------------------------------------
+      // FIND ADMIN
+      // -----------------------------------------
 
-    if (!admin) {
-      return res.status(401).json({
-        message: "Admin not found",
+      const admin = await Admin.findOne({
+        email: email.toLowerCase().trim(),
+      });
+
+      if (!admin) {
+        return res.status(401).json({
+          message: "Admin not found",
+        });
+      }
+
+      // -----------------------------------------
+      // CHECK PASSWORD
+      // -----------------------------------------
+
+      const isMatch = await bcrypt.compare(
+        password,
+        admin.password
+      );
+
+      if (!isMatch) {
+        return res.status(401).json({
+          message: "Wrong admin password",
+        });
+      }
+
+      // -----------------------------------------
+      // CREATE ADMIN TOKEN
+      // -----------------------------------------
+
+      const token =
+        generateAdminToken(admin);
+
+      // -----------------------------------------
+      // ADMIN COOKIE
+      // -----------------------------------------
+
+      res.cookie(
+        "adminToken",
+        token,
+        getCookieOptions(
+          7 * 24 * 60 * 60 * 1000
+        )
+      );
+
+      // -----------------------------------------
+      // RESPONSE
+      // -----------------------------------------
+
+      res.status(200).json({
+        message:
+          "Admin login successful",
+
+        admin: {
+          id: admin._id,
+          name: admin.name,
+          email: admin.email,
+          role: "admin",
+        },
+      });
+    } catch (error) {
+      console.error(
+        "ADMIN LOGIN ERROR:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Server error",
       });
     }
-
-    const isMatch = await bcrypt.compare(
-      password,
-      admin.password
-    );
-
-    // console.log("PASSWORD MATCH:", isMatch);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        message: "Wrong admin password",
-      });
-    }
-
-    const token = generateAdminToken(admin);
-
-    res.cookie("adminToken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    res.status(200).json({
-      message: "Admin login successful",
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: "admin",
-      },
-    });
-
-  } catch (error) {
-    console.error("ADMIN LOGIN ERROR:", error);
-
-    res.status(500).json({
-      message: "Server error",
-    });
   }
-});
+);
 
 // =====================================================
 // USER - LOGOUT
 // POST /api/auth/logout
 // =====================================================
 
-router.post(
-  "/logout",
-  (req, res) => {
-    res.clearCookie(
-      "userToken",
-      {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax",
-      }
-    );
+router.post("/logout", (req, res) => {
+  res.clearCookie(
+    "userToken",
+    getCookieOptions(0)
+  );
 
-    res.status(200).json({
-      message:
-        "User logged out successfully",
-    });
-  }
-);
-
+  res.status(200).json({
+    message:
+      "User logged out successfully",
+  });
+});
 
 // =====================================================
 // ADMIN - LOGOUT
@@ -385,11 +430,7 @@ router.post(
   (req, res) => {
     res.clearCookie(
       "adminToken",
-      {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax",
-      }
+      getCookieOptions(0)
     );
 
     res.status(200).json({
@@ -398,6 +439,5 @@ router.post(
     });
   }
 );
-
 
 module.exports = router;
