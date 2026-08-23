@@ -6,7 +6,6 @@
   width: 100%;
 }
 
-
 /* =========================================================
    HEADER
 ========================================================= */
@@ -26,7 +25,6 @@
   font-size: 14px;
 }
 
-
 /* =========================================================
    SETTINGS LAYOUT
 ========================================================= */
@@ -40,7 +38,6 @@
 
   align-items: start;
 }
-
 
 /* =========================================================
    SETTINGS SIDEBAR
@@ -102,7 +99,6 @@
   color: var(--green-light);
 }
 
-
 /* =========================================================
    SETTINGS CARD
 ========================================================= */
@@ -116,7 +112,6 @@
 
   overflow: hidden;
 }
-
 
 /* =========================================================
    CARD HEADER
@@ -143,7 +138,6 @@
 
   font-size: 11px;
 }
-
 
 /* =========================================================
    FORM
@@ -220,7 +214,6 @@
   color: var(--text-muted);
 }
 
-
 /* =========================================================
    CARD FOOTER
 ========================================================= */
@@ -234,7 +227,6 @@
 
   border-top: 1px solid var(--border);
 }
-
 
 /* =========================================================
    SAVE BUTTON
@@ -269,10 +261,8 @@
 .save-button:hover {
   transform: translateY(-1px);
 
-  box-shadow:
-    0 6px 18px rgba(66, 168, 156, 0.2);
+  box-shadow: 0 6px 18px rgba(66, 168, 156, 0.2);
 }
-
 
 /* =========================================================
    COMPACT ADMIN PROFILE
@@ -300,7 +290,6 @@
   overflow: hidden;
 }
 
-
 /* ADMIN PROFILE IMAGE */
 
 .profile-section img {
@@ -324,7 +313,6 @@
   margin: 0 !important;
 }
 
-
 /* PROFILE TEXT */
 
 .profile-section h3 {
@@ -337,14 +325,12 @@
   margin-bottom: 6px !important;
 }
 
-
 /* CHANGE AVATAR BUTTON */
 
 .profile-section .secondary-button {
   padding: 5px 9px !important;
   font-size: 9px !important;
 }
-
 
 /* PROFILE FORM */
 
@@ -358,10 +344,8 @@
   margin-bottom: 14px;
 }
 
-
 /* Mobile */
 @media (max-width: 600px) {
-
   .profile-section {
     padding: 14px 16px;
   }
@@ -373,7 +357,6 @@
     min-width: 42px;
     min-height: 42px;
   }
-
 }
 
 /* =========================================================
@@ -417,7 +400,6 @@
 
   font-size: 10px;
 }
-
 
 /* =========================================================
    TOGGLE
@@ -487,7 +469,6 @@
   background: var(--green-light);
 }
 
-
 /* =========================================================
    PAYMENTS
 ========================================================= */
@@ -554,13 +535,11 @@
   font-size: 10px;
 }
 
-
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
 @media (max-width: 850px) {
-
   .settings-layout {
     grid-template-columns: 1fr;
   }
@@ -570,12 +549,9 @@
 
     grid-template-columns: repeat(2, 1fr);
   }
-
 }
 
-
 @media (max-width: 600px) {
-
   .settings-sidebar {
     grid-template-columns: 1fr;
   }
@@ -595,5 +571,4 @@
 
     justify-content: center;
   }
-
 }

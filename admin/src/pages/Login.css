@@ -31,7 +31,6 @@
     #06100f;
 }
 
-
 /* =====================================================
    BACKGROUND DECORATION
 ===================================================== */
@@ -76,7 +75,6 @@
   pointer-events: none;
 }
 
-
 /* =====================================================
    LOGIN CONTAINER
 ===================================================== */
@@ -94,12 +92,11 @@
 
   border-radius: 22px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(17, 34, 31, 0.98),
-      rgba(9, 21, 19, 0.98)
-    );
+  background: linear-gradient(
+    145deg,
+    rgba(17, 34, 31, 0.98),
+    rgba(9, 21, 19, 0.98)
+  );
 
   border: 1px solid rgba(78, 194, 177, 0.18);
 
@@ -109,7 +106,6 @@
 
   backdrop-filter: blur(20px);
 }
-
 
 /* =====================================================
    TOP BORDER GLOW
@@ -126,16 +122,10 @@
   width: 76%;
   height: 1px;
 
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #42a89c,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, #42a89c, transparent);
 
   opacity: 0.7;
 }
-
 
 /* =====================================================
    BRAND
@@ -152,7 +142,6 @@
   margin-bottom: 38px;
 }
 
-
 /* =====================================================
    BRAND ICON
 ===================================================== */
@@ -168,21 +157,15 @@
 
   border-radius: 12px;
 
-  background: linear-gradient(
-    135deg,
-    #6fd6cb,
-    #1f7b70
-  );
+  background: linear-gradient(135deg, #6fd6cb, #1f7b70);
 
   color: #06100f;
 
   font-size: 21px;
   font-weight: 900;
 
-  box-shadow:
-    0 8px 25px rgba(42, 174, 155, 0.2);
+  box-shadow: 0 8px 25px rgba(42, 174, 155, 0.2);
 }
-
 
 /* =====================================================
    BRAND TEXT
@@ -197,12 +180,7 @@
 
   letter-spacing: 3px;
 
-  background: linear-gradient(
-    135deg,
-    #8de3d8,
-    #2aae9b,
-    #1f7b70
-  );
+  background: linear-gradient(135deg, #8de3d8, #2aae9b, #1f7b70);
 
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -221,7 +199,6 @@
 
   letter-spacing: 3px;
 }
-
 
 /* =====================================================
    LOGIN HEADER
@@ -255,7 +232,6 @@
   line-height: 1.6;
 }
 
-
 /* =====================================================
    FORM GROUP
 ===================================================== */
@@ -263,7 +239,6 @@
 .form-group {
   margin-bottom: 21px;
 }
-
 
 /* =====================================================
    LABEL
@@ -282,7 +257,6 @@
 
   letter-spacing: 0.2px;
 }
-
 
 /* =====================================================
    INPUT
@@ -339,7 +313,6 @@
   opacity: 0.6;
 }
 
-
 /* =====================================================
    ERROR
 ===================================================== */
@@ -394,7 +367,6 @@
   font-weight: 800;
 }
 
-
 /* =====================================================
    LOGIN BUTTON
 ===================================================== */
@@ -436,8 +408,7 @@
     #17665d 100%
   );
 
-  box-shadow:
-    0 10px 25px rgba(42, 174, 155, 0.18);
+  box-shadow: 0 10px 25px rgba(42, 174, 155, 0.18);
 
   transition:
     transform 0.2s ease,
@@ -451,8 +422,7 @@
 
   filter: brightness(1.06);
 
-  box-shadow:
-    0 14px 30px rgba(42, 174, 155, 0.28);
+  box-shadow: 0 14px 30px rgba(42, 174, 155, 0.28);
 }
 
 .login-button:active:not(:disabled) {
@@ -466,7 +436,6 @@
 
   box-shadow: none;
 }
-
 
 /* =====================================================
    LOADING SPINNER
@@ -491,7 +460,6 @@
   }
 }
 
-
 /* =====================================================
    FOOTER
 ===================================================== */
@@ -512,13 +480,11 @@
   letter-spacing: 0.4px;
 }
 
-
 /* =====================================================
    RESPONSIVE
 ===================================================== */
 
 @media (max-width: 600px) {
-
   .login-page {
     padding: 18px;
   }
@@ -548,13 +514,11 @@
   }
 }
 
-
 /* =====================================================
    SMALL MOBILE
 ===================================================== */
 
 @media (max-width: 380px) {
-
   .login-page {
     padding: 12px;
   }

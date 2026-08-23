@@ -40,8 +40,8 @@ const Notifications = () => {
         prev.map((notification) =>
           notification._id === id
             ? { ...notification, isRead: true }
-            : notification
-        )
+            : notification,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -55,7 +55,7 @@ const Notifications = () => {
         prev.map((notification) => ({
           ...notification,
           isRead: true,
-        }))
+        })),
       );
     } catch (error) {
       console.error(error);
@@ -66,7 +66,7 @@ const Notifications = () => {
     try {
       await adminApi.delete(`/notifications/${id}`);
       setNotifications((prev) =>
-        prev.filter((notification) => notification._id !== id)
+        prev.filter((notification) => notification._id !== id),
       );
     } catch (error) {
       console.error(error);
@@ -83,9 +83,7 @@ const Notifications = () => {
   if (loading) {
     return (
       <div className="notifications-page">
-        <div className="notifications-loading">
-          Loading notifications...
-        </div>
+        <div className="notifications-loading">Loading notifications...</div>
       </div>
     );
   }
@@ -129,9 +127,7 @@ const Notifications = () => {
               <div className="notification-content">
                 <h3>{notification.title}</h3>
                 <p>{notification.message}</p>
-                <span>
-                  {new Date(notification.createdAt).toLocaleString()}
-                </span>
+                <span>{new Date(notification.createdAt).toLocaleString()}</span>
               </div>
 
               <button

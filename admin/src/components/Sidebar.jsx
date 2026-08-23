@@ -28,56 +28,53 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-
       {/* ===============================
           LOGO
       =============================== */}
 
-     <div
-  className="sidebar-logo"
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: "clamp(10px, 2vw, 20px)",
-    minWidth: 0,
-    width: "100%",
-  
-    boxSizing: "border-box",
-    overflow: "hidden",
-  }}
->
-  <NavLink
-    to="/admin/dashboard"
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      textDecoration: "none",
-      outline: "none",
-    }}
-  >
-    <img
-      src={logo2}
-      alt="Logo"
-      className="image1"
-      style={{
-        height: "auto",
-        maxHeight: "160px",
-        maxWidth: "100%",
-        objectFit: "contain",
-        display: "block",
-      }}
-    />
-  </NavLink>
-</div>
+      <div
+        className="sidebar-logo"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: "clamp(10px, 2vw, 20px)",
+          minWidth: 0,
+          width: "100%",
 
+          boxSizing: "border-box",
+          overflow: "hidden",
+        }}
+      >
+        <NavLink
+          to="/admin/dashboard"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            textDecoration: "none",
+            outline: "none",
+          }}
+        >
+          <img
+            src={logo2}
+            alt="Logo"
+            className="image1"
+            style={{
+              height: "auto",
+              maxHeight: "160px",
+              maxWidth: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </NavLink>
+      </div>
 
       {/* ===============================
           NAVIGATION
       =============================== */}
 
       <nav className="sidebar-nav">
-
         <NavLink
           to="/admin/dashboard"
           className={({ isActive }) =>
@@ -127,25 +124,17 @@ const Sidebar = () => {
           <Settings size={20} />
           <span>Settings</span>
         </NavLink>
-
       </nav>
 
       {/* ===============================
           LOGOUT
       =============================== */}
 
-      <button
-        type="button"
-        className="logout-button"
-        onClick={handleLogout}
-      >
+      <button type="button" className="logout-button" onClick={handleLogout}>
         <LogOut size={20} />
 
-        <span>
-          Logout
-        </span>
+        <span>Logout</span>
       </button>
-
     </aside>
   );
 };

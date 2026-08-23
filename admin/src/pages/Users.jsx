@@ -27,9 +27,7 @@ const Users = () => {
 
       setUsers(response.data.users || []);
       setTotalUsers(
-        response.data.totalCount ||
-        response.data.users?.length ||
-        0
+        response.data.totalCount || response.data.users?.length || 0,
       );
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -313,11 +311,14 @@ const Users = () => {
                   <span>Joined</span>
                   <strong>
                     {selectedUser.joined
-                      ? new Date(selectedUser.joined).toLocaleDateString("en-IN", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        })
+                      ? new Date(selectedUser.joined).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          },
+                        )
                       : "N/A"}
                   </strong>
                 </div>

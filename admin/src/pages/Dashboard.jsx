@@ -39,17 +39,16 @@ const Dashboard = () => {
     try {
       setLoading(true);
 
-      const [ordersResponse, productsResponse, usersResponse] = await Promise.all([
-        adminApi.get("/orders"),
-        adminApi.get("/products"),
-        adminApi.get("/users"),
-      ]);
+      const [ordersResponse, productsResponse, usersResponse] =
+        await Promise.all([
+          adminApi.get("/orders/admin"),
+          adminApi.get("/products"),
+          adminApi.get("/users"),
+        ]);
 
       setOrders(ordersResponse.data || []);
       setProducts(
-        productsResponse.data.products ||
-          productsResponse.data ||
-          []
+        productsResponse.data.products || productsResponse.data || [],
       );
       setTotalUsers(usersResponse.data.totalCount || 0);
     } catch (error) {
@@ -80,7 +79,8 @@ const Dashboard = () => {
     .forEach((order) => {
       const date = new Date(order.createdAt);
       const month = date.toLocaleDateString("en-IN", { month: "short" });
-      revenueMap[month] = (revenueMap[month] || 0) + Number(order.totalAmount || 0);
+      revenueMap[month] =
+        (revenueMap[month] || 0) + Number(order.totalAmount || 0);
     });
 
   const revenueData = Object.keys(revenueMap).map((month) => ({
@@ -205,8 +205,18 @@ const Dashboard = () => {
                   margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
                   <defs>
-                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6fd6cb" stopOpacity={0.35} />
+                    <linearGradient
+                      id="revenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="#6fd6cb"
+                        stopOpacity={0.35}
+                      />
                       <stop offset="100%" stopColor="#0f4d45" stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -252,9 +262,7 @@ const Dashboard = () => {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="empty-chart">
-                No revenue data available yet.
-              </div>
+              <div className="empty-chart">No revenue data available yet.</div>
             )}
           </div>
         </div>

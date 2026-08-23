@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AdminLayout from "./components/AdminLayout";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -26,134 +21,73 @@ import Notifications from "./pages/Notification.jsx";
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-
         {/* ==========================================
             ADMIN LOGIN
         ========================================== */}
 
-        <Route
-          path="/admin/login"
-          element={<Login />}
-        />
-
-     
+        <Route path="/admin/login" element={<Login />} />
 
         {/* ==========================================
             PROTECTED ADMIN AREA
         ========================================== */}
 
-        <Route
-          path="/admin"
-          element={<AdminProtectedRoute />}
-        >
-
-          <Route
-            element={<AdminLayout />}
-          >
-
+        <Route path="/admin" element={<AdminProtectedRoute />}>
+          <Route element={<AdminLayout />}>
             {/* /admin → dashboard */}
 
-            <Route
-              index
-              element={
-                <Navigate
-                  to="/admin/dashboard"
-                  replace
-                />
-              }
-            />
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
 
             {/* ======================================
                 DASHBOARD
             ====================================== */}
 
-            <Route
-              path="dashboard"
-              element={<Dashboard />}
-            />
+            <Route path="dashboard" element={<Dashboard />} />
 
             {/* ======================================
                 PRODUCTS
             ====================================== */}
 
-            <Route
-              path="products"
-              element={<Products />}
-            />
+            <Route path="products" element={<Products />} />
 
-            <Route
-              path="products/add"
-              element={<AddProduct />}
-            />
+            <Route path="products/add" element={<AddProduct />} />
 
-            <Route
-              path="products/edit/:id"
-              element={<EditProduct />}
-            />
+            <Route path="products/edit/:id" element={<EditProduct />} />
 
-            <Route
-              path="products/view/:id"
-              element={<ViewProduct />}
-            />
+            <Route path="products/view/:id" element={<ViewProduct />} />
 
             {/* ======================================
                 ORDERS
             ====================================== */}
 
-            <Route
-              path="orders"
-              element={<Orders />}
-            />
+            <Route path="orders" element={<Orders />} />
 
             {/* ======================================
                 USERS
             ====================================== */}
 
-            <Route
-              path="users"
-              element={<Users />}
-            />
+            <Route path="users" element={<Users />} />
 
             {/* ======================================
                 NOTIFICATIONS
             ====================================== */}
 
-            <Route
-              path="notifications"
-              element={<Notifications />}
-            />
+            <Route path="notifications" element={<Notifications />} />
 
             {/* ======================================
                 SETTINGS
             ====================================== */}
 
-            <Route
-              path="settings"
-              element={<Settings />}
-            />
-
+            <Route path="settings" element={<Settings />} />
           </Route>
-
         </Route>
 
         {/* ==========================================
             UNKNOWN ROUTES
         ========================================== */}
 
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/admin/login"
-              replace
-            />
-          }
-        />
-
+        <Route path="*" element={<Navigate to="/admin/login" replace />} />
       </Routes>
-
     </BrowserRouter>
   );
 }

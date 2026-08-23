@@ -43,8 +43,8 @@ const Orders = () => {
 
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order._id === orderId ? response.data.order : order
-        )
+          order._id === orderId ? response.data.order : order,
+        ),
       );
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -55,7 +55,10 @@ const Orders = () => {
   const filteredOrders = orders.filter((order) => {
     const customerName = order.customer?.name?.toLowerCase() || "";
     const productNames =
-      order.products?.map((item) => item.name).join(" ").toLowerCase() || "";
+      order.products
+        ?.map((item) => item.name)
+        .join(" ")
+        .toLowerCase() || "";
     const orderId = order._id?.toLowerCase() || "";
     const searchText = search.toLowerCase();
 
@@ -88,9 +91,15 @@ const Orders = () => {
   };
 
   const totalOrders = orders.length;
-  const pendingOrders = orders.filter((order) => order.status === "Pending").length;
-  const confirmedOrders = orders.filter((order) => order.status === "Confirmed").length;
-  const deliveredOrders = orders.filter((order) => order.status === "Delivered").length;
+  const pendingOrders = orders.filter(
+    (order) => order.status === "Pending",
+  ).length;
+  const confirmedOrders = orders.filter(
+    (order) => order.status === "Confirmed",
+  ).length;
+  const deliveredOrders = orders.filter(
+    (order) => order.status === "Delivered",
+  ).length;
 
   if (loading) {
     return (
@@ -199,9 +208,7 @@ const Orders = () => {
               {filteredOrders.map((order) => (
                 <tr key={order._id}>
                   <td>
-                    <span className="order-number">
-                      #{order._id.slice(-6)}
-                    </span>
+                    <span className="order-number">#{order._id.slice(-6)}</span>
                   </td>
                   <td>
                     <div className="customer-info">
@@ -339,9 +346,7 @@ const Orders = () => {
                 {selectedOrder.products?.map((item, index) => (
                   <div className="order-product-row" key={index}>
                     <div className="order-product-details">
-                      {item.image && (
-                        <img src={item.image} alt={item.name} />
-                      )}
+                      {item.image && <img src={item.image} alt={item.name} />}
                       <div>
                         <strong>{item.name}</strong>
                         <span>Quantity: {item.quantity}</span>
@@ -350,8 +355,7 @@ const Orders = () => {
                     <strong>
                       ₹
                       {(
-                        Number(item.price || 0) *
-                        Number(item.quantity || 0)
+                        Number(item.price || 0) * Number(item.quantity || 0)
                       ).toLocaleString("en-IN")}
                     </strong>
                   </div>
@@ -385,7 +389,7 @@ const Orders = () => {
                 <strong className="modal-total">
                   ₹
                   {Number(selectedOrder.totalAmount || 0).toLocaleString(
-                    "en-IN"
+                    "en-IN",
                   )}
                 </strong>
               </div>

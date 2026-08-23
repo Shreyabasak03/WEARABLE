@@ -17,10 +17,9 @@ const Topbar = () => {
 
   return (
     <header className="topbar">
-
-     {/* SEARCH */}
-<div>
-  {/* <Search size={20} />
+      {/* SEARCH */}
+      <div>
+        {/* <Search size={20} />
 
   <input
     type="search"
@@ -31,10 +30,9 @@ const Topbar = () => {
     data-form-type="other"
     placeholder="Search..."
   /> */}
-</div>
+      </div>
 
       <div className="topbar-right">
-
         {/* NOTIFICATION */}
         <button
           className="icon-button"
@@ -45,20 +43,19 @@ const Topbar = () => {
           <Bell size={20} />
         </button>
 
-
         {/* ADMIN PROFILE */}
         <button
-  className="admin-profile"
-  type="button"
-  onClick={handleProfileClick}
-  title="Admin Profile"
-  style={{  
-    background: "transparent",
-    color: "inherit",
-    textAlign: "left",
-    cursor: "pointer",
-  }}
->
+          className="admin-profile"
+          type="button"
+          onClick={handleProfileClick}
+          title="Admin Profile"
+          style={{
+            background: "transparent",
+            color: "inherit",
+            textAlign: "left",
+            cursor: "pointer",
+          }}
+        >
           <div className="admin-avatar">
             <User size={20} />
           </div>
@@ -69,9 +66,7 @@ const Topbar = () => {
             <span>Administrator</span>
           </div>
         </button>
-
       </div>
-
     </header>
   );
 };

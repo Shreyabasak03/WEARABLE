@@ -37,12 +37,9 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-       `/products/${id}`,
-           {
-    withCredentials: true,
-  }
-        );
+        const response = await axios.get(`/products/${id}`, {
+          withCredentials: true,
+        });
 
         const product = response.data.product;
 
@@ -56,17 +53,13 @@ const EditProduct = () => {
           stock: product.stock ?? "",
           sizes: product.sizes || [],
           colors: product.colors || [],
-          discountPercentage:
-            product.discountPercentage || "",
+          discountPercentage: product.discountPercentage || "",
           isActive: product.isActive ?? true,
         });
       } catch (err) {
         console.error(err);
 
-        setError(
-          err.response?.data?.message ||
-            "Failed to load product."
-        );
+        setError(err.response?.data?.message || "Failed to load product.");
       } finally {
         setLoading(false);
       }
@@ -116,9 +109,7 @@ const EditProduct = () => {
   const removeSize = (sizeToRemove) => {
     setFormData((prev) => ({
       ...prev,
-      sizes: prev.sizes.filter(
-        (size) => size !== sizeToRemove
-      ),
+      sizes: prev.sizes.filter((size) => size !== sizeToRemove),
     }));
   };
 
@@ -150,9 +141,7 @@ const EditProduct = () => {
   const removeColor = (colorToRemove) => {
     setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.filter(
-        (color) => color !== colorToRemove
-      ),
+      colors: prev.colors.filter((color) => color !== colorToRemove),
     }));
   };
 
@@ -190,32 +179,23 @@ const EditProduct = () => {
         stock: Number(formData.stock),
         sizes: formData.sizes,
         colors: formData.colors,
-        discountPercentage: Number(
-          formData.discountPercentage || 0
-        ),
+        discountPercentage: Number(formData.discountPercentage || 0),
         isActive: formData.isActive,
       };
 
-      await axios.put(
-         `/products/${id}`,
-        productData,
-         {
-    withCredentials: true,
-  }
-      );
+      await axios.put(`/products/${id}`, productData, {
+        withCredentials: true,
+      });
 
       setSuccess("Product updated successfully!");
 
       setTimeout(() => {
-navigate("/admin/products");
+        navigate("/admin/products");
       }, 800);
     } catch (err) {
       console.error(err);
 
-      setError(
-        err.response?.data?.message ||
-          "Failed to update product."
-      );
+      setError(err.response?.data?.message || "Failed to update product.");
     } finally {
       setSaving(false);
     }
@@ -228,9 +208,7 @@ navigate("/admin/products");
   if (loading) {
     return (
       <div className="edit-product-page">
-        <div className="edit-loading">
-          Loading product...
-        </div>
+        <div className="edit-loading">Loading product...</div>
       </div>
     );
   }
@@ -245,9 +223,7 @@ navigate("/admin/products");
         <div className="edit-error">
           <p>{error}</p>
 
-          <button
-            onClick={() => navigate("/admin/products")}
-          >
+          <button onClick={() => navigate("/admin/products")}>
             Back to Products
           </button>
         </div>
@@ -257,11 +233,9 @@ navigate("/admin/products");
 
   return (
     <div className="edit-product-page">
-
       {/* HEADER */}
 
       <div className="edit-product-header">
-
         <button
           className="back-button"
           onClick={() => navigate("/admin/products")}
@@ -272,39 +246,23 @@ navigate("/admin/products");
 
         <h1>Edit Product</h1>
 
-        <p>
-          Update the details of your product.
-        </p>
-
+        <p>Update the details of your product.</p>
       </div>
 
-
-      <form
-        className="edit-product-form"
-        onSubmit={handleSubmit}
-      >
-
+      <form className="edit-product-form" onSubmit={handleSubmit}>
         {/* BASIC INFORMATION */}
 
         <div className="form-card">
-
           <div className="form-card-header">
-
             <h2>Basic Information</h2>
 
-            <p>
-              Update the main details of your product.
-            </p>
-
+            <p>Update the main details of your product.</p>
           </div>
 
-
           <div className="form-grid">
-
             {/* NAME */}
 
             <div className="form-group full-width">
-
               <label>Product Name *</label>
 
               <input
@@ -313,14 +271,11 @@ navigate("/admin/products");
                 value={formData.name}
                 onChange={handleChange}
               />
-
             </div>
-
 
             {/* DESCRIPTION */}
 
             <div className="form-group full-width">
-
               <label>Description *</label>
 
               <textarea
@@ -329,14 +284,11 @@ navigate("/admin/products");
                 value={formData.description}
                 onChange={handleChange}
               />
-
             </div>
-
 
             {/* PRICE */}
 
             <div className="form-group">
-
               <label>Price (₹) *</label>
 
               <input
@@ -346,14 +298,11 @@ navigate("/admin/products");
                 value={formData.price}
                 onChange={handleChange}
               />
-
             </div>
-
 
             {/* CATEGORY */}
 
             <div className="form-group">
-
               <label>Category *</label>
 
               <select
@@ -363,21 +312,14 @@ navigate("/admin/products");
               >
                 <option value="Men">Men</option>
                 <option value="Women">Women</option>
-                <option value="Children">
-                  Children
-                </option>
-                <option value="Accessories">
-                  Accessories
-                </option>
+                <option value="Children">Children</option>
+                <option value="Accessories">Accessories</option>
               </select>
-
             </div>
-
 
             {/* BRAND */}
 
             <div className="form-group">
-
               <label>Brand</label>
 
               <input
@@ -386,14 +328,11 @@ navigate("/admin/products");
                 value={formData.brand}
                 onChange={handleChange}
               />
-
             </div>
-
 
             {/* STOCK */}
 
             <div className="form-group">
-
               <label>Stock *</label>
 
               <input
@@ -403,9 +342,7 @@ navigate("/admin/products");
                 value={formData.stock}
                 onChange={handleChange}
               />
-
             </div>
-
 
             {/* DISCOUNT */}
 
@@ -424,11 +361,9 @@ navigate("/admin/products");
 
             </div> */}
 
-
             {/* IMAGE */}
 
             <div className="form-group full-width">
-
               <label>Image URL *</label>
 
               <input
@@ -437,38 +372,25 @@ navigate("/admin/products");
                 value={formData.image}
                 onChange={handleChange}
               />
-
             </div>
-
           </div>
-
         </div>
-
 
         {/* SIZES */}
 
         <div className="form-card">
-
           <div className="form-card-header">
-
             <h2>Sizes</h2>
 
-            <p>
-              Update available sizes.
-            </p>
-
+            <p>Update available sizes.</p>
           </div>
 
-
           <div className="tag-input">
-
             <input
               type="text"
               placeholder="e.g. M"
               value={sizeInput}
-              onChange={(e) =>
-                setSizeInput(e.target.value)
-              }
+              onChange={(e) => setSizeInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -477,66 +399,40 @@ navigate("/admin/products");
               }}
             />
 
-            <button
-              type="button"
-              onClick={addSize}
-            >
+            <button type="button" onClick={addSize}>
               <Plus size={16} />
               Add
             </button>
-
           </div>
 
-
           <div className="tags">
-
             {formData.sizes.map((size) => (
-              <span
-                className="tag"
-                key={size}
-              >
+              <span className="tag" key={size}>
                 {size}
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    removeSize(size)
-                  }
-                >
+                <button type="button" onClick={() => removeSize(size)}>
                   <X size={13} />
                 </button>
               </span>
             ))}
-
           </div>
-
         </div>
-
 
         {/* COLORS */}
 
         <div className="form-card">
-
           <div className="form-card-header">
-
             <h2>Colors</h2>
 
-            <p>
-              Update available colors.
-            </p>
-
+            <p>Update available colors.</p>
           </div>
 
-
           <div className="tag-input">
-
             <input
               type="text"
               placeholder="e.g. Black"
               value={colorInput}
-              onChange={(e) =>
-                setColorInput(e.target.value)
-              }
+              onChange={(e) => setColorInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -545,60 +441,36 @@ navigate("/admin/products");
               }}
             />
 
-            <button
-              type="button"
-              onClick={addColor}
-            >
+            <button type="button" onClick={addColor}>
               <Plus size={16} />
               Add
             </button>
-
           </div>
 
-
           <div className="tags">
-
             {formData.colors.map((color) => (
-              <span
-                className="tag"
-                key={color}
-              >
+              <span className="tag" key={color}>
                 {color}
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    removeColor(color)
-                  }
-                >
+                <button type="button" onClick={() => removeColor(color)}>
                   <X size={13} />
                 </button>
               </span>
             ))}
-
           </div>
-
         </div>
-
 
         {/* STATUS */}
 
         <div className="form-card">
-
           <div className="status-row">
-
             <div>
               <h2>Product Status</h2>
 
-              <p>
-                Active products are visible to
-                customers.
-              </p>
+              <p>Active products are visible to customers.</p>
             </div>
 
-
             <label className="switch">
-
               <input
                 type="checkbox"
                 name="isActive"
@@ -607,33 +479,19 @@ navigate("/admin/products");
               />
 
               <span className="slider"></span>
-
             </label>
-
           </div>
-
         </div>
-
 
         {/* MESSAGES */}
 
-        {error && (
-          <div className="form-message error">
-            {error}
-          </div>
-        )}
+        {error && <div className="form-message error">{error}</div>}
 
-        {success && (
-          <div className="form-message success">
-            {success}
-          </div>
-        )}
-
+        {success && <div className="form-message success">{success}</div>}
 
         {/* ACTIONS */}
 
         <div className="form-actions">
-
           <button
             type="button"
             className="cancel-button"
@@ -647,15 +505,10 @@ navigate("/admin/products");
             className="save-product-button"
             disabled={saving}
           >
-            {saving
-              ? "Updating Product..."
-              : "Update Product"}
+            {saving ? "Updating Product..." : "Update Product"}
           </button>
-
         </div>
-
       </form>
-
     </div>
   );
 };

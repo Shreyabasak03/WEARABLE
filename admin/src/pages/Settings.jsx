@@ -254,7 +254,9 @@ const Settings = () => {
       showMessage("Payment settings saved");
     } catch (err) {
       console.error("PAYMENT SETTINGS ERROR:", err);
-      showError(err.response?.data?.message || "Failed to save payment settings");
+      showError(
+        err.response?.data?.message || "Failed to save payment settings",
+      );
     } finally {
       setSaving(false);
     }
@@ -567,78 +569,78 @@ const Settings = () => {
           )}
 
           {/* SECURITY */}
-        {/* =================================================
+          {/* =================================================
     SECURITY
 ================================================= */}
-{activeSection === "security" && (
-  <div className="settings-card">
-    <div className="settings-card-header">
-      <div>
-        <h2>Security</h2>
-        <p>Manage your admin account password.</p>
-      </div>
-    </div>
+          {activeSection === "security" && (
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div>
+                  <h2>Security</h2>
+                  <p>Manage your admin account password.</p>
+                </div>
+              </div>
 
-    {/* Dedicated form container */}
-    <form 
-      className="settings-form" 
-      onSubmit={(e) => {
-        e.preventDefault();
-        updatePassword();
-      }}
-      autoComplete="off"
-    >
-      {/* Hidden dummy input to catch autofill */}
-      <input
-        type="text"
-        name="username"
-        autoComplete="username"
-        style={{ display: "none" }}
-        tabIndex="-1"
-        aria-hidden="true"
-        readOnly
-      />
+              {/* Dedicated form container */}
+              <form
+                className="settings-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  updatePassword();
+                }}
+                autoComplete="off"
+              >
+                {/* Hidden dummy input to catch autofill */}
+                <input
+                  type="text"
+                  name="username"
+                  autoComplete="username"
+                  style={{ display: "none" }}
+                  tabIndex="-1"
+                  aria-hidden="true"
+                  readOnly
+                />
 
-      <PasswordInput
-        label="Current Password"
-        value={currentPassword}
-        setValue={setCurrentPassword}
-        show={showCurrentPassword}
-        setShow={setShowCurrentPassword}
-        autoCompleteType="current-password"
-      />
+                <PasswordInput
+                  label="Current Password"
+                  value={currentPassword}
+                  setValue={setCurrentPassword}
+                  show={showCurrentPassword}
+                  setShow={setShowCurrentPassword}
+                  autoCompleteType="current-password"
+                />
 
-      <PasswordInput
-        label="New Password"
-        value={newPassword}
-        setValue={setNewPassword}
-        show={showNewPassword}
-        setShow={setShowNewPassword}
-        autoCompleteType="new-password"
-      />
+                <PasswordInput
+                  label="New Password"
+                  value={newPassword}
+                  setValue={setNewPassword}
+                  show={showNewPassword}
+                  setShow={setShowNewPassword}
+                  autoCompleteType="new-password"
+                />
 
-      <PasswordInput
-        label="Confirm New Password"
-        value={confirmPassword}
-        setValue={setConfirmPassword}
-        show={showConfirmPassword}
-        setShow={setShowConfirmPassword}
-        autoCompleteType="new-password"
-      />
+                <PasswordInput
+                  label="Confirm New Password"
+                  value={confirmPassword}
+                  setValue={setConfirmPassword}
+                  show={showConfirmPassword}
+                  setShow={setShowConfirmPassword}
+                  autoCompleteType="new-password"
+                />
 
-      <div className="settings-card-footer">
-        <button
-          type="submit"
-          className="save-button"
-          disabled={saving}
-        >
-          <Shield size={16} />
-          {saving ? "Updating..." : "Update Password"}
-        </button>
-      </div>
-    </form>
-  </div>
-)}
+                <div className="settings-card-footer">
+                  <button
+                    type="submit"
+                    className="save-button"
+                    disabled={saving}
+                  >
+                    <Shield size={16} />
+                    {saving ? "Updating..." : "Update Password"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
           {/* PAYMENTS */}
           {activeSection === "payments" && (
             <div className="settings-card">

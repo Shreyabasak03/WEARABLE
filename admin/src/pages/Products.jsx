@@ -2,17 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Search,
-  Plus,
-  Package,
-  Edit,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { Search, Plus, Package, Edit, Trash2, Eye } from "lucide-react";
 
 import "./Products.css";
-
 
 const Products = () => {
   const navigate = useNavigate();
@@ -25,7 +17,6 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   // ==========================================
   // GET PRODUCTS FROM BACKEND
   // ==========================================
@@ -35,9 +26,7 @@ const Products = () => {
       setLoading(true);
       setError("");
 
-      const response = await axios.get(
-        "/products"
-      );
+      const response = await axios.get("/products");
 
       // console.log("Products received:", response.data);
 
@@ -45,10 +34,7 @@ const Products = () => {
     } catch (err) {
       console.error("Failed to fetch products:", err);
 
-      setError(
-        err.response?.data?.message ||
-          "Failed to load products."
-      );
+      setError(err.response?.data?.message || "Failed to load products.");
     } finally {
       setLoading(false);
     }
@@ -81,58 +67,43 @@ const Products = () => {
   // ==========================================
   // FILTER PRODUCTS
   // ==========================================
-const handleDelete = async (productId) => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this product?"
-  );
-
-  if (!confirmed) return;
-
-  try {
-    await axios.delete(
-      `/products/${productId}`
+  const handleDelete = async (productId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?",
     );
 
-    // Remove the product from the current UI
-    setProducts((prevProducts) =>
-      prevProducts.filter(
-        (product) => product._id !== productId
-      )
-    );
+    if (!confirmed) return;
 
-  } catch (err) {
-    console.error("Failed to delete product:", err);
+    try {
+      await axios.delete(`/products/${productId}`);
 
-    alert(
-      err.response?.data?.message ||
-        "Failed to delete product."
-    );
-  }
-};
+      // Remove the product from the current UI
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product._id !== productId),
+      );
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+
+      alert(err.response?.data?.message || "Failed to delete product.");
+    }
+  };
 
   const filteredProducts = products.filter((product) => {
     const status = getProductStatus(product.stock);
 
-    const matchesSearch =
-      product.name
-        ?.toLowerCase()
-        .includes(search.toLowerCase());
+    const matchesSearch = product.name
+      ?.toLowerCase()
+      .includes(search.toLowerCase());
 
     const matchesCategory =
       categoryFilter === "All Categories" ||
       product.category === categoryFilter;
 
     const matchesStatus =
-      statusFilter === "All Status" ||
-      status === statusFilter;
+      statusFilter === "All Status" || status === statusFilter;
 
-    return (
-      matchesSearch &&
-      matchesCategory &&
-      matchesStatus
-    );
+    return matchesSearch && matchesCategory && matchesStatus;
   });
-
 
   // ==========================================
   // LOADING
@@ -145,9 +116,7 @@ const handleDelete = async (productId) => {
           <div>
             <h1>Products</h1>
 
-            <p>
-              Manage your store products and inventory.
-            </p>
+            <p>Manage your store products and inventory.</p>
           </div>
         </div>
 
@@ -177,15 +146,10 @@ const handleDelete = async (productId) => {
           <div>
             <h1>Products</h1>
 
-            <p>
-              Manage your store products and inventory.
-            </p>
+            <p>Manage your store products and inventory.</p>
           </div>
 
-          <button
-            className="add-product-button"
-            onClick={fetchProducts}
-          >
+          <button className="add-product-button" onClick={fetchProducts}>
             Retry
           </button>
         </div>
@@ -211,65 +175,48 @@ const handleDelete = async (productId) => {
 
   return (
     <div className="products-page">
-
       {/* HEADER */}
 
       <div className="products-header">
-
         <div>
           <h1>Products</h1>
 
-          <p>
-            Manage your store products and inventory.
-          </p>
+          <p>Manage your store products and inventory.</p>
         </div>
-<button
-  className="add-product-button"
-  onClick={() => navigate("/admin/products/add")}
->
+        <button
+          className="add-product-button"
+          onClick={() => navigate("/admin/products/add")}
+        >
           <Plus size={18} />
-          
           Add Product
         </button>
-
       </div>
-
 
       {/* PRODUCTS CARD */}
 
       <div className="products-card">
-
         {/* TOOLBAR */}
 
         <div className="products-toolbar">
-
           {/* SEARCH */}
 
           <div className="product-search">
-
             <Search size={17} />
 
             <input
               type="text"
               placeholder="Search products..."
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              onChange={(e) => setSearch(e.target.value)}
             />
-
           </div>
-
 
           {/* FILTERS */}
 
           <div className="product-filters">
-
             <select
               value={categoryFilter}
-              onChange={(e) =>
-                setCategoryFilter(e.target.value)
-              }
+              onChange={(e) => setCategoryFilter(e.target.value)}
             >
               <option>All Categories</option>
 
@@ -282,12 +229,9 @@ const handleDelete = async (productId) => {
               <option>Children</option>
             </select>
 
-
             <select
               value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
-              }
+              onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option>All Status</option>
 
@@ -297,22 +241,15 @@ const handleDelete = async (productId) => {
 
               <option>Out of Stock</option>
             </select>
-
           </div>
-
         </div>
-
 
         {/* TABLE */}
 
         <div className="products-table-wrapper">
-
           <table className="products-table">
-
             <thead>
-
               <tr>
-
                 <th>Product</th>
 
                 <th>Category</th>
@@ -324,38 +261,22 @@ const handleDelete = async (productId) => {
                 <th>Status</th>
 
                 <th>Action</th>
-
               </tr>
-
             </thead>
 
-
             <tbody>
-
               {filteredProducts.length > 0 ? (
-
                 filteredProducts.map((product) => {
-
-                  const status = getProductStatus(
-                    product.stock
-                  );
+                  const status = getProductStatus(product.stock);
 
                   return (
-
-                    <tr
-                      key={product._id}
-                    >
-
+                    <tr key={product._id}>
                       {/* PRODUCT */}
 
                       <td>
-
                         <div className="product-info">
-
                           <div className="product-image">
-
                             {product.image ? (
-
                               <img
                                 src={product.image}
                                 alt={product.name}
@@ -366,86 +287,56 @@ const handleDelete = async (productId) => {
                                   borderRadius: "8px",
                                 }}
                               />
-
                             ) : (
-
                               <Package size={20} />
-
                             )}
-
                           </div>
-
 
                           <div>
-
-                            <h4>
-                              {product.name}
-                            </h4>
+                            <h4>{product.name}</h4>
 
                             <span>
-                              ID: #
-                              {product._id
-                                ?.slice(-6)
-                                .toUpperCase()}
+                              ID: #{product._id?.slice(-6).toUpperCase()}
                             </span>
-
                           </div>
-
                         </div>
-
                       </td>
-
 
                       {/* CATEGORY */}
 
                       <td>
-
                         <span className="category-text">
                           {product.category}
                         </span>
-
                       </td>
-
 
                       {/* PRICE */}
 
                       <td>
-
                         <span className="product-price">
-
-                          ₹
-                          {Number(
-                            product.price
-                          ).toLocaleString("en-IN")}
-
+                          ₹{Number(product.price).toLocaleString("en-IN")}
                         </span>
-
                       </td>
-
 
                       {/* STOCK */}
 
                       <td>
-
                         <span
                           className={`stock-value ${
                             product.stock <= 5
                               ? "stock-danger"
                               : product.stock <= 10
-                              ? "stock-warning"
-                              : ""
+                                ? "stock-warning"
+                                : ""
                           }`}
                         >
                           {product.stock}
                         </span>
-
                       </td>
-
 
                       {/* STATUS */}
 
                       <td>
-
                         <span
                           className={`product-status ${status
                             .toLowerCase()
@@ -453,57 +344,44 @@ const handleDelete = async (productId) => {
                         >
                           {status}
                         </span>
-
                       </td>
-
 
                       {/* ACTIONS */}
 
                       <td>
-
                         <div className="product-actions">
-
-                        <button
-  title="View"
-  onClick={() =>
-    navigate(`/admin/products/view/${product._id}`)
-  }
->
-  <Eye size={16} />
-</button>
-
-
-                    <button
-  title="Edit"
-  onClick={() =>
-    navigate(`/admin/products/edit/${product._id}`)
-  }
->
-  <Edit size={16} />
-</button>
+                          <button
+                            title="View"
+                            onClick={() =>
+                              navigate(`/admin/products/view/${product._id}`)
+                            }
+                          >
+                            <Eye size={16} />
+                          </button>
 
                           <button
-  className="delete-action"
-  title="Delete"
-  onClick={() => handleDelete(product._id)}
->
-  <Trash2 size={16} />
-</button>
+                            title="Edit"
+                            onClick={() =>
+                              navigate(`/admin/products/edit/${product._id}`)
+                            }
+                          >
+                            <Edit size={16} />
+                          </button>
 
+                          <button
+                            className="delete-action"
+                            title="Delete"
+                            onClick={() => handleDelete(product._id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-
                       </td>
-
                     </tr>
-
                   );
-
                 })
-
               ) : (
-
                 <tr>
-
                   <td
                     colSpan="6"
                     style={{
@@ -514,52 +392,28 @@ const handleDelete = async (productId) => {
                   >
                     No products found.
                   </td>
-
                 </tr>
-
               )}
-
             </tbody>
-
           </table>
-
         </div>
-
 
         {/* FOOTER */}
 
         <div className="products-footer">
-
           <span>
-
-            Showing{" "}
-            {filteredProducts.length}{" "}
-            of{" "}
-            {products.length} products
-
+            Showing {filteredProducts.length} of {products.length} products
           </span>
 
-
           <div className="pagination">
+            <button disabled>Previous</button>
 
-            <button disabled>
-              Previous
-            </button>
+            <button className="active-page">1</button>
 
-            <button className="active-page">
-              1
-            </button>
-
-            <button>
-              Next
-            </button>
-
+            <button>Next</button>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -5,12 +5,7 @@ import adminApi from "../api/axios";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
-import {
-  X,
-  ShoppingBag,
-  Package,
-  UserPlus,
-} from "lucide-react";
+import { X, ShoppingBag, Package, UserPlus } from "lucide-react";
 
 import "./AdminLayout.css";
 

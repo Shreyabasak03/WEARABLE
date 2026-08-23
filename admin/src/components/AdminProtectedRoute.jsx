@@ -3,10 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const AdminProtectedRoute = () => {
-  const {
-    user,
-    loading,
-  } = useAuth();
+  const { user, loading } = useAuth();
 
   // ==========================================
   // CHECKING AUTHENTICATION
@@ -34,12 +31,7 @@ const AdminProtectedRoute = () => {
   // ==========================================
 
   if (!user) {
-    return (
-      <Navigate
-        to="/admin/login"
-        replace
-      />
-    );
+    return <Navigate to="/admin/login" replace />;
   }
 
   // ==========================================
@@ -47,12 +39,7 @@ const AdminProtectedRoute = () => {
   // ==========================================
 
   if (user.role !== "admin") {
-    return (
-      <Navigate
-        to="/admin/login"
-        replace
-      />
-    );
+    return <Navigate to="/admin/login" replace />;
   }
 
   // ==========================================
