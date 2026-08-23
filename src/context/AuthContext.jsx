@@ -5,11 +5,9 @@ import React, {
   useState,
 } from "react";
 
-import axios from "axios";
+import api from "../api/api"; // Adjust import path if needed
 
 const AuthContext = createContext();
-
-const API_URL = "http://localhost:5001/api/auth";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -20,13 +18,7 @@ export const AuthProvider = ({ children }) => {
   // ===============================
   const checkAuth = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}/me`,
-        {
-          withCredentials: true,
-        }
-      );
-
+      const response = await api.get("/auth/me");
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
@@ -43,20 +35,13 @@ export const AuthProvider = ({ children }) => {
   // REGISTER
   // ===============================
   const register = async (name, email, password) => {
-    const response = await axios.post(
-      `${API_URL}/register`,
-      {
-        name,
-        email,
-        password,
-      },
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+    });
 
     setUser(response.data.user);
-
     return response.data;
   };
 
@@ -64,19 +49,12 @@ export const AuthProvider = ({ children }) => {
   // LOGIN
   // ===============================
   const login = async (email, password) => {
-    const response = await axios.post(
-      `${API_URL}/login`,
-      {
-        email,
-        password,
-      },
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+    });
 
     setUser(response.data.user);
-
     return response.data;
   };
 
@@ -84,14 +62,7 @@ export const AuthProvider = ({ children }) => {
   // LOGOUT
   // ===============================
   const logout = async () => {
-    await axios.post(
-      `${API_URL}/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-
+    await api.post("/auth/logout", {});
     setUser(null);
   };
 

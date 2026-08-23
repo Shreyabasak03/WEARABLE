@@ -1,26 +1,19 @@
-// services/api.js
-
-import axios from "axios";
-
-const API_URL = "http://localhost:5001/api/products";
+import api from "./api"; // adjust path if api instance is in ../api/api
 
 // ==========================================
 // GET ALL PRODUCTS
 // ==========================================
 
 export const getProducts = async () => {
-  const response = await axios.get(API_URL);
-
-  return response.data.products;
+  const response = await api.get("/products");
+  return response.data.products || response.data;
 };
-
 
 // ==========================================
 // GET SINGLE PRODUCT
 // ==========================================
 
 export const getSingleProduct = async (id) => {
-  const response = await axios.get(`${API_URL}/${id}`);
-
-  return response.data.product;
+  const response = await api.get(`/products/${id}`);
+  return response.data.product || response.data;
 };
