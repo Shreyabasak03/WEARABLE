@@ -1718,6 +1718,10 @@ select {
     .feature-item p {
         font-size: 12px;
     }
+
+    .scroll-container {
+    height: 180vh; /* Shorter scroll threshold for touch devices */
+  }
 }
 
 

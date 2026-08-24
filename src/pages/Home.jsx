@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 import ProductDetails from '../components/ProductDetails';
-import { getProductsByCategory } from '../api/ProductsApi.js';
+import { getAllProducts } from '../api/ProductsApi.js';
 import { useCart } from '../context/cartContext.jsx';
 import './Home.css';
 
@@ -30,17 +30,20 @@ export default function ScrollSequence() {
 
   const { addToCart } = useCart();
 
-  // 1. Fetch dynamic products from the API (Same logic as Men.jsx)
+  // 1. Fetch newly added products from MongoDB
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const [shirts, shoes, watches] = await Promise.all([
-          getProductsByCategory("mens-shirts"),
-          getProductsByCategory("mens-shoes"),
-          getProductsByCategory("mens-watches"),
-        ]);
+        setLoading(true);
+        const data = await getAllProducts();
+        const allProducts = Array.isArray(data) ? data : data?.products || [];
 
-        setProducts([...shirts, ...shoes, ...watches]);
+        // Sort by newest first (using createdAt or _id timestamp) and take the latest 8-10 items
+        const newlyAdded = [...allProducts]
+          .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+          .slice(0, 10);
+
+        setProducts(newlyAdded);
       } catch (err) {
         console.error("Error loading trending products:", err);
       } finally {
@@ -62,7 +65,6 @@ export default function ScrollSequence() {
 
       if (totalScrollableHeight <= 0) return;
 
-      // Calculate progress clamped strictly between 0 and 1
       const progress = Math.min(
         Math.max(-rect.top / totalScrollableHeight, 0),
         1
@@ -103,10 +105,10 @@ export default function ScrollSequence() {
   // Categories Data
   const categories = [
     {
-      name: "Women's Collection",
+      name: "Kids's Collection",
       image:
-        'https://plus.unsplash.com/premium_photo-1683817138638-d3d2d0626f71?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      link: '/women',
+        'https://images.unsplash.com/photo-1566454544259-f4b94c3d758c?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      link: '/kids',
     },
     {
       name: 'Dresses & Tops',
@@ -178,12 +180,11 @@ export default function ScrollSequence() {
       {/* SCROLL SEQUENCE ANIMATION SECTION */}
       <section className="scroll-container" ref={containerRef}>
         <div className="sticky-viewport">
-          {/* Phase 1: Text Layer */}
           <div
             className="hero-text-layer"
             style={{ opacity: Math.max(1 - zoomProgress * 1.5, 0) }}
           >
-            <span className="subtitle">the ESSENCE of VERO</span>
+            <span className="subtitle">the ESSENCE of WEARABLE</span>
             <h1>
               <span className="italic-text">where</span> INNOVATION
               <br />
@@ -191,7 +192,6 @@ export default function ScrollSequence() {
             </h1>
           </div>
 
-          {/* Phase 2: Zoom Container */}
           <div
             className="zooming-image-wrapper"
             style={{
@@ -207,7 +207,6 @@ export default function ScrollSequence() {
               className="full-cover-img"
             />
 
-            {/* Phase 3: Wipe Overlay */}
             <div
               className="wipe-image-layer"
               style={{
@@ -256,10 +255,9 @@ export default function ScrollSequence() {
         <div className="section-header-slider">
           <div className="header-text">
             <h2>Trending Arrivals</h2>
-            <p>Discover our top-rated fashion pieces of the week</p>
+            <p>Discover our newest fashion arrivals</p>
           </div>
 
-          {/* Slider Controls */}
           <div className="slider-controls">
             <button
               className="nav-btn prev-btn"
@@ -285,51 +283,59 @@ export default function ScrollSequence() {
               <h3>Loading Trending Arrivals...</h3>
             </div>
           ) : products.length > 0 ? (
-            products.map((product) => (
-              <div className="slider-card" key={product.id}>
-                <div className="card-media">
-                  <img 
-                    src={product.thumbnail || product.images?.[0]} 
-                    alt={product.title} 
-                    loading="lazy" 
-                  />
+            products.map((product) => {
+              const productId = product._id || product.id;
+              const productName = product.name || product.title || 'Product';
+              const productImage = product.image || product.thumbnail || product.images?.[0] || '';
+              const productPrice = Number(product.price || 0);
 
-                  {/* Quick Action Overlay */}
-                  <div className="media-overlay">
-                    <button
-                      className="quick-action-btn"
-                      onClick={() => setSelectedProduct(product)}
-                      title="Quick View Modal"
-                    >
-                      <Eye size={18} /> Quick View
-                    </button>
-                    <button
-                      className="quick-action-btn primary"
-                      onClick={() => addToCart(product, 1)}
-                      title="Add to Cart"
-                    >
-                      <ShoppingCart size={18} /> Add
-                    </button>
+              return (
+                <div className="slider-card" key={productId}>
+                  <div className="card-media">
+                    <img 
+                      src={productImage} 
+                      alt={productName} 
+                      loading="lazy" 
+                    />
+
+                    {/* Quick Action Overlay */}
+                    <div className="media-overlay">
+                      <button
+                        className="quick-action-btn"
+                        onClick={() => setSelectedProduct(product)}
+                        title="Quick View Modal"
+                      >
+                        <Eye size={18} /> Quick View
+                      </button>
+                      <button
+                        className="quick-action-btn primary"
+                        onClick={() => addToCart(product, 1)}
+                        title="Add to Cart"
+                        disabled={product.stock <= 0}
+                      >
+                        <ShoppingCart size={18} /> {product.stock > 0 ? 'Add' : 'Out of Stock'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="card-info">
+                    <span className="card-brand">{product.brand || product.category || 'Wearable'}</span>
+                    <h3 className="card-title">{productName}</h3>
+                    <div className="card-bottom">
+                      <span className="card-price">
+                        ₹{productPrice.toLocaleString('en-IN')}
+                      </span>
+                      <button
+                        className="details-link-btn"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        Details &rarr;
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="card-info">
-                  <span className="card-brand">{product.brand || 'Wearable'}</span>
-                  <h3 className="card-title">{product.title}</h3>
-                  <div className="card-bottom">
-                    <span className="card-price">
-                      ${Number(product.price).toFixed(2)}
-                    </span>
-                    <button
-                      className="details-link-btn"
-                      onClick={() => setSelectedProduct(product)}
-                    >
-                      Details &rarr;
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <h3>No products available</h3>
           )}
@@ -347,7 +353,7 @@ export default function ScrollSequence() {
         <div className="feature-item">
           <Truck size={32} />
           <h4>Free Express Delivery</h4>
-          <p>On all orders over $99</p>
+          <p>On all orders over ₹999</p>
         </div>
 
         <div className="feature-item">

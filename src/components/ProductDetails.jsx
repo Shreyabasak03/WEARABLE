@@ -138,25 +138,7 @@ export default function ProductDetails({
           )}
 
 
-          {/* ====================================
-              RATING
-          ==================================== */}
-
-          <div className="details-rating">
-
-            <Star
-              size={18}
-              fill="#FFD700"
-              color="#FFD700"
-            />
-
-            <span>
-              {product.rating
-                ? `${product.rating} / 5`
-                : "No rating yet"}
-            </span>
-
-          </div>
+         
 
 
           {/* ====================================

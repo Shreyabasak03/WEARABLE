@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import ProductDetails from "../components/ProductDetails";
-import { getProductsByCategory } from "../api/ProductsApi";
+import { getAllProducts } from "../api/ProductsApi";
 import { useCart } from "../context/cartContext";
 
 export default function Search() {
@@ -19,34 +19,36 @@ export default function Search() {
     const fetchAndFilterProducts = async () => {
       setLoading(true);
       try {
-        // Fetch all categories to search across the catalog
-        const [shirts, shoes, watches] = await Promise.all([
-          getProductsByCategory("mens-shirts"),
-          getProductsByCategory("mens-shoes"),
-          getProductsByCategory("mens-watches"),
-        ]);
+        // 1. Fetch all products from your database
+        const allProducts = (await getAllProducts()) || [];
 
-        const allProducts = [...shirts, ...shoes, ...watches];
+        // 2. Filter across name, description, category, and brand
+        const searchLower = query.toLowerCase().trim();
 
-        // Filter by title, brand, or category
         const filtered = allProducts.filter((item) => {
-          const searchLower = query.toLowerCase();
+          const name = (item.name || item.title || "").toLowerCase();
+          const brand = (item.brand || "").toLowerCase();
+          const category = (item.category || "").toLowerCase();
+          const description = (item.description || "").toLowerCase();
+
           return (
-            item.title?.toLowerCase().includes(searchLower) ||
-            item.brand?.toLowerCase().includes(searchLower) ||
-            item.category?.toLowerCase().includes(searchLower)
+            name.includes(searchLower) ||
+            brand.includes(searchLower) ||
+            category.includes(searchLower) ||
+            description.includes(searchLower)
           );
         });
 
         setProducts(filtered);
       } catch (err) {
         console.error("Error searching products:", err);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (query) {
+    if (query.trim()) {
       fetchAndFilterProducts();
     } else {
       setProducts([]);
@@ -61,12 +63,12 @@ export default function Search() {
       </h2>
 
       {loading ? (
-        <h3>Searching products...</h3>
+        <h3 style={{ marginTop: "20px" }}>Searching products...</h3>
       ) : products.length > 0 ? (
         <div className="cards-container" style={{ marginTop: "30px" }}>
           {products.map((product) => (
             <ProductCard
-              key={product.id}
+              key={product._id || product.id}
               product={product}
               onViewDetails={setSelectedProduct}
             />
@@ -75,7 +77,9 @@ export default function Search() {
       ) : (
         <div style={{ marginTop: "40px", textAlign: "center" }}>
           <h3>No products found matching "{query}"</h3>
-          <p>Try searching for terms like "shirt", "shoes", or "watch".</p>
+          <p style={{ color: "#666", marginTop: "8px" }}>
+            Try searching with different keywords like shirts, pants, or brand names.
+          </p>
         </div>
       )}
 

@@ -296,3 +296,33 @@
     font-size: 22px;
   }
 }
+
+/* --- SIZES & COLORS OPTIONS STYLING --- */
+.product-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Provides spacing between size/color tags */
+  margin-top: 8px;
+}
+
+.option-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d5f54;
+  background: #eef8f6;
+  border: 1px solid #c9e4df;
+  border-radius: 8px;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.option-tag:hover {
+  background: #2aae9b;
+  color: #ffffff;
+  border-color: #2aae9b;
+}
