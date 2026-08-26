@@ -353,7 +353,7 @@ export default function ScrollSequence() {
         <div className="feature-item">
           <Truck size={32} />
           <h4>Free Express Delivery</h4>
-          <p>On all orders over ₹999</p>
+          <p>On all orders </p>
         </div>
 
         <div className="feature-item">

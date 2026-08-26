@@ -183,7 +183,7 @@ export default function OrderHistory() {
                             <span>Quantity: {quantity}</span>
                           </div>
                           <div className="order-product-price">
-                            ${(Number(price) * Number(quantity)).toFixed(2)}
+                            ₹{(Number(price) * Number(quantity)).toFixed(2)}
                           </div>
                         </div>
                       );
